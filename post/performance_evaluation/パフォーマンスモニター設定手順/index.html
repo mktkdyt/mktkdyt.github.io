@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>パフォーマンスモニター設定手順</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">パフォーマンスモニター設定手順</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>パフォーマンスモニター設定手順</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="パフォーマンスモニター設定手順">パフォーマンスモニター設定手順</h1>
+<p>Webサーバー，DBサーバーで実施する。</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li><a href="#%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%BC%E8%A8%AD%E5%AE%9A%E6%89%8B%E9%A0%86">パフォーマンスモニター設定手順</a>
+<ul>
+<li><a href="#%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E4%BD%9C%E6%88%90">カウンター作成</a>
+<ul>
+<li><a href="#perfmoncreaterbat">perfMonCreater.bat</a></li>
+<li><a href="#counter_listtxt">counter_list.txt</a></li>
+</ul>
+</li>
+<li><a href="#%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E7%A2%BA%E8%AA%8D">カウンター確認</a></li>
+<li><a href="#%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E5%AE%9F%E8%A1%8C">カウンター実行</a></li>
+</ul>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<h2 id="カウンター作成">カウンター作成</h2>
+<p>下記ファイルをWebサーバーの任意のディレクトリに配置する。</p>
+<ul>
+<li>perfMonCreater.bat</li>
+<li>counter_list.txt</li>
+</ul>
+<p>管理者権限で perfMonCreater.bat を実行する。</p>
+<h3 id="perfmoncreaterbat">perfMonCreater.bat</h3>
+<ul>
+<li>logman コマンドでカウンターを作成する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bat" data-lang="bat"><span style="color:#75715e">REM -m start stop    開始，終了を手動にする。</span>
+<span style="color:#75715e">REM -f bin           ログの形式を指定する。</span>
+<span style="color:#75715e">REM -v mmddhhmm      ログのファイル名のサフィックスを日時にする。</span>
+<span style="color:#75715e">REM -si 10           サンプリング間隔を 10 秒に設定する。</span>
+<span style="color:#75715e">REM -cf              収集するパフォーマンスカウンターをファイルで指定する。</span>
+logman create counter PerfMon -m start stop -f bin -v mmddhhmm -si 10 -cf .\counter_list.txt
+@<span style="color:#66d9ef">pause</span>
+</code></pre></div><h3 id="counter_listtxt">counter_list.txt</h3>
+<ul>
+<li>取得したいパフォーマンスカウンターのリスト。</li>
+<li>Webで IIS や ASP.NET, WebEOC のメトリクスを取得する。</li>
+<li>DBで SQL Server のメトリクスを取得する。</li>
+<li>共通で CPU や メモリのメトリクスを取得する。</li>
+</ul>
+<!-- raw HTML omitted -->
+<pre><code>\Paging File(*)\% Usage
+\Processor(*)\% Processor Time
+\Processor(*)\% User Time
+\Processor(*)\% Privileged Time
+\Processor(*)\% Interrupt Time
+\Processor(*)\% DPC Time
+\Processor(*)\% Idle Time
+\Processor(*)\Interrupts/sec
+\Processor Information(*)\% Processor Time
+\Processor Information(*)\% User Time
+\Processor Information(*)\% Privileged Time
+\Memory\Available Bytes
+\Memory\Commit Limit
+\Memory\Committed Bytes
+\Memory\Pages Input/sec
+\Memory\Pages Output/sec
+\Memory\Page Faults/sec
+\LogicalDisk(*)\% Disk Time
+\LogicalDisk(*)\Disk Reads/sec
+\LogicalDisk(*)\Disk Writes/sec
+\LogicalDisk(*)\Disk Read Bytes/sec
+\LogicalDisk(*)\Disk Write Bytes/sec
+\LogicalDisk(*)\Current Disk Queue Length
+\LogicalDisk(*)\% Free Space
+\LogicalDisk(*)\Free Megabytes
+\LogicalDisk(*)\% Idle Time
+\PhysicalDisk(*)\% Disk Time
+\PhysicalDisk(*)\Disk Reads/sec
+\PhysicalDisk(*)\Disk Writes/sec
+\PhysicalDisk(*)\Disk Read Bytes/sec
+\PhysicalDisk(*)\Disk Write Bytes/sec
+\PhysicalDisk(*)\Current Disk Queue Length
+\PhysicalDisk(*)\% Idle Time
+\Network Interface(*)\Bytes Received/sec
+\Network Interface(*)\Bytes Sent/sec
+\Process(*)\ID Process
+\Process(*)\% User Time
+\Process(*)\Page File Bytes
+\Process(*)\Page Faults/sec
+\Process(*)\IO Read Bytes/sec
+\Process(*)\IO Read Operations/sec
+\Process(*)\IO Write Bytes/sec
+\Process(*)\IO Write Operations/sec
+\Process(*)\Thread Count
+\Process(*)\Private Bytes
+\Process(*)\Virtual Bytes
+\Process(*)\Working Set
+\Process(*)\Handle Count
+\Server\*
+\System\*
+\Cache\Data Map Hits %
+\Network Interface(*)\*
+\Objects\*
+\WAS_W3WP(*)\*
+\W3SVC_W3WP(*)\*
+\ASP.NET\*
+\ASP.NET Applications(*)\*
+\ASP.NET v4.0.30319\*
+\ASP.NET Apps v4.0.30319(*)\*
+\ASP.NET v2.0.50727\*
+\ASP.NET Apps v2.0.50727(*)\*
+\ASP.NET State Service\*
+\WebEOC(*)\*
+</code></pre><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<pre><code>\Paging File(*)\% Usage
+\Processor(*)\% Processor Time
+\Processor(*)\% User Time
+\Processor(*)\% Privileged Time
+\Processor(*)\% Interrupt Time
+\Processor(*)\% DPC Time
+\Processor(*)\% Idle Time
+\Processor(*)\Interrupts/sec
+\Processor Information(*)\% Processor Time
+\Processor Information(*)\% User Time
+\Processor Information(*)\% Privileged Time
+\Memory\Available Bytes
+\Memory\Commit Limit
+\Memory\Committed Bytes
+\Memory\Pages Input/sec
+\Memory\Pages Output/sec
+\Memory\Page Faults/sec
+\LogicalDisk(*)\% Disk Time
+\LogicalDisk(*)\Disk Reads/sec
+\LogicalDisk(*)\Disk Writes/sec
+\LogicalDisk(*)\Disk Read Bytes/sec
+\LogicalDisk(*)\Disk Write Bytes/sec
+\LogicalDisk(*)\Current Disk Queue Length
+\LogicalDisk(*)\% Free Space
+\LogicalDisk(*)\Free Megabytes
+\LogicalDisk(*)\% Idle Time
+\PhysicalDisk(*)\% Disk Time
+\PhysicalDisk(*)\Disk Reads/sec
+\PhysicalDisk(*)\Disk Writes/sec
+\PhysicalDisk(*)\Disk Read Bytes/sec
+\PhysicalDisk(*)\Disk Write Bytes/sec
+\PhysicalDisk(*)\Current Disk Queue Length
+\PhysicalDisk(*)\% Idle Time
+\Network Interface(*)\Bytes Received/sec
+\Network Interface(*)\Bytes Sent/sec
+\Process(*)\ID Process
+\Process(*)\% User Time
+\Process(*)\Page File Bytes
+\Process(*)\Page Faults/sec
+\Process(*)\IO Read Bytes/sec
+\Process(*)\IO Read Operations/sec
+\Process(*)\IO Write Bytes/sec
+\Process(*)\IO Write Operations/sec
+\Process(*)\Thread Count
+\Process(*)\Private Bytes
+\Process(*)\Virtual Bytes
+\Process(*)\Working Set
+\Process(*)\Handle Count
+\Server\*
+\System\*
+\Cache\Data Map Hits %
+\Network Interface(*)\*
+\Objects\*
+\SQL Server 2016 XTP Databases(*)\*
+\SQL Server 2016 XTP Cursors(*)\*
+\SQL Server 2016 XTP Phantom Processor(*)\*
+\SQL Server 2016 XTP Garbage Collection(*)\*
+\SQL Server 2016 XTP Transaction Log(*)\*
+\SQL Server 2016 XTP Storage(*)\*
+\SQL Server 2016 XTP Transactions(*)\*
+\SQL Server 2016 XTP IO Governor(*)\*
+\MSRS 2016 Web Service(*)\*
+\SQLServer:SSIS Pipeline 13.0\*
+\SQLServer:Memory Broker Clerks(*)\*
+\SQLServer:Buffer Manager\*
+\SQLServer:Buffer Node(*)\*
+\SQLServer:General Statistics\*
+\SQLServer:Locks(*)\*
+\SQLServer:Databases(*)\*
+\SQLServer:LogPool FreePool(*)\*
+\SQLServer:Database Mirroring(*)\*
+\SQLServer:Database Replica(*)\*
+\SQLServer:Availability Replica(*)\*
+\SQLServer:Latches\*
+\SQLServer:Access Methods\*
+\SQLServer:SQL Errors(*)\Errors/sec
+\SQLServer:SQL Statistics\*
+\SQLServer:Memory Manager\*
+\SQLServer:Transactions\*
+\SQLServer:Broker Statistics\*
+\SQLServer:Broker/DBM Transport\*
+\SQLServer:Broker Activation(*)\*
+\SQLServer:Broker TO Statistics\*
+\SQLServer:Wait Statistics(*)\*
+\SQLServer:Workload Group Stats(*)\*
+\SQLServer:Resource Pool Stats(*)\*
+\SQLServer:FileTable\*
+</code></pre><!-- raw HTML omitted -->
+<h2 id="カウンター確認">カウンター確認</h2>
+<p>パフォーマンスモニターを起動する。
+パフォーマンス\データコレクターセット\ユーザー定義 にカウンターが追加される。</p>
+<h2 id="カウンター実行">カウンター実行</h2>
+<p>パフォーマンス\データコレクターセット\ユーザー定義 でカウンターをクリックする。
+▶アイコンをクリックする。
+停止する場合は■アイコンをクリックする。
+ログは C:\PerfLogs\Admin に .blg 形式で保存される。
+.blg を開くとパフォーマンスモニターで結果を確認出来る。</p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

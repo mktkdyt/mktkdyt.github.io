@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>JMeter Tips</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">JMeter Tips</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>JMeter Tips</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="jmeter-tips">JMeter Tips</h1>
+<h2 id="grafana-で-jmeter-のメトリクスを表示する">Grafana で JMeter のメトリクスを表示する</h2>
+<ul>
+<li>JMeter シナリオに Backend Listener を追加することで JMeter -&gt; InfluxDB -&gt; Grafana という流れで Grafana で JMeter メトリクスをリアルタイムで可視化出来る。</li>
+<li>Grafana で JMeter のメトリクスを描画するには InfluxDB にデータを送信するように JMeter シナリオに Backend Listener を追加する。
+<ul>
+<li>テスト計画を右クリックし，追加\リスナー\Backend Listener を選択する。</li>
+<li>Backend Listener implemantation で org.apache.jmeter.visualizers.backend.influxdb.influxdbBackendListenerClient を選択する。
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>influxdbUrl</td>
+<td>http://127.0.0.1:8086/write?db=jmeter</td>
+</tr>
+<tr>
+<td>summaryOnly</td>
+<td>true</td>
+</tr>
+<tr>
+<td>application</td>
+<td>webeoc</td>
+</tr>
+<tr>
+<td>measurement</td>
+<td>jmeter</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</li>
+<li>Grafana でトランザクションごとにグラフを描画出来るように HTTP リクエストの名前を適宜設定する。</li>
+</ul>
+<h2 id="1シナリオで複数のシナリオを実行する">1シナリオで複数のシナリオを実行する</h2>
+<ul>
+<li>テスト計画に複数のスレッドグループを追加し，スレッドグループを別々に実行 のチェックを外す。
+<ul>
+<li>Run Thread Groups consecutively の誤訳が スレッドグループを別々に実行 となっている。</li>
+<li>正しくはスレッドグループを連続で実行。</li>
+</ul>
+</li>
+<li>例：1シナリオで複数ユーザによる登録，複数ユーザによる画面リロードを同時実行する。</li>
+</ul>
+<h2 id="パラメータの受け渡し">パラメータの受け渡し</h2>
+<ul>
+<li>正規表現抽出を HTTPリクエスト に追加し正規表現で抽出した値を変数に格納し別の HTTPリクエスト で変数を参照する。</li>
+<li>例：CSRF値</li>
+</ul>
+<h2 id="一定間隔でリクエストを送信する">一定間隔でリクエストを送信する</h2>
+<ul>
+<li>ループコントローラに定数タイマを追加すると配下の各リクエストでタイマが作動してしまう。</li>
+<li>ループコントローラの先頭のリクエストの下に定数タイマを追加することで1ループあたり1回だけタイマが作動し一定間隔でリクエストを送信出来る。</li>
+<li>例：一定間隔で画面更新を行う。</li>
+</ul>
+<h2 id="一定間隔でリクエストを複数回送信する">一定間隔でリクエストを複数回送信する</h2>
+<ul>
+<li>1 スレッドかつ 1 ループで同じ処理を複数回実施したい場合はループコントローラの中にループコントローラを置き下層のループコントローラに HTTP リクエストを追加する。</li>
+<li>複数スレッドにする場合はスレッドグループを新たに作成し、スレッド数を適宜設定し、ループコントローラを追加する。</li>
+<li>例：一定間隔でA機能のリクエストを2回，B機能のリクエストを4回送信する。</li>
+</ul>
+<h2 id="スレッドグループ共通化">スレッドグループ共通化</h2>
+<ul>
+<li>スレッドグループに処理をまとめ別のスレッドグループからモジュールコントローラで呼び出す。</li>
+<li>例：登録処理のスレッドグループと，画面更新処理のスレッドグループで共通してログイン処理を呼び出す。</li>
+</ul>
+<h2 id="スレッドグループの起動遅延">スレッドグループの起動遅延</h2>
+<ul>
+<li>スレッドグループに「起動遅延」という設定があるが正常に動作しない場合がある。</li>
+<li>スレッドグループに Flow Control Action を追加し Duration を設定することで対応出来る。
+<ul>
+<li>Flow Control Action の下に Syncronizing Timer を追加する。</li>
+</ul>
+</li>
+<li>特定のスレッドグループのみ起動遅延させるためには スレッドグループを別々に実行 のチェックを外す。</li>
+<li>例：複数ユーザによるログイン処理を実行している間に登録処理を遅延実行する。</li>
+</ul>
+<h2 id="リスナー設定">リスナー設定</h2>
+<ul>
+<li>シンプルデータライタ以外のリスナーは無効にする。</li>
+<li>シンプルデータライタで Configure をクリックすると出力の設定が出来る。
+<ul>
+<li>Save As XML でXML形式で出力出来る。デフォルトはCSV。</li>
+<li>Save Response Data でレスポンスを保存出来る。</li>
+</ul>
+</li>
+<li>シンプルデータライタの出力を読み込み，JMeter クライアントでグラフを描画する。</li>
+<li>出力先は Log\_${_<em>time(YMDHMS)}\result</em>${__time(YMDHMS)}.csv のように日時を挿入できる。</li>
+</ul>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>JMeter インストール手順</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">JMeter インストール手順</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>JMeter インストール手順</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="jmeter-インストール手順">JMeter インストール手順</h1>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li><a href="#jmeter-%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86">JMeter インストール手順</a>
+<ul>
+<li><a href="#java-%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB">Java インストール</a></li>
+<li><a href="#zip-%E5%B1%95%E9%96%8B">zip 展開</a></li>
+<li><a href="#path-%E3%82%92%E9%80%9A%E3%81%99">Path を通す</a></li>
+<li><a href="#jmeter-%E8%A8%AD%E5%AE%9A">JMeter 設定</a>
+<ul>
+<li><a href="#jmeter-%E3%82%92%E8%B5%B7%E5%8B%95%E3%81%99%E3%82%8B">JMeter を起動する</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<h2 id="java-インストール">Java インストール</h2>
+<p><a href="https://java.com/ja/download/win10.jsp">https://java.com/ja/download/win10.jsp</a></p>
+<p>Windows 版 Java をダウンロードしインストーラーを実行する。</p>
+<h2 id="zip-展開">zip 展開</h2>
+<p><a href="http://jmeter.apache.org/download_jmeter.cgi">http://jmeter.apache.org/download_jmeter.cgi</a></p>
+<p>Binaries の apache-jmeter-5.2.1.zip をダウンロードする。
+zip を C:\Program Files に展開する。</p>
+<h2 id="path-を通す">Path を通す</h2>
+<p>コントロール パネル\すべてのコントロール パネル項目\システム\システムの詳細設定\環境変数 で環境変数設定画面を開きシステム環境変数の Path に JMeter の bin を追加する（今回は C:\Program Files\apache-jmeter-5.2.1\bin）。</p>
+<h2 id="jmeter-設定">JMeter 設定</h2>
+<p>C:\Program Files\apache-jmeter-5.2.1\bin に jmeter.properties がある。
+これを作業ディレクトリにコピーし，設定を変更する。
+今回は日本語化，日付フォーマットを設定した。</p>
+<pre><code>language=ja
+locales.add=ja
+jmeter.save.saveservice.timestamp_format=yyyy/MM/dd HH:mm:ss.SSS
+sampleresult.default.encoding=UTF-8
+</code></pre><h3 id="jmeter-を起動する">JMeter を起動する</h3>
+<p>作業ディレクトリで JMeter を起動する。
+オプションで設定ファイルを指定する。</p>
+<pre><code>&gt; jmeter -p .\jmeter.properties
+</code></pre></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

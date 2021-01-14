@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Docker インストール手順</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Docker インストール手順</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Docker インストール手順</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="docker-インストール手順">Docker インストール手順</h1>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li><a href="#docker-%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86">Docker インストール手順</a>
+<ul>
+<li><a href="#docker-desktop-for-windows">Docker Desktop For Windows</a>
+<ul>
+<li><a href="#hyper-v-%E6%9C%89%E5%8A%B9%E5%8C%96">Hyper-V 有効化</a></li>
+<li><a href="#%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%A9%E3%83%BC%E5%8F%96%E5%BE%97">インストーラー取得</a></li>
+<li><a href="#%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%A9%E3%83%BC%E5%AE%9F%E8%A1%8C">インストーラー実行</a></li>
+<li><a href="#%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D">動作確認</a></li>
+</ul>
+</li>
+<li><a href="#docker-compose">Docker Compose</a>
+<ul>
+<li><a href="#%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB">インストール</a></li>
+<li><a href="#%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D-1">動作確認</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<h2 id="docker-desktop-for-windows">Docker Desktop For Windows</h2>
+<h3 id="hyper-v-有効化">Hyper-V 有効化</h3>
+<p>コントロール パネル\すべてのコントロール パネル項目\プログラムと機能\Windowsの機能の有効化または無効化 で Hyper-V を有効にする。</p>
+<h3 id="インストーラー取得">インストーラー取得</h3>
+<p><a href="https://hub.docker.com/editions/community/docker-ce-desktop-windows/">https://hub.docker.com/editions/community/docker-ce-desktop-windows/</a> から Docker Desktop for Windows をダウンロードする。</p>
+<h3 id="インストーラー実行">インストーラー実行</h3>
+<p>インストーラーを実行し Docker を使えるようにする。</p>
+<h3 id="動作確認">動作確認</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">&gt; docker --version
+Docker version 19.03.8, build afacb8b
+&gt; docker pull nginx
+&gt; docker run -d -p 8080:80 --name webserver nginx
+</code></pre></div><h2 id="docker-compose">Docker Compose</h2>
+<h3 id="インストール">インストール</h3>
+<ol>
+<li>
+<p>Powershell を 管理者権限 で起動する</p>
+</li>
+<li>
+<p>次のコマンドを実行して TLS 1.2 を有効化する。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; <span style="color:#66d9ef">[Net.ServicePointManager]</span>::SecurityProtocol = <span style="color:#66d9ef">[Net.SecurityProtocolType]</span>::Tls12
+</code></pre></div></li>
+<li>
+<p>次のコマンドを実行して Docker Compose をインストールする</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; Invoke-WebRequest <span style="color:#e6db74">&#34;https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Windows-x86_64.exe&#34;</span> -UseBasicParsing -OutFile $Env:ProgramFiles\docker\docker-compose.exe
+</code></pre></div><p>ここで 1.23.2 の部分はインストールしたい Docker Compose のバージョンを指定する。
+今回は現時点の安定版である 1.23.2 を指定した( docker/compose - release )。</p>
+</li>
+</ol>
+<h3 id="動作確認-1">動作確認</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; docker-compose version
+docker-compose version 1.23.2, build 1110ad01
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

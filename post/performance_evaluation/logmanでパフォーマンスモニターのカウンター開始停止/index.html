@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>logmanでパフォーマンスモニターのカウンター開始／停止</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">logmanでパフォーマンスモニターのカウンター開始／停止</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>logmanでパフォーマンスモニターのカウンター開始／停止</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="logmanでパフォーマンスモニターのカウンター開始停止">logmanでパフォーマンスモニターのカウンター開始／停止</h1>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li><a href="#logman%E3%81%A7%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%BC%E3%81%AE%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E9%96%8B%E5%A7%8B%E5%81%9C%E6%AD%A2">logmanでパフォーマンスモニターのカウンター開始／停止</a>
+<ul>
+<li><a href="#%E6%A6%82%E8%A6%81">概要</a></li>
+<li><a href="#winrm-%E3%81%A7%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%81%8B%E3%82%89%E3%83%9B%E3%82%B9%E3%83%88%E3%81%AB%E6%8E%A5%E7%B6%9A">WinRM でクライアントからホストに接続</a></li>
+<li><a href="#%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E4%B8%80%E8%A6%A7">カウンター一覧</a></li>
+<li><a href="#%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E7%8A%B6%E6%85%8B%E7%A2%BA%E8%AA%8D">カウンター状態確認</a></li>
+<li><a href="#%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E9%96%8B%E5%A7%8B">カウンター開始</a></li>
+<li><a href="#%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E5%81%9C%E6%AD%A2">カウンター停止</a></li>
+</ul>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<h2 id="概要">概要</h2>
+<ul>
+<li>WinRM でクライアントからホストに接続する。</li>
+<li>logman コマンドでカウンターを開始する。</li>
+<li>logman コマンドでカウンターを停止する。</li>
+</ul>
+<h2 id="winrm-でクライアントからホストに接続">WinRM でクライアントからホストに接続</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">&gt; $targetHost = <span style="color:#e6db74">&#34;web&#34;</span>
+&gt; $id = <span style="color:#e6db74">&#34;user&#34;</span>
+&gt; $password = <span style="color:#e6db74">&#34;password&#34;</span>
+&gt; $securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force
+&gt; $cred = New-Object System.Management.Automation.PSCredential($id, $securePassword)
+&gt; Enter-PSSession -ComputerName $targetHost -Credential $cred
+</code></pre></div><h2 id="カウンター一覧">カウンター一覧</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">&gt; logman query
+
+データ コレクター セット                  種類                          状態
+-------------------------------------------------------------------------------
+GAEvents                               トレース                      実行中
+PerfMonWeb                             カウンター                     停止済み
+RTEvents                               トレース                      実行中
+Server Manager Performance Monitor     カウンター                     停止済み
+</code></pre></div><h2 id="カウンター状態確認">カウンター状態確認</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">&gt; logman query PerfMonWeb
+
+
+名前<span style="color:#960050;background-color:#1e0010">:</span>                   PerfMonWeb
+状態<span style="color:#960050;background-color:#1e0010">:</span>                   実行中
+ルート パス<span style="color:#960050;background-color:#1e0010">:</span>               <span style="color:#66d9ef">%</span>systemdrive%\PerfLogs\Admin
+セグメント<span style="color:#960050;background-color:#1e0010">:</span>                オフ
+スケジュール<span style="color:#960050;background-color:#1e0010">:</span>               オフ
+別のユーザーとして実行<span style="color:#960050;background-color:#1e0010">:</span>          SYSTEM
+
+名前<span style="color:#960050;background-color:#1e0010">:</span>                   PerfMonWeb\PerfMonWeb
+種類<span style="color:#960050;background-color:#1e0010">:</span>                   カウンター
+出力場所<span style="color:#960050;background-color:#1e0010">:</span>                 C:\PerfLogs\Admin\PerfMonWeb_05131446.blg
+追加<span style="color:#960050;background-color:#1e0010">:</span>                   オフ
+循環<span style="color:#960050;background-color:#1e0010">:</span>                   オフ
+上書き<span style="color:#960050;background-color:#1e0010">:</span>                  オフ
+サンプルの間隔<span style="color:#960050;background-color:#1e0010">:</span>              10 秒
+
+カウンター<span style="color:#960050;background-color:#1e0010">:</span>
+  \Paging File(*)\% Usage
+  \Processor(*)\% Processor Time
+  \Processor(*)\% User Time
+  \Processor(*)\% Privileged Time
+  \Processor(*)\% Interrupt Time
+  \Processor(*)\% DPC Time
+  \Processor(*)\% Idle Time
+  \Processor(*)\Interrupts/sec
+</code></pre></div><h2 id="カウンター開始">カウンター開始</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">&gt; logman start PerfMonWeb
+</code></pre></div><h2 id="カウンター停止">カウンター停止</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">&gt; logman stop PerfMonWeb
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

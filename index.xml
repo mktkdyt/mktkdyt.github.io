@@ -19,6 +19,18 @@
     </item>
     
     <item>
+      <title>Docker インストール手順</title>
+      <link>https://mktkdyt.github.io/post/performance_evaluation/docker%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/performance_evaluation/docker%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</guid>
+      <description>Docker インストール手順  Docker インストール手順  Docker Desktop For Windows  Hyper-V 有効化 インストーラー取得 インストーラー実行 動作確認   Docker Compose  インストール 動作確認      Docker Desktop For Windows Hyper-V 有効化 コントロール パネル\すべてのコントロール パネル項目\プログラムと機能\Windowsの機能の有効化または無効化 で Hyper-V を有効にする。
+インストーラー取得 https://hub.docker.com/editions/community/docker-ce-desktop-windows/ から Docker Desktop for Windows をダウンロードする。
+インストーラー実行 インストーラーを実行し Docker を使えるようにする。
+動作確認 &amp;gt; docker --version Docker version 19.03.8, build afacb8b &amp;gt; docker pull nginx &amp;gt; docker run -d -p 8080:80 --name webserver nginx Docker Compose インストール   Powershell を 管理者権限 で起動する</description>
+    </item>
+    
+    <item>
       <title>Elasticsearch を構築する</title>
       <link>https://mktkdyt.github.io/post/full_text_search/elasticsearch%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
@@ -27,6 +39,39 @@
       <description>Elasticsearch を構築する ローカルで Elasticsearch を構築しました。 Elasticsearch 用に 3台，Kibana 用に 1台 VM を立てました。
 VM 作成 Vagrantfile を作成して vagrant up します。
 # Elasticsearch ノード数 es_cnt = 3 cnt = 4 Vagrant.configure(&amp;#34;2&amp;#34;) do |config| config.vm.box = &amp;#34;ubuntu/bionic64&amp;#34; config.vm.synced_folder &amp;#34;./share&amp;#34;, &amp;#34;/home/vagrant/share&amp;#34;, owner: &amp;#34;vagrant&amp;#34;, group: &amp;#34;vagrant&amp;#34; #--- Elasticsearch 構築 ---# (1..es_cnt).each do |i| config.vm.define &amp;#34;es#{i}&amp;#34; do | es | es.disksize.size = &amp;#39;50GB&amp;#39; es.vm.provider &amp;#34;virtualbox&amp;#34; do |vb| vb.memory = 8192 end es.vm.hostname = &amp;#34;es#{i}&amp;#34; es.vm.network &amp;#34;private_network&amp;#34;, ip: &amp;#34;192.</description>
+    </item>
+    
+    <item>
+      <title>JMeter Tips</title>
+      <link>https://mktkdyt.github.io/post/performance_evaluation/jmetertips/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/performance_evaluation/jmetertips/</guid>
+      <description>JMeter Tips Grafana で JMeter のメトリクスを表示する  JMeter シナリオに Backend Listener を追加することで JMeter -&amp;gt; InfluxDB -&amp;gt; Grafana という流れで Grafana で JMeter メトリクスをリアルタイムで可視化出来る。 Grafana で JMeter のメトリクスを描画するには InfluxDB にデータを送信するように JMeter シナリオに Backend Listener を追加する。  テスト計画を右クリックし，追加\リスナー\Backend Listener を選択する。 Backend Listener implemantation で org.apache.jmeter.visualizers.backend.influxdb.influxdbBackendListenerClient を選択する。    項目 設定     influxdbUrl http://127.0.0.1:8086/write?db=jmeter   summaryOnly true   application webeoc   measurement jmeter       Grafana でトランザクションごとにグラフを描画出来るように HTTP リクエストの名前を適宜設定する。  1シナリオで複数のシナリオを実行する  テスト計画に複数のスレッドグループを追加し，スレッドグループを別々に実行 のチェックを外す。  Run Thread Groups consecutively の誤訳が スレッドグループを別々に実行 となっている。 正しくはスレッドグループを連続で実行。   例：1シナリオで複数ユーザによる登録，複数ユーザによる画面リロードを同時実行する。  パラメータの受け渡し  正規表現抽出を HTTPリクエスト に追加し正規表現で抽出した値を変数に格納し別の HTTPリクエスト で変数を参照する。 例：CSRF値  一定間隔でリクエストを送信する  ループコントローラに定数タイマを追加すると配下の各リクエストでタイマが作動してしまう。 ループコントローラの先頭のリクエストの下に定数タイマを追加することで1ループあたり1回だけタイマが作動し一定間隔でリクエストを送信出来る。 例：一定間隔で画面更新を行う。  一定間隔でリクエストを複数回送信する  1 スレッドかつ 1 ループで同じ処理を複数回実施したい場合はループコントローラの中にループコントローラを置き下層のループコントローラに HTTP リクエストを追加する。 複数スレッドにする場合はスレッドグループを新たに作成し、スレッド数を適宜設定し、ループコントローラを追加する。 例：一定間隔でA機能のリクエストを2回，B機能のリクエストを4回送信する。  スレッドグループ共通化  スレッドグループに処理をまとめ別のスレッドグループからモジュールコントローラで呼び出す。 例：登録処理のスレッドグループと，画面更新処理のスレッドグループで共通してログイン処理を呼び出す。  スレッドグループの起動遅延  スレッドグループに「起動遅延」という設定があるが正常に動作しない場合がある。 スレッドグループに Flow Control Action を追加し Duration を設定することで対応出来る。  Flow Control Action の下に Syncronizing Timer を追加する。   特定のスレッドグループのみ起動遅延させるためには スレッドグループを別々に実行 のチェックを外す。 例：複数ユーザによるログイン処理を実行している間に登録処理を遅延実行する。  リスナー設定  シンプルデータライタ以外のリスナーは無効にする。 シンプルデータライタで Configure をクリックすると出力の設定が出来る。  Save As XML でXML形式で出力出来る。デフォルトはCSV。 Save Response Data でレスポンスを保存出来る。   シンプルデータライタの出力を読み込み，JMeter クライアントでグラフを描画する。 出力先は Log\_${_time(YMDHMS)}\result${__time(YMDHMS)}.</description>
+    </item>
+    
+    <item>
+      <title>JMeter インストール手順</title>
+      <link>https://mktkdyt.github.io/post/performance_evaluation/jmeter%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/performance_evaluation/jmeter%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</guid>
+      <description>JMeter インストール手順  JMeter インストール手順  Java インストール zip 展開 Path を通す JMeter 設定  JMeter を起動する      Java インストール https://java.com/ja/download/win10.jsp
+Windows 版 Java をダウンロードしインストーラーを実行する。
+zip 展開 http://jmeter.apache.org/download_jmeter.cgi
+Binaries の apache-jmeter-5.2.1.zip をダウンロードする。 zip を C:\Program Files に展開する。
+Path を通す コントロール パネル\すべてのコントロール パネル項目\システム\システムの詳細設定\環境変数 で環境変数設定画面を開きシステム環境変数の Path に JMeter の bin を追加する（今回は C:\Program Files\apache-jmeter-5.2.1\bin）。
+JMeter 設定 C:\Program Files\apache-jmeter-5.2.1\bin に jmeter.properties がある。 これを作業ディレクトリにコピーし，設定を変更する。 今回は日本語化，日付フォーマットを設定した。
+language=jalocales.add=jajmeter.save.saveservice.timestamp_format=yyyy/MM/dd HH:mm:ss.SSSsampleresult.default.encoding=UTF-8JMeter を起動する 作業ディレクトリで JMeter を起動する。 オプションで設定ファイルを指定する。</description>
+    </item>
+    
+    <item>
+      <title>logmanでパフォーマンスモニターのカウンター開始／停止</title>
+      <link>https://mktkdyt.github.io/post/performance_evaluation/logman%E3%81%A7%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%BC%E3%81%AE%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E9%96%8B%E5%A7%8B%E5%81%9C%E6%AD%A2/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/performance_evaluation/logman%E3%81%A7%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%BC%E3%81%AE%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E9%96%8B%E5%A7%8B%E5%81%9C%E6%AD%A2/</guid>
+      <description>logmanでパフォーマンスモニターのカウンター開始／停止  logmanでパフォーマンスモニターのカウンター開始／停止  概要 WinRM でクライアントからホストに接続 カウンター一覧 カウンター状態確認 カウンター開始 カウンター停止    概要  WinRM でクライアントからホストに接続する。 logman コマンドでカウンターを開始する。 logman コマンドでカウンターを停止する。  WinRM でクライアントからホストに接続 &amp;gt; $targetHost = &amp;#34;web&amp;#34; &amp;gt; $id = &amp;#34;user&amp;#34; &amp;gt; $password = &amp;#34;password&amp;#34; &amp;gt; $securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force &amp;gt; $cred = New-Object System.Management.Automation.PSCredential($id, $securePassword) &amp;gt; Enter-PSSession -ComputerName $targetHost -Credential $cred カウンター一覧 &amp;gt; logman query データ コレクター セット 種類 状態 ------------------------------------------------------------------------------- GAEvents トレース 実行中 PerfMonWeb カウンター 停止済み RTEvents トレース 実行中 Server Manager Performance Monitor カウンター 停止済み カウンター状態確認 &amp;gt; logman query PerfMonWeb 名前: PerfMonWeb 状態: 実行中 ルート パス: %systemdrive%\PerfLogs\Admin セグメント: オフ スケジュール: オフ 別のユーザーとして実行: SYSTEM 名前: PerfMonWeb\PerfMonWeb 種類: カウンター 出力場所: C:\PerfLogs\Admin\PerfMonWeb_05131446.</description>
     </item>
     
     <item>
@@ -87,6 +132,28 @@ D:\vagrant\solr-standalone ┣Vagrantfile ┗create_solr.sh Vagrantfile  OS は 
     </item>
     
     <item>
+      <title>WinRM(Windows Remote Management)設定手順</title>
+      <link>https://mktkdyt.github.io/post/performance_evaluation/winrmwindowsremotemanagement%E8%A8%AD%E5%AE%9A%E6%89%8B%E9%A0%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/performance_evaluation/winrmwindowsremotemanagement%E8%A8%AD%E5%AE%9A%E6%89%8B%E9%A0%86/</guid>
+      <description>WinRM(Windows Remote Management)設定手順 WinRMを設定しPowerShellでWindowsにリモートで接続出来るようにする。 これによりリモートデスクトップで接続することなくWebサーバのIISを止めたりIISのログをローテートしたり出来る。
+ WinRM(Windows Remote Management)設定手順  ホスト側設定 クライアント側設定 クライアントからホストに接続 ホストから切断    ホスト側設定 接続先，接続される側の設定。
+&amp;gt; winrm quickconfigWinRM サービスは、既にこのコンピューターで実行されています。WinRM は、管理用にこのコンピューターへのリモート アクセスを許可するように設定されていません。次の変更を行う必要があります:ローカル ユーザーにリモートで管理権限を付与するよう LocalAccountTokenFilterPolicy を構成してください。変更しますか [y/n]? yWinRM はリモート管理用に更新されました。ローカル ユーザーにリモートで管理権限を付与するよう LocalAccountTokenFilterPolicy を構成しました。クライアント側設定 接続元，接続する側の設定。
+&amp;gt; winrm quickconfigWinRM はこのコンピューター上で要求を受信するように設定されていません。次の変更を行う必要があります:WinRM サービスを開始します。WinRM サービスの種類を遅延自動開始に設定します。変更しますか [y/n]? yWinRM は要求を受信するように更新されました。WinRM サービスの種類を正しく変更できました。WinRM サービスが開始されました。WSManFaultMessageProviderFaultWSManFaultMessage = このコンピューターのネットワーク接続の種類の 1 つが Public に設定されているため、WinRM ファイアウォール例外は機能しません。 ネットワーク接続の種類を Domain または Private に変更して、やり直してください。エラー番号: -2144108183 0x80338169このコンピューターのネットワーク接続の種類の 1 つが Public に設定されているため、WinRM ファイアウォール例外は機能しません。 ネットワーク接続の種類を Domain または Private に変更して、やり直してください。上記のようなエラーが発生した場合は -SkipNetworkProfileCheck を付与し Enable-PSRemoting を実行する。</description>
+    </item>
+    
+    <item>
+      <title>WSL オフラインインストール手順</title>
+      <link>https://mktkdyt.github.io/post/performance_evaluation/wsl%E3%82%AA%E3%83%95%E3%83%A9%E3%82%A4%E3%83%B3%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/performance_evaluation/wsl%E3%82%AA%E3%83%95%E3%83%A9%E3%82%A4%E3%83%B3%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</guid>
+      <description>WSL オフラインインストール手順  WSL オフラインインストール手順  WSL 有効化 ディストリビューションダウンロード ディストリビューションインストール ディストリビューション初期化    WSL 有効化 &amp;gt; Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux ディストリビューションダウンロード https://docs.microsoft.com/ja-jp/windows/wsl/install-manual から目的のOSをダウンロードする。
+ディストリビューションインストール &amp;gt; Add-AppxPackage C:\Users\usename\Downloads\CanonicalGroupLimited.Ubuntu18.04onWindows_1804.2018.817.0_x64__79rhkp1fndgsc.Appx ディストリビューション初期化 スタートメニューに表示されるディストリビューションをクリックし，ユーザ名，パスワードを設定する（仮想マシンのアカウントと同じユーザ名，パスワードとした）。</description>
+    </item>
+    
+    <item>
       <title>ZooKeeper Ensemble を構築する</title>
       <link>https://mktkdyt.github.io/post/full_text_search/zookeeper-ensemble%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
@@ -128,6 +195,37 @@ https://qiita.com/yottyann1221/items/a08300b572206075ee9f https://qiita.com/tomo
  大量の画像を用意する 教師／テストデータを作成する モデルを作成する モデルで評価する  今回は、画像認識でシェルティー判定プログラムを作成することにしました。
 環境構築 Windows 10 に chocolatey で python3 を入れました。 venv で仮想環境を構築し、必要なライブラリを入れます。
 &amp;gt; mkdir -p e:\python\ml &amp;gt; cd e:\python\ml &amp;gt; python -m venv ml &amp;gt; .\ml\Scripts\activate (ml)&amp;gt; pip install requests (ml)&amp;gt; pip install beautifulsoup4 # lxml を入れないと下のエラーが出る # bs4.FeatureNotFound: Couldn&amp;#39;t find a tree builder with the features you requested: lxml. Do you need to install a parser library?</description>
+    </item>
+    
+    <item>
+      <title>パフォーマンスモニター設定手順</title>
+      <link>https://mktkdyt.github.io/post/performance_evaluation/%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%BC%E8%A8%AD%E5%AE%9A%E6%89%8B%E9%A0%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/performance_evaluation/%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%BC%E8%A8%AD%E5%AE%9A%E6%89%8B%E9%A0%86/</guid>
+      <description>パフォーマンスモニター設定手順 Webサーバー，DBサーバーで実施する。
+ パフォーマンスモニター設定手順  カウンター作成  perfMonCreater.bat counter_list.txt   カウンター確認 カウンター実行    カウンター作成 下記ファイルをWebサーバーの任意のディレクトリに配置する。
+ perfMonCreater.bat counter_list.txt  管理者権限で perfMonCreater.bat を実行する。
+perfMonCreater.bat  logman コマンドでカウンターを作成する。  REM -m start stop 開始，終了を手動にする。 REM -f bin ログの形式を指定する。 REM -v mmddhhmm ログのファイル名のサフィックスを日時にする。 REM -si 10 サンプリング間隔を 10 秒に設定する。 REM -cf 収集するパフォーマンスカウンターをファイルで指定する。 logman create counter PerfMon -m start stop -f bin -v mmddhhmm -si 10 -cf .\counter_list.txt @pause counter_list.txt  取得したいパフォーマンスカウンターのリスト。 Webで IIS や ASP.</description>
+    </item>
+    
+    <item>
+      <title>メトリクス監視環境構築手順</title>
+      <link>https://mktkdyt.github.io/post/performance_evaluation/%E3%83%A1%E3%83%88%E3%83%AA%E3%82%AF%E3%82%B9%E7%9B%A3%E8%A6%96%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E6%89%8B%E9%A0%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/performance_evaluation/%E3%83%A1%E3%83%88%E3%83%AA%E3%82%AF%E3%82%B9%E7%9B%A3%E8%A6%96%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E6%89%8B%E9%A0%86/</guid>
+      <description>メトリクス監視環境構築手順  JMeter を CUI で実行している際の JMeter のメトリクスを Grafana で可視化する。 Windows Server のメトリクスを Grafana で可視化する。   メトリクス監視環境構築手順  概要 Telegraf  インストール telegraf.conf 起動 サービス化 サービス起動／停止   Docker コンテナ作成  ディレクトリ influxdb.conf docker-compose.yml コンテナ作成 コンテナ停止 コンテナ開始   InfluxDB  動作確認 DB 作成   Grafana  管理者作成 サーバメトリクス取得設定  data source 追加 フォルダ作成 Dashboard 作成   JMeter メトリクス取得設定  data source 追加 Dashboard 追加     JMeter シナリオ編集  Backend Listener 追加      概要    ソフト 内容     InfluxDB 時系列DB。メトリクスをここで収集する。   Grafana 様々なデータソースを可視化するGUIツール。   Telegraf 様々なメトリクスを influxdb に収集するコレクタ。     JMeter のメトリクスを InfluxDB に流し，Grafana で可視化する。  JMeter -&amp;gt; InfluxDB -&amp;gt; Grafana   対象の Windows に Telegraf をインストールし，Telegraf から Windows のメトリクスを InfluxDB に流し，Grafana で可視化する。  Telegraf -&amp;gt; InfluxDB -&amp;gt; Grafana    Telegraf パフォーマンスを見たい Windows にインストールする。</description>
+    </item>
+    
+    <item>
+      <title>性能評価実施手順</title>
+      <link>https://mktkdyt.github.io/post/performance_evaluation/%E6%80%A7%E8%83%BD%E8%A9%95%E4%BE%A1%E5%AE%9F%E6%96%BD%E6%89%8B%E9%A0%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/performance_evaluation/%E6%80%A7%E8%83%BD%E8%A9%95%E4%BE%A1%E5%AE%9F%E6%96%BD%E6%89%8B%E9%A0%86/</guid>
+      <description>性能評価実施手順  性能評価実施手順  手順 Docker 起動 性能評価前処理  フルバックアップのリストア プランキャッシュ削除 データ量取得 Webサーバ／DBサーバ処理   性能評価実施  JMeter 実行 Grafana でメトリクス監視 JMeter 停止   性能評価後処理 性能評価結果回収  IISログ パフォーマンスモニターのログ SSMSでレポートを出力 データ量確認      手順 Docker でコンテナを起動した後，測定毎に下記処理を実施する。
+ 性能評価前処理  対象のシナリオのデータ量に該当するDBのフルバックアップをリストアする。 DBのプランキャッシュを削除する。 データ量を取得する。 WinRMでWebサーバに接続する。  IISを停止する。 IISログをローテートする。 IISを起動する。 パフォーマンスモニターのカウンターを開始する。   WinRMでDBサーバに接続する。  パフォーマンスモニターのカウンターを開始する。     性能評価実施  JMeterを実行する。 Grafanaでメトリクスを監視する。 JMeterを終了する。   性能評価後処理  WinRMでWebサーバに接続する。  パフォーマンスモニターのカウンターを停止する。 IISを停止する。 IISログをローテートする。 IISを起動する。   WinRMでDBサーバに接続する。  パフォーマンスモニターのカウンターを停止する。     性能評価結果回収  IISログを回収する。 パフォーマンスモニターのログを回収する。 Grafanaのデータをエクスポートする。 SSMSでレポートを出力する。 データ量を確認する。    Docker 起動  Grafana, InfluxDB のコンテナを起動する。  cd C:\LoadTest\Docker docker-compose up -d 性能評価前処理 フルバックアップのリストア  SSMS を起動し DB サーバに接続する。 対象のデータベースを右クリックし タスク\オフライン でデータベースの接続を切断する。 対象のデータベースを右クリックし タスク\復元\データベース で デバイス に該当するフルバックアップを指定し OK をクリックする。  プランキャッシュ削除  SSMS で下記クエリを実行する。  DBCC FREEPROCCACHE データ量取得  性能評価実施前にデータ量を取得する。 SSMS で下記クエリを実行する。 テーブル名は適宜修正する。  DECLARE @now datetime; SET @now = GETDATE(); select &amp;#39;XXX&amp;#39; as &amp;#39;機能&amp;#39;, (select count(*) from XXX) as &amp;#39;件数&amp;#39;, @now as &amp;#39;検索日時&amp;#39; union all select &amp;#39;YYY&amp;#39; as &amp;#39;機能&amp;#39;, (select count(*) from YYY) as &amp;#39;件数&amp;#39;, @now as &amp;#39;検索日時&amp;#39; union all select &amp;#39;ZZZ&amp;#39; as &amp;#39;機能&amp;#39;, (select count(*) from ZZZ) as &amp;#39;件数&amp;#39;, @now as &amp;#39;検索日時&amp;#39; Webサーバ／DBサーバ処理  PowerShell を起動し下記コマンドを実行する。  WinRMでWebサーバに接続する。  IISを停止する。 IISログをローテートする。 IISを起動する。 パフォーマンスモニターのカウンターを開始する。   WinRMでDBサーバに接続する。  パフォーマンスモニターのカウンターを開始する。     日時は適宜設定すること。  .</description>
     </item>
     
     <item>

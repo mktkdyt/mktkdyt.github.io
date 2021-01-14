@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>性能評価実施手順</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">性能評価実施手順</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>性能評価実施手順</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="性能評価実施手順">性能評価実施手順</h1>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li><a href="#%E6%80%A7%E8%83%BD%E8%A9%95%E4%BE%A1%E5%AE%9F%E6%96%BD%E6%89%8B%E9%A0%86">性能評価実施手順</a>
+<ul>
+<li><a href="#%E6%89%8B%E9%A0%86">手順</a></li>
+<li><a href="#docker-%E8%B5%B7%E5%8B%95">Docker 起動</a></li>
+<li><a href="#%E6%80%A7%E8%83%BD%E8%A9%95%E4%BE%A1%E5%89%8D%E5%87%A6%E7%90%86">性能評価前処理</a>
+<ul>
+<li><a href="#%E3%83%95%E3%83%AB%E3%83%90%E3%83%83%E3%82%AF%E3%82%A2%E3%83%83%E3%83%97%E3%81%AE%E3%83%AA%E3%82%B9%E3%83%88%E3%82%A2">フルバックアップのリストア</a></li>
+<li><a href="#%E3%83%97%E3%83%A9%E3%83%B3%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E5%89%8A%E9%99%A4">プランキャッシュ削除</a></li>
+<li><a href="#%E3%83%87%E3%83%BC%E3%82%BF%E9%87%8F%E5%8F%96%E5%BE%97">データ量取得</a></li>
+<li><a href="#web%E3%82%B5%E3%83%BC%E3%83%90db%E3%82%B5%E3%83%BC%E3%83%90%E5%87%A6%E7%90%86">Webサーバ／DBサーバ処理</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%A7%E8%83%BD%E8%A9%95%E4%BE%A1%E5%AE%9F%E6%96%BD">性能評価実施</a>
+<ul>
+<li><a href="#jmeter-%E5%AE%9F%E8%A1%8C">JMeter 実行</a></li>
+<li><a href="#grafana-%E3%81%A7%E3%83%A1%E3%83%88%E3%83%AA%E3%82%AF%E3%82%B9%E7%9B%A3%E8%A6%96">Grafana でメトリクス監視</a></li>
+<li><a href="#jmeter-%E5%81%9C%E6%AD%A2">JMeter 停止</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%A7%E8%83%BD%E8%A9%95%E4%BE%A1%E5%BE%8C%E5%87%A6%E7%90%86">性能評価後処理</a></li>
+<li><a href="#%E6%80%A7%E8%83%BD%E8%A9%95%E4%BE%A1%E7%B5%90%E6%9E%9C%E5%9B%9E%E5%8F%8E">性能評価結果回収</a>
+<ul>
+<li><a href="#iis%E3%83%AD%E3%82%B0">IISログ</a></li>
+<li><a href="#%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%BC%E3%81%AE%E3%83%AD%E3%82%B0">パフォーマンスモニターのログ</a></li>
+<li><a href="#ssms%E3%81%A7%E3%83%AC%E3%83%9D%E3%83%BC%E3%83%88%E3%82%92%E5%87%BA%E5%8A%9B">SSMSでレポートを出力</a></li>
+<li><a href="#%E3%83%87%E3%83%BC%E3%82%BF%E9%87%8F%E7%A2%BA%E8%AA%8D">データ量確認</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<h2 id="手順">手順</h2>
+<p>Docker でコンテナを起動した後，測定毎に下記処理を実施する。</p>
+<ul>
+<li>性能評価前処理
+<ul>
+<li>対象のシナリオのデータ量に該当するDBのフルバックアップをリストアする。</li>
+<li>DBのプランキャッシュを削除する。</li>
+<li>データ量を取得する。</li>
+<li>WinRMでWebサーバに接続する。
+<ul>
+<li>IISを停止する。</li>
+<li>IISログをローテートする。</li>
+<li>IISを起動する。</li>
+<li>パフォーマンスモニターのカウンターを開始する。</li>
+</ul>
+</li>
+<li>WinRMでDBサーバに接続する。
+<ul>
+<li>パフォーマンスモニターのカウンターを開始する。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>性能評価実施
+<ul>
+<li>JMeterを実行する。</li>
+<li>Grafanaでメトリクスを監視する。</li>
+<li>JMeterを終了する。</li>
+</ul>
+</li>
+<li>性能評価後処理
+<ul>
+<li>WinRMでWebサーバに接続する。
+<ul>
+<li>パフォーマンスモニターのカウンターを停止する。</li>
+<li>IISを停止する。</li>
+<li>IISログをローテートする。</li>
+<li>IISを起動する。</li>
+</ul>
+</li>
+<li>WinRMでDBサーバに接続する。
+<ul>
+<li>パフォーマンスモニターのカウンターを停止する。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>性能評価結果回収
+<ul>
+<li>IISログを回収する。</li>
+<li>パフォーマンスモニターのログを回収する。</li>
+<li>Grafanaのデータをエクスポートする。</li>
+<li>SSMSでレポートを出力する。</li>
+<li>データ量を確認する。</li>
+</ul>
+</li>
+</ul>
+<h2 id="docker-起動">Docker 起動</h2>
+<ul>
+<li>Grafana, InfluxDB のコンテナを起動する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">cd C:\LoadTest\Docker
+docker-compose up -d
+</code></pre></div><h2 id="性能評価前処理">性能評価前処理</h2>
+<h3 id="フルバックアップのリストア">フルバックアップのリストア</h3>
+<ul>
+<li>SSMS を起動し DB サーバに接続する。</li>
+<li>対象のデータベースを右クリックし タスク\オフライン でデータベースの接続を切断する。</li>
+<li>対象のデータベースを右クリックし タスク\復元\データベース で デバイス に該当するフルバックアップを指定し OK をクリックする。</li>
+</ul>
+<h3 id="プランキャッシュ削除">プランキャッシュ削除</h3>
+<ul>
+<li>SSMS で下記クエリを実行する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">DBCC FREEPROCCACHE
+</code></pre></div><h3 id="データ量取得">データ量取得</h3>
+<ul>
+<li>性能評価実施前にデータ量を取得する。</li>
+<li>SSMS で下記クエリを実行する。</li>
+<li>テーブル名は適宜修正する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">DECLARE</span> <span style="color:#f92672">@</span>now datetime;
+<span style="color:#66d9ef">SET</span> <span style="color:#f92672">@</span>now <span style="color:#f92672">=</span> GETDATE();
+
+<span style="color:#66d9ef">select</span> <span style="color:#e6db74">&#39;XXX&#39;</span> <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;機能&#39;</span>, (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> XXX) <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;件数&#39;</span>, <span style="color:#f92672">@</span>now <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;検索日時&#39;</span>
+<span style="color:#66d9ef">union</span> <span style="color:#66d9ef">all</span>
+<span style="color:#66d9ef">select</span> <span style="color:#e6db74">&#39;YYY&#39;</span> <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;機能&#39;</span>, (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> YYY) <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;件数&#39;</span>, <span style="color:#f92672">@</span>now <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;検索日時&#39;</span>
+<span style="color:#66d9ef">union</span> <span style="color:#66d9ef">all</span>
+<span style="color:#66d9ef">select</span> <span style="color:#e6db74">&#39;ZZZ&#39;</span> <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;機能&#39;</span>, (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> ZZZ) <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;件数&#39;</span>, <span style="color:#f92672">@</span>now <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;検索日時&#39;</span>
+</code></pre></div><h3 id="webサーバdbサーバ処理">Webサーバ／DBサーバ処理</h3>
+<ul>
+<li>PowerShell を起動し下記コマンドを実行する。
+<ul>
+<li>WinRMでWebサーバに接続する。
+<ul>
+<li>IISを停止する。</li>
+<li>IISログをローテートする。</li>
+<li>IISを起動する。</li>
+<li>パフォーマンスモニターのカウンターを開始する。</li>
+</ul>
+</li>
+<li>WinRMでDBサーバに接続する。
+<ul>
+<li>パフォーマンスモニターのカウンターを開始する。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>日時は適宜設定すること。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">.<span style="color:#ae81ff">\E</span>nablePSSessionToHost.ps1
+$date <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;200605&#34;</span>
+$from <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;125000&#34;</span>
+iisreset /stop
+cd C:<span style="color:#ae81ff">\i</span>netpub<span style="color:#ae81ff">\l</span>ogs<span style="color:#ae81ff">\L</span>ogFiles<span style="color:#ae81ff">\W</span>3SVC1
+Rename-Item <span style="color:#e6db74">&#34;.\u_ex</span><span style="color:#e6db74">${</span>date<span style="color:#e6db74">}</span><span style="color:#e6db74">.log&#34;</span> <span style="color:#e6db74">&#34;u_ex</span><span style="color:#e6db74">${</span>date<span style="color:#e6db74">}</span><span style="color:#e6db74">_to_</span><span style="color:#e6db74">${</span>from<span style="color:#e6db74">}</span><span style="color:#e6db74">.log&#34;</span>
+iisreset /start
+logman start PerfMon
+Exit-PSSession
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">$targetHost = <span style="color:#e6db74">&#34;Host&#34;</span>
+$id = <span style="color:#e6db74">&#34;user&#34;</span>
+$password = <span style="color:#e6db74">&#34;password&#34;</span>
+$securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force
+$cred = New-Object System.Management.Automation.PSCredential($id, $securePassword)
+Enter-PSSession -ComputerName $targetHost -Credential $cred
+</code></pre></div><h2 id="性能評価実施">性能評価実施</h2>
+<h3 id="jmeter-実行">JMeter 実行</h3>
+<ul>
+<li>JMeter を CUI で実行する。</li>
+<li>日時やシナリオファイルは適宜設定すること。</li>
+<li>結果はシナリオでシンプルデータライタにて出力しているためコマンドで指定する必要はない。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">$date = <span style="color:#e6db74">&#34;20200605&#34;</span>
+$from = <span style="color:#e6db74">&#34;125000&#34;</span>
+$scenario = <span style="color:#e6db74">&#34;.\scenario.jmx&#34;</span>
+
+cd <span style="color:#e6db74">&#34;${date}&#34;</span>
+jmeter -n -p .\jmeter.properties -t ${scenario} -j <span style="color:#e6db74">&#34;.\${date}_${from}_jmeter.log&#34;</span>
+</code></pre></div><h3 id="grafana-でメトリクス監視">Grafana でメトリクス監視</h3>
+<p>http://localhost:3000 にアクセスし時間を適宜設定するとメトリクスをリアルタイムで監視出来る。</p>
+<h3 id="jmeter-停止">JMeter 停止</h3>
+<p>JMeter を実行しているシェルで Ctrl + C で強制終了する。</p>
+<h2 id="性能評価後処理">性能評価後処理</h2>
+<ul>
+<li>PowerShell を起動し下記コマンドを実行する。
+<ul>
+<li>WinRMでWebサーバに接続する。
+<ul>
+<li>パフォーマンスモニターのカウンターを停止する。</li>
+<li>IISを停止する。</li>
+<li>IISログをローテートする。</li>
+<li>IISを起動する。</li>
+</ul>
+</li>
+<li>WinRMでDBサーバに接続する。
+<ul>
+<li>パフォーマンスモニターのカウンターを停止する。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>日時は適宜設定すること。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">.\EnablePSSessionToHost.ps1
+logman stop PerfMon
+iisreset /stop
+cd C:\inetpub\logs\LogFiles\W3SVC1
+$date = <span style="color:#e6db74">&#34;200605&#34;</span>
+$from = <span style="color:#e6db74">&#34;125000&#34;</span>
+$to = <span style="color:#e6db74">&#34;133500&#34;</span>
+Rename-Item <span style="color:#e6db74">&#34;.\u_ex${date}.log&#34;</span> <span style="color:#e6db74">&#34;.\u_ex${date}_from_${from}_to_${to}.log&#34;</span>
+iisreset /start
+Exit-PSSession
+</code></pre></div><h2 id="性能評価結果回収">性能評価結果回収</h2>
+<h3 id="iisログ">IISログ</h3>
+<p>Webサーバの C:\inetpub\logs\LogFiles\W3SVC1 から該当するログを回収する。</p>
+<h3 id="パフォーマンスモニターのログ">パフォーマンスモニターのログ</h3>
+<p>Webサーバ，DBサーバの C:\PerfLogs\Admin から該当するログを回収する。</p>
+<h3 id="ssmsでレポートを出力">SSMSでレポートを出力</h3>
+<ul>
+<li>SSMS でデータベースを右クリックし下記統計レポートを出力する。
+<ul>
+<li>CPU の平均時間ごとの上位のクエリ</li>
+<li>CPU の総時間ごとの上位のクエリ</li>
+<li>IO の総数ごとの上位のクエリ</li>
+<li>平均 IO 数ごとの上位のクエリ</li>
+</ul>
+</li>
+</ul>
+<h3 id="データ量確認">データ量確認</h3>
+<ul>
+<li>性能評価実施前にデータ量を取得する。</li>
+<li>SSMS で下記クエリを実行する。</li>
+<li>テーブル名は適宜修正する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">DECLARE</span> <span style="color:#f92672">@</span>now datetime;
+<span style="color:#66d9ef">SET</span> <span style="color:#f92672">@</span>now <span style="color:#f92672">=</span> GETDATE();
+
+<span style="color:#66d9ef">select</span> <span style="color:#e6db74">&#39;XXX&#39;</span> <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;機能&#39;</span>, (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> XXX) <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;件数&#39;</span>, <span style="color:#f92672">@</span>now <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;検索日時&#39;</span>
+<span style="color:#66d9ef">union</span> <span style="color:#66d9ef">all</span>
+<span style="color:#66d9ef">select</span> <span style="color:#e6db74">&#39;YYY&#39;</span> <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;機能&#39;</span>, (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> YYY) <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;件数&#39;</span>, <span style="color:#f92672">@</span>now <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;検索日時&#39;</span>
+<span style="color:#66d9ef">union</span> <span style="color:#66d9ef">all</span>
+<span style="color:#66d9ef">select</span> <span style="color:#e6db74">&#39;ZZZ&#39;</span> <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;機能&#39;</span>, (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">from</span> ZZZ) <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;件数&#39;</span>, <span style="color:#f92672">@</span>now <span style="color:#66d9ef">as</span> <span style="color:#e6db74">&#39;検索日時&#39;</span>
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
