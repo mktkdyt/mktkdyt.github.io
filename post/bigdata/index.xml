@@ -1,109 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>mktkdyt</title>
-    <link>https://mktkdyt.github.io/</link>
-    <description>Recent content on mktkdyt</description>
+    <title>Bigdata on mktkdyt</title>
+    <link>https://mktkdyt.github.io/post/bigdata/</link>
+    <description>Recent content in Bigdata on mktkdyt</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 14 Jan 2021 17:24:23 +0900</lastBuildDate><atom:link href="https://mktkdyt.github.io/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Elasticsearch を構築する</title>
-      <link>https://mktkdyt.github.io/post/full_text_search/elasticsearch%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link>
-      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
-      
-      <guid>https://mktkdyt.github.io/post/full_text_search/elasticsearch%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</guid>
-      <description>Elasticsearch を構築する ローカルで Elasticsearch を構築しました。 Elasticsearch 用に 3台，Kibana 用に 1台 VM を立てました。
-VM 作成 Vagrantfile を作成して vagrant up します。
-# Elasticsearch ノード数 es_cnt = 3 cnt = 4 Vagrant.configure(&amp;#34;2&amp;#34;) do |config| config.vm.box = &amp;#34;ubuntu/bionic64&amp;#34; config.vm.synced_folder &amp;#34;./share&amp;#34;, &amp;#34;/home/vagrant/share&amp;#34;, owner: &amp;#34;vagrant&amp;#34;, group: &amp;#34;vagrant&amp;#34; #--- Elasticsearch 構築 ---# (1..es_cnt).each do |i| config.vm.define &amp;#34;es#{i}&amp;#34; do | es | es.disksize.size = &amp;#39;50GB&amp;#39; es.vm.provider &amp;#34;virtualbox&amp;#34; do |vb| vb.memory = 8192 end es.vm.hostname = &amp;#34;es#{i}&amp;#34; es.vm.network &amp;#34;private_network&amp;#34;, ip: &amp;#34;192.</description>
-    </item>
-    
-    <item>
-      <title>Solr Cloud の可用性を検証する</title>
-      <link>https://mktkdyt.github.io/post/full_text_search/solr-cloud%E3%81%AE%E5%8F%AF%E7%94%A8%E6%80%A7%E3%82%92%E6%A4%9C%E8%A8%BC%E3%81%99%E3%82%8B/</link>
-      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
-      
-      <guid>https://mktkdyt.github.io/post/full_text_search/solr-cloud%E3%81%AE%E5%8F%AF%E7%94%A8%E6%80%A7%E3%82%92%E6%A4%9C%E8%A8%BC%E3%81%99%E3%82%8B/</guid>
-      <description>Solr Cloud の可用性を検証する Solr Cloud の可用性を検証しました．
-node の管理 node が停止したら Failover するか，node が再起動したら Failback するか実験しました．
-1個の node を停止する 全ての node が起動しているときの node 一覧とグラフです．
-これらの node で shard1 の leader を停止してみます．
-vagrant halt node2 node 一覧を見ると shard1 の leader が死んだことがすぐわかります．
-グラフを見ると shard1 の leader が 192.168.33.22 -&amp;gt; 192.168.33.24 になりました．
-このように node が停止したら自動で leader が切り替わることがわかりました．
-1個の node を復旧する こんどは停止した node を起動します． また Cloud モードで起動します．
-vagrant up node2 vagrant ssh node2 -c &amp;#34;sudo -u solr /opt/solr/bin/solr stop&amp;#34; vagrant ssh node2 -c &amp;#34;sudo -u solr /opt/solr/bin/solr start -cloud -s /var/solr/data -p 8983 -z 192.</description>
-    </item>
-    
-    <item>
-      <title>Solr Cloud を構築する</title>
-      <link>https://mktkdyt.github.io/post/full_text_search/solr-cloud%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link>
-      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
-      
-      <guid>https://mktkdyt.github.io/post/full_text_search/solr-cloud%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</guid>
-      <description>Solr Cloud を構築する Solr Cloud を Vagrant で構築します．
-Solr Cloud を構築するには，Solr はもちろん ZooKeeper も必要です．
-Solr Cloud イメージはこんな感じです．
- ZooKeeper : 3 Solr node: 4 shard : 2 replica : 2  Zookeeper 3 個，Solr node 4 個の計 7 個の VM を構築します．
-構成 構成を以下に示します．
-D:\vagrant\solrcloud ┣Vagrantfile ┣create_zkensemble.sh ┗create_solrnode.sh Vagrantfile Zookeeper 3 個，Solr node 4 個の計 7 個の VM を構築します．
-Solr を Cloud モードで起動する際に ZooKeeper の接続先を指定する必要があるので Vagrantfile で接続先文字列を用意するのがポイントです．
-# ZooKeeper 数 zk_cnt = 3 # Solr node 数 node_cnt = 4 Vagrant.</description>
-    </item>
-    
-    <item>
-      <title>Solr(Master-Slave)を構築する</title>
-      <link>https://mktkdyt.github.io/post/full_text_search/solrmaster-slave%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link>
-      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
-      
-      <guid>https://mktkdyt.github.io/post/full_text_search/solrmaster-slave%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</guid>
-      <description>Solr(Master-Slave)を構築する Vagrant で Solr を Master-Slave で構築しました．
-Solr のバージョンは 6.2.0 です．
-構成 Solr の構築はシェルでやることにしました．
-D:\vagrant\solrmasterslave ┣Vagrantfile ┗create_solr.sh Vagrantfile  OS は CentOS 7 を使用します． プロビジョナでシェルを実行します．  slave_cnt = 2 Vagrant.configure(&amp;#34;2&amp;#34;) do |config| config.vm.box = &amp;#34;centos/7&amp;#34; config.vm.define &amp;#34;master&amp;#34; do | master | master.vm.hostname = &amp;#34;master&amp;#34; master.vm.network &amp;#34;private_network&amp;#34;, ip: &amp;#34;192.168.33.40&amp;#34; master.vm.provision :hosts, :sync_hosts =&amp;gt; true master.vm.provision :shell, path: &amp;#34;./create_solr.sh&amp;#34; end (1..slave_cnt).each do |i| config.vm.define &amp;#34;slave#{i}&amp;#34; do | slave | slave.vm.hostname = &amp;#34;slave#{i}&amp;#34; slave.</description>
-    </item>
-    
-    <item>
-      <title>Solr(Standalone) を構築する</title>
-      <link>https://mktkdyt.github.io/post/full_text_search/solrstandalone%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link>
-      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
-      
-      <guid>https://mktkdyt.github.io/post/full_text_search/solrstandalone%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</guid>
-      <description>Solr(Standalone) を構築する Vagrant で Solr を Standalone で構築しました．
-Solr のバージョンは 6.2.0 です．
-構成 Solr の構築はシェルでやることにしました．
-D:\vagrant\solr-standalone ┣Vagrantfile ┗create_solr.sh Vagrantfile  OS は CentOS 7 を使用します． プロビジョナでシェルを実行します．  Vagrant.configure(&amp;#34;2&amp;#34;) do |config| config.vm.box = &amp;#34;centos/7&amp;#34; config.vm.network &amp;#34;private_network&amp;#34;, ip: &amp;#34;192.168.33.30&amp;#34; config.vm.provision :shell, path: &amp;#34;./create_solr.sh&amp;#34; end create_solr.sh  Java をインストールします． Solr のアーカイブを取得して展開しシェルを実行します． Solr で使用する Port を開放します．  # Java をインストールする yum install -y java-1.8.0-openjdk # Solr を構築する cd /usr/local/src/ yum install -y wget wget https://archive.</description>
-    </item>
-    
-    <item>
-      <title>ZooKeeper Ensemble を構築する</title>
-      <link>https://mktkdyt.github.io/post/full_text_search/zookeeper-ensemble%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link>
-      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
-      
-      <guid>https://mktkdyt.github.io/post/full_text_search/zookeeper-ensemble%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</guid>
-      <description>ZooKeeper Ensemble を構築する ZooKeeper も冗長構成を取れるように ZooKeeper Ensemble を構築します． ZooKeeper のバージョンは 3.4.14 です．
-ZooKeeper Ensemble ZooKeeper の可用性を高めるために複数台で　Ensemble 構成を取ります． ZooKeeper では Ensemble の過半数が動作していることがサービスの継続条件のため，奇数台で構築するのがベストなようです．
-例
-4 台のマシンで ZooKeeper Ensemble を構築した場合，1 台のマシンがダウンしても残り 3 台で過半数となるためサービスを継続することができますが， 2 台のマシンがダウンすると残り 2 台で過半数にならないためサービスを継続できなくなってしまいます． つまり 1 / 4，25 % のダウンを許容します．
-5 台のマシンで ZooKeeper Ensemble を構築した場合，2 台のマシンがダウンしても残り 3 台で過半数となるためサービスを継続することができますが， 3 台のマシンがダウンすると残り 2 台で過半数にならないためサービスを継続できなくなってしまいます． つまり 2 / 5，40 % のダウンを許容します．
-6 台のマシンで ZooKeeper Ensemble を構築した場合，2 台のマシンがダウンしても残り 4 台で過半数となるためサービスを継続することができますが， 3 台のマシンがダウンすると残り 3 台で過半数にならないためサービスを継続できなくなってしまいます． つまり 2 / 6，33 % のダウンを許容します．</description>
-    </item>
-    
-    <item>
-      <title>ZooKeeper を構築する</title>
-      <link>https://mktkdyt.github.io/post/full_text_search/zookeeper%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link>
-      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
-      
-      <guid>https://mktkdyt.github.io/post/full_text_search/zookeeper%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</guid>
-      <description>ZooKeeper を構築する Solr Cloud を構築するには ZooKeeper を構築する必要があります．
-そこで Vagrant で ZooKeeper を構築しました． ZooKeeper のバージョンは 3.4.14 です．
-ZooKeeper??? Solr Cloud を構築する上で必須なサービスです．
-Solr Cloud では collection を 複数の shard に分けることでインデックスを分散し，さらに shard を replication により複製し冗長構成をとることで可用性を向上させます．
-ZooKeeper は分散アプリケーションの管理をおこない，Solr Cloud において shard の replica が格納された Solr の各 node の状態を管理します．
-構成 ZooKeeper の構築はシェルでやることにしました．
-D:\vagrant\zk ┣Vagrantfile ┗create_zk.sh Vagrantfile  OS は CentOS 7 を使用します． プロビジョナでシェルを実行します．  Vagrant.configure(&amp;#34;2&amp;#34;) do |config| config.vm.box = &amp;#34;centos/7&amp;#34; config.vm.network &amp;#34;private_network&amp;#34;, ip: &amp;#34;192.168.33.10&amp;#34; config.vm.provision :shell, path: &amp;#34;.</description>
-    </item>
-    
+    <lastBuildDate>Thu, 14 Jan 2021 17:24:23 +0900</lastBuildDate><atom:link href="https://mktkdyt.github.io/post/bigdata/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Pigで辞書を当てる</title>
       <link>https://mktkdyt.github.io/post/bigdata/pig%E3%81%A7%E8%BE%9E%E6%9B%B8%E3%82%92%E5%BD%93%E3%81%A6%E3%82%8B/</link>

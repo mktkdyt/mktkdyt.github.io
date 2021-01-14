@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Solr Cloud の可用性を検証する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Solr Cloud の可用性を検証する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Solr Cloud の可用性を検証する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="solr-cloud-の可用性を検証する">Solr Cloud の可用性を検証する</h1>
+<p>Solr Cloud の可用性を検証しました．</p>
+<h2 id="node-の管理">node の管理</h2>
+<p>node が停止したら Failover するか，node が再起動したら Failback するか実験しました．</p>
+<h3 id="1個の-node-を停止する">1個の node を停止する</h3>
+<p>全ての node が起動しているときの node 一覧とグラフです．</p>
+<p><img src="images/solr_cloud_nodes_collection_created.png" alt="images/solr_cloud_nodes_collection_created.png"></p>
+<p><img src="images/solr_cloud_graph_collection_created.png" alt="images/solr_cloud_graph_collection_created.png"></p>
+<p>これらの node で shard1 の leader を停止してみます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">vagrant halt node2
+</code></pre></div><p>node 一覧を見ると shard1 の leader が死んだことがすぐわかります．</p>
+<p><img src="images/solr_cloud_nodes_shard1_leader_dead.png" alt="images/solr_cloud_nodes_shard1_leader_dead.png"></p>
+<p>グラフを見ると shard1 の leader が 192.168.33.22 -&gt; 192.168.33.24 になりました．</p>
+<p><img src="images/solr_cloud_graph_shard1_leader_dead.png" alt="images/solr_cloud_graph_shard1_leader_dead.png"></p>
+<p>このように node が停止したら自動で leader が切り替わることがわかりました．</p>
+<h3 id="1個の-node-を復旧する">1個の node を復旧する</h3>
+<p>こんどは停止した node を起動します．
+また Cloud モードで起動します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">vagrant up node2
+vagrant ssh node2 -c <span style="color:#e6db74">&#34;sudo -u solr /opt/solr/bin/solr stop&#34;</span>
+vagrant ssh node2 -c <span style="color:#e6db74">&#34;sudo -u solr /opt/solr/bin/solr start -cloud -s /var/solr/data -p 8983 -z 192.168.33.11:2181,192.168.33.12:2181,192.168.33.13:2181 -h 192.168.33.22&#34;</span>
+</code></pre></div><p>node 一覧を見ると shard1 の node が復活したことがすぐわかります．</p>
+<p><img src="images/solr_cloud_nodes_shard1_node_revival.png" alt="images/solr_cloud_nodes_shard1_node_revival.png"></p>
+<p>グラフを見ると node が shard1 に復帰しました．</p>
+<p><img src="images/solr_cloud_graph_shard1_node_revival.png" alt="images/solr_cloud_graph_shard1_node_revival.png"></p>
+<p>このように node が再起動したら自動で Solr Cloud に復帰し，shard に割り当てられることがわかりました．</p>
+<h2 id="shard-の管理">shard の管理</h2>
+<p>先ほどの例では 1個の node を消しました．
+今度は 1個の shard を消したらどうなるか実験します．</p>
+<h3 id="1個の-shard-を停止する">1個の shard を停止する</h3>
+<p>現状の node 一覧とグラフです．</p>
+<p><img src="images/solr_cloud_nodes_shard1_node_revival.png" alt="images/solr_cloud_nodes_shard1_node_revival.png"></p>
+<p><img src="images/solr_cloud_graph_shard1_node_revival.png" alt="images/solr_cloud_graph_shard1_node_revival.png"></p>
+<p>shard1 の node を全てを停止してみます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">vagrant halt node2
+vagrant halt node4
+</code></pre></div><p>shard1 が死んでますね．
+shard2 の node が shard1 の node になるなんてことは起こりませんでした．</p>
+<p><img src="images/solr_cloud_nodes_shard1_dead.png" alt="images/solr_cloud_nodes_shard1_dead.png"></p>
+<p><img src="images/solr_cloud_graph_shard1_dead.png" alt="images/solr_cloud_graph_shard1_dead.png"></p>
+<p>この状態で検索すると shard1 がありませんと怒られます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.21:8983/solr/examplecollection/select?q=*:*&amp;fl=id&amp;sort=id%20asc&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.21
+<span style="color:#f92672">{</span>
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:<span style="color:#f92672">{</span>
+    <span style="color:#e6db74">&#34;status&#34;</span>:503,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:0,
+    <span style="color:#e6db74">&#34;params&#34;</span>:<span style="color:#f92672">{</span>
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;sort&#34;</span>:<span style="color:#e6db74">&#34;id asc&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span><span style="color:#f92672">}}</span>,
+  <span style="color:#e6db74">&#34;error&#34;</span>:<span style="color:#f92672">{</span>
+    <span style="color:#e6db74">&#34;metadata&#34;</span>:<span style="color:#f92672">[</span>
+      <span style="color:#e6db74">&#34;error-class&#34;</span>,<span style="color:#e6db74">&#34;org.apache.solr.common.SolrException&#34;</span>,
+      <span style="color:#e6db74">&#34;root-error-class&#34;</span>,<span style="color:#e6db74">&#34;org.apache.solr.common.SolrException&#34;</span><span style="color:#f92672">]</span>,
+    <span style="color:#e6db74">&#34;msg&#34;</span>:<span style="color:#e6db74">&#34;no servers hosting shard: shard1&#34;</span>,
+    <span style="color:#e6db74">&#34;code&#34;</span>:503<span style="color:#f92672">}}</span>
+</code></pre></div><p>shard が死ぬと検索にも影響を及ぼすことがわかりました．</p>
+<h3 id="shard-を復旧する">shard を復旧する</h3>
+<p>先ほどのままではよろしくないので復旧します．
+停止している shard に属する node を起動します．
+また Cloud モードで起動します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">vagrant up node2
+vagrant ssh node2 -c <span style="color:#e6db74">&#34;sudo -u solr /opt/solr/bin/solr stop&#34;</span>
+vagrant ssh node2 -c <span style="color:#e6db74">&#34;sudo -u solr /opt/solr/bin/solr restart -cloud -s /var/solr/data -p 8983 -z 192.168.33.11:2181,192.168.33.12:2181,192.168.33.13:2181 -h 192.168.33.22&#34;</span>
+</code></pre></div><p>node 一覧を見ると shard1 の node が復活しましたが down と表示されています．</p>
+<p><img src="images/solr_cloud_nodes_shard1_down.png" alt="images/solr_cloud_nodes_shard1_down.png"></p>
+<p>グラフを見ても shard1 の node が down しています．</p>
+<p><img src="images/solr_cloud_graph_shard1_down.png" alt="images/solr_cloud_graph_shard1_down.png"></p>
+<p>この状態で検索しても shard1 がないと怒られてしまいます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.21:8983/solr/examplecollection/select?q=*:*&amp;fl=id&amp;sort=id%20asc&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.21
+<span style="color:#f92672">{</span>
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:<span style="color:#f92672">{</span>
+    <span style="color:#e6db74">&#34;status&#34;</span>:503,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:0,
+    <span style="color:#e6db74">&#34;params&#34;</span>:<span style="color:#f92672">{</span>
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;sort&#34;</span>:<span style="color:#e6db74">&#34;id asc&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span><span style="color:#f92672">}}</span>,
+  <span style="color:#e6db74">&#34;error&#34;</span>:<span style="color:#f92672">{</span>
+    <span style="color:#e6db74">&#34;metadata&#34;</span>:<span style="color:#f92672">[</span>
+      <span style="color:#e6db74">&#34;error-class&#34;</span>,<span style="color:#e6db74">&#34;org.apache.solr.common.SolrException&#34;</span>,
+      <span style="color:#e6db74">&#34;root-error-class&#34;</span>,<span style="color:#e6db74">&#34;org.apache.solr.common.SolrException&#34;</span><span style="color:#f92672">]</span>,
+    <span style="color:#e6db74">&#34;msg&#34;</span>:<span style="color:#e6db74">&#34;no servers hosting shard: shard1&#34;</span>,
+    <span style="color:#e6db74">&#34;code&#34;</span>:503<span style="color:#f92672">}}</span>
+</code></pre></div><p>ですがしばらく待つと node が生き返ります．</p>
+<p><img src="images/solr_cloud_nodes_shard1_revival.png" alt="images/solr_cloud_nodes_shard1_revival.png"></p>
+<p><img src="images/solr_cloud_graph_shard1_revival.png" alt="images/solr_cloud_graph_shard1_revival.png"></p>
+<p>検索すると全件取得できました．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.21:8983/solr/examplecollection/select?q=*:*&amp;fl=id&amp;sort=id%20asc&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.21
+<span style="color:#f92672">{</span>
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:<span style="color:#f92672">{</span>
+    <span style="color:#e6db74">&#34;zkConnected&#34;</span>:true,
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:108,
+    <span style="color:#e6db74">&#34;params&#34;</span>:<span style="color:#f92672">{</span>
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;sort&#34;</span>:<span style="color:#e6db74">&#34;id asc&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span><span style="color:#f92672">}}</span>,
+  <span style="color:#e6db74">&#34;response&#34;</span>:<span style="color:#f92672">{</span><span style="color:#e6db74">&#34;numFound&#34;</span>:32,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:<span style="color:#f92672">[</span>
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;0579B002&#34;</span><span style="color:#f92672">}</span>,
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;100-435805&#34;</span><span style="color:#f92672">}</span>,
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;3007WFP&#34;</span><span style="color:#f92672">}</span>,
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;6H500F0&#34;</span><span style="color:#f92672">}</span>,
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;9885A004&#34;</span><span style="color:#f92672">}</span>,
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;EN7800GTX/2DHTV/256M&#34;</span><span style="color:#f92672">}</span>,
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;EUR&#34;</span><span style="color:#f92672">}</span>,
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;F8V7067-APL-KIT&#34;</span><span style="color:#f92672">}</span>,
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GB18030TEST&#34;</span><span style="color:#f92672">}</span>,
+      <span style="color:#f92672">{</span>
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GBP&#34;</span><span style="color:#f92672">}]</span>
+  <span style="color:#f92672">}}</span>
+</code></pre></div><h2 id="まとめ">まとめ</h2>
+<ul>
+<li>node が停止したら自動で leader が切り替わります．</li>
+<li>node が再起動したら自動で Solr Cloud に復帰し，shard に割り当てられます．</li>
+<li>shard に属する node が全て停止したら shard は機能しなくなり検索にも影響が出ます．</li>
+<li>node が全停止した shard で node が復旧すると最初は dead 状態だがしばらくすると復旧し検索できるようになります．</li>
+</ul>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

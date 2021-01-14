@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ビッグデータ分析で使用するPythonコード一覧</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">ビッグデータ分析で使用するPythonコード一覧</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>ビッグデータ分析で使用するPythonコード一覧</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h2 id="環境構築">環境構築</h2>
+<ul>
+<li>必要に応じて仮想環境を作る。</li>
+</ul>
+<h3 id="仮想環境作成">仮想環境作成</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python3 -m venv test
+</code></pre></div><h3 id="仮想環境有効化">仮想環境有効化</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ source test/bin/activate
+<span style="color:#f92672">(</span>test<span style="color:#f92672">)</span>$
+</code></pre></div><h3 id="仮想環境無効化">仮想環境無効化</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#f92672">(</span>test<span style="color:#f92672">)</span>$ deactivate
+$
+</code></pre></div><h2 id="文字列処理">文字列処理</h2>
+<h3 id="文字列を切り出す">文字列を切り出す</h3>
+<ul>
+<li>[開始インデックス:終了文字番号(インデックスではないことに注意)]とする。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">s <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;2019-06-01&#34;</span>
+<span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#34;{s[0:4]}-{s[5:7]}-{s[8:10]}&#34;</span>)
+</code></pre></div><h2 id="エスケープ">エスケープ</h2>
+<h3 id="波括弧のエスケープ">波括弧のエスケープ</h3>
+<ul>
+<li>波括弧は波括弧でエスケープする。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">var <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;aiuto&#39;</span>
+<span style="color:#66d9ef">print</span>( f<span style="color:#e6db74">&#34;val is {{{var}}}&#34;</span> )
+</code></pre></div><h2 id="ディレクトリ操作">ディレクトリ操作</h2>
+<h3 id="ディレクトリ作成">ディレクトリ作成</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> os
+
+os<span style="color:#f92672">.</span>makidirs(<span style="color:#e6db74">&#39;tmp&#39;</span>, exist_ok<span style="color:#f92672">=</span>True)
+</code></pre></div><h2 id="class">class</h2>
+<ul>
+<li>プロパティ等を別ファイルにしたい場合等に使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">classsample
+├── main.py
+└── prop
+    └── user_property.py
+</code></pre></div><p>main.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> prop.user_property <span style="color:#f92672">import</span> UserProperty
+
+user_property <span style="color:#f92672">=</span> UserProperty({<span style="color:#e6db74">&#39;first_name&#39;</span>: <span style="color:#e6db74">&#39;イチロー&#39;</span>, <span style="color:#e6db74">&#39;family_name&#39;</span>: <span style="color:#e6db74">&#39;テスト&#39;</span>})
+<span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#39;{user_property.FAMILY_NAME} {user_property.FIRST_NAME}&#39;</span>)
+</code></pre></div><p>prop/user_property.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> ClassVar, Dict, List, Any
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserProperty</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, kwargs: Dict[str, Any]):
+        self<span style="color:#f92672">.</span>FIRST_NAME <span style="color:#f92672">=</span> kwargs[<span style="color:#e6db74">&#39;first_name&#39;</span>]
+        self<span style="color:#f92672">.</span>FAMILY_NAME <span style="color:#f92672">=</span> kwargs[<span style="color:#e6db74">&#39;family_name&#39;</span>]
+</code></pre></div><p>実行結果</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python main.py
+テスト イチロー
+</code></pre></div><h2 id="ジェネレータ">ジェネレータ</h2>
+<ul>
+<li>yield でジェネレータイテレータ（ジェネレータで生成された要素を1個ずつ取り出すことが出来るオブジェクト）を生成する。</li>
+<li>ジェネレータイテレータから要素を取り出すタイミングでジェネレータ関数が実行される。</li>
+<li>例えば1,000,000行のレコードを読み込むとき，リストに格納してreturnする関数を用意するとメモリを多く使用してしまうがジェネレータ関数を使えば1行ずつ読み込むためメモリへの負荷を抑えることが出来る。</li>
+</ul>
+<p>main.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">genarate_items</span>():
+    <span style="color:#66d9ef">yield</span> <span style="color:#ae81ff">1</span>
+    <span style="color:#66d9ef">yield</span> <span style="color:#ae81ff">2</span>
+    <span style="color:#66d9ef">yield</span> <span style="color:#ae81ff">3</span>
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;ジェネレータイテレータ生成&#39;</span>)
+    items <span style="color:#f92672">=</span> genarate_items()
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;イテレーション開始&#39;</span>)
+    <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> items:
+        <span style="color:#66d9ef">print</span>(item)
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;イテレーション終了&#39;</span>)
+</code></pre></div><p>実行結果</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python main.py
+ジェネレータイテレータ生成
+イテレーション開始
+<span style="color:#ae81ff">1</span>
+<span style="color:#ae81ff">2</span>
+<span style="color:#ae81ff">3</span>
+イテレーション終了
+</code></pre></div><h2 id="subprocess">subprocess</h2>
+<ul>
+<li>subprocess で Python からシェルコマンドを実行出来る。
+<ul>
+<li>むしろシェルコマンドを実行しないとビッグデータ分析出来ない。</li>
+</ul>
+</li>
+</ul>
+<h3 id="シェルコマンド実行">シェルコマンド実行</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> subprocess
+
+c <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;hadoop&#39;</span>, <span style="color:#e6db74">&#39;fs&#39;</span>, <span style="color:#e6db74">&#39;-rm&#39;</span>, <span style="color:#e6db74">&#39;-r&#39;</span>, <span style="color:#e6db74">&#39;/tmp/test&#39;</span>]
+subprocess<span style="color:#f92672">.</span>run(c)
+</code></pre></div><h3 id="xargs-でシェルコマンドを並列実行">xargs でシェルコマンドを並列実行</h3>
+<ul>
+<li>パイプを使うには shell=True とする必要がある。</li>
+<li>subprocess.Popen() でプロセスを受け取り，wait()で処理完了を待機出来る。
+<ul>
+<li>後続の処理はプロセスが完了するまで実行されない。</li>
+</ul>
+</li>
+<li>サンプルは Python から tmp に入った各ファイルを cat して test.sh を並列数10で実行している。</li>
+<li>途中の処理だけ並列実行して処理時間を短縮したい場合に使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">c <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;ls tmp/* | xargs -L 1 -P 10 -t bash -c </span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">cat $0 | test.sh -&#39;</span>
+p <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>Popen(c, shell <span style="color:#f92672">=</span> True)
+p<span style="color:#f92672">.</span>wait()
+
+<span style="color:#75715e"># 後続の処理</span>
+</code></pre></div><h3 id="標準出力の扱い">標準出力の扱い</h3>
+<ul>
+<li>stdout, stderr は必要なければあえて pipe に渡さない。
+<ul>
+<li>python test.py &amp;&gt; log/test.log で標準出力を受け取れる。</li>
+</ul>
+</li>
+</ul>
+<h2 id="click">click</h2>
+<ul>
+<li>click で簡単にターミナルで実行可能なコマンドを実装出来る。</li>
+<li>@click.command() でコマンドを実装する。</li>
+<li>@click.group()，add_command() で複数コマンドを実装可能。</li>
+<li>@click.option() でコマンドの引数を追加出来る。</li>
+<li>click.get_text_stream(&ldquo;stdin&rdquo;, encoding=&ldquo;utf-8&rdquo;) で標準入力を受け取る。</li>
+<li>click.echo() で標準出力に出力する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">click
+├── cli.py
+└── command
+    └── hello
+        └── cli.py
+</code></pre></div><p>click/cli.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> click
+
+<span style="color:#f92672">from</span> command.hello.cli <span style="color:#f92672">import</span> hello
+
+<span style="color:#a6e22e">@click.group</span>()
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">entry_point</span>():
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;click/cli.py のメッセージ。&#39;</span>)
+
+entry_point<span style="color:#f92672">.</span>add_command(hello)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">init</span>():
+    entry_point(<span style="color:#f92672">**</span>{})
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+    init()
+</code></pre></div><p>click/command/hello/cli.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> click
+
+<span style="color:#a6e22e">@click.command</span>(<span style="color:#e6db74">&#39;hello&#39;</span>)
+<span style="color:#a6e22e">@click.option</span>(<span style="color:#e6db74">&#39;--msg&#39;</span>, <span style="color:#e6db74">&#39;-m&#39;</span>, <span style="color:#e6db74">&#39;msg&#39;</span>, type<span style="color:#f92672">=</span>str, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;表示したいメッセージを入力してください。&#39;</span>)
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hello</span>(<span style="color:#f92672">**</span>kwargs):
+    <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#39;入力されたメッセージ：{kwargs[&#34;msg&#34;]}&#39;</span>)
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;click/cmd/hello/cli.py のメッセージ。&#39;</span>)
+    lines <span style="color:#f92672">=</span> click<span style="color:#f92672">.</span>get_text_stream(<span style="color:#e6db74">&#34;stdin&#34;</span>, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;utf-8&#34;</span>)
+    <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> lines:
+        <span style="color:#66d9ef">print</span>(line)
+    click<span style="color:#f92672">.</span>echo(<span style="color:#e6db74">&#39;標準出力に出力。&#39;</span>)
+</code></pre></div><p>test.tsv</p>
+<pre><code>001	a
+002	b
+003	c
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ cat test.tsv | python cli.py hello -m <span style="color:#e6db74">&#39;テスト&#39;</span>
+click/cli.py のメッセージ。
+入力されたメッセージ：テスト
+click/cmd/hello/cli.py のメッセージ。
+001	a
+002	b
+003	c
+標準出力に出力。
+</code></pre></div><h2 id="pandas">pandas</h2>
+<ul>
+<li>データを加工する際に使用する。</li>
+</ul>
+<h3 id="tsv-読み込み">tsv 読み込み</h3>
+<ul>
+<li>delimiter で区切り文字を指定出来る。</li>
+<li>names で列名を設定出来る。</li>
+<li>dtype でデータ型を指定出来る。</li>
+<li>大容量ファイルを扱う場合は low_memory=False とする。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> pandas <span style="color:#f92672">as</span> pd
+
+df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;user.tsv&#39;</span>, delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">&#39;</span>, header<span style="color:#f92672">=</span>None, names<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;id&#39;</span>, <span style="color:#e6db74">&#39;name&#39;</span>], dtype<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;id&#39;</span>: str, <span style="color:#e6db74">&#39;name&#39;</span>: str}, low_memory<span style="color:#f92672">=</span>False)
+</code></pre></div><h3 id="tsv-出力">tsv 出力</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">df<span style="color:#f92672">.</span>to_csv(<span style="color:#e6db74">&#39;test.tsv&#39;</span>, sep<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">&#39;</span>)
+</code></pre></div><h3 id="特定の列を指定して出力">特定の列を指定して出力</h3>
+<ul>
+<li>分析する上では必要だが結果として不要な列を配所したい時に使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;id&#39;</span>, <span style="color:#e6db74">&#39;name&#39;</span>]
+df[colums]<span style="color:#f92672">.</span>to_csv(<span style="color:#e6db74">&#39;test.tsv&#39;</span>, sep<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">&#39;</span>, index<span style="color:#f92672">=</span>False)
+</code></pre></div><h3 id="件数を絞って出力する">件数を絞って出力する</h3>
+<ul>
+<li>サンプリングで使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">df<span style="color:#f92672">.</span>sample(n<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span>)<span style="color:#f92672">.</span>to_csv(<span style="color:#e6db74">&#39;test.tsv&#39;</span>, sep<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">&#39;</span>)
+</code></pre></div><h3 id="重複行削除">重複行削除</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">df<span style="color:#f92672">.</span>drop_duplicates()
+</code></pre></div><h3 id="query-でダブルクォートを使う">query でダブルクォートを使う</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">df<span style="color:#f92672">.</span>query(<span style="color:#e6db74">&#39;row_name.str.contains(&#34;</span><span style="color:#ae81ff">\\\&#34;</span><span style="color:#e6db74">keyword</span><span style="color:#ae81ff">\\\&#34;</span><span style="color:#e6db74">&#34;)&#39;</span>)
+</code></pre></div><h2 id="エラーハンドリング">エラーハンドリング</h2>
+<h3 id="python-スクリプト強制終了">Python スクリプト強制終了</h3>
+<ul>
+<li>エラー発生時に Python スクリプトを強制終了したい時に使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> sys
+
+sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+</code></pre></div><h3 id="ファイル存在確認">ファイル存在確認</h3>
+<ul>
+<li>データ分析をかける前に必要なインプットが揃っているかを見る際に使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> os
+
+<span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists():
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;ファイルが存在します。後続の処理を実行します。&#39;</span>)
+<span style="color:#66d9ef">else</span>:
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;ファイルが存在しません。処理を終了します。&#39;</span>)
+    sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+</code></pre></div><h2 id="ロギング">ロギング</h2>
+<ul>
+<li>Python の標準モジュール logging を使用する。</li>
+<li>以下のような構成でのロギングサンプルを記載する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">test
+├── module
+│   └── sub.py
+└── main.py
+</code></pre></div><p>main.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># 自作モジュール</span>
+<span style="color:#f92672">import</span> module.sub <span style="color:#f92672">as</span> sub
+
+<span style="color:#f92672">from</span> logging <span style="color:#f92672">import</span> CRITICAL, DEBUG, ERROR, INFO, WARNING
+<span style="color:#f92672">from</span> logging <span style="color:#f92672">import</span> NullHandler, StreamHandler, basicConfig, getLogger, Formatter
+<span style="color:#f92672">from</span> logging.handlers <span style="color:#f92672">import</span> TimedRotatingFileHandler
+
+logger <span style="color:#f92672">=</span> getLogger(__name__)
+logger<span style="color:#f92672">.</span>addHandler(NullHandler())
+logger<span style="color:#f92672">.</span>setLevel(DEBUG)
+sh <span style="color:#f92672">=</span> StreamHandler()
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">init</span>() <span style="color:#f92672">-&gt;</span> None:
+    basicConfig(
+        handlers<span style="color:#f92672">=</span>[sh],
+        format<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">%(asctime)s</span><span style="color:#e6db74">] </span><span style="color:#e6db74">%(name)s</span><span style="color:#e6db74"> </span><span style="color:#e6db74">%(levelname)s</span><span style="color:#e6db74">: </span><span style="color:#e6db74">%(message)s</span><span style="color:#e6db74">&#34;</span>,
+        datefmt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;%y-%m-</span><span style="color:#e6db74">%d</span><span style="color:#e6db74"> %H:%M:%S&#34;</span>,
+    )
+    root_logger <span style="color:#f92672">=</span> getLogger()
+    root_logger<span style="color:#f92672">.</span>setLevel(DEBUG)
+
+    rfh <span style="color:#f92672">=</span> TimedRotatingFileHandler(
+        <span style="color:#e6db74">&#34;log/test.log&#34;</span>,
+        when<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;midnight&#34;</span>,
+        backupCount<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>,
+    )
+    format_template <span style="color:#f92672">=</span> (
+        f<span style="color:#e6db74">&#34;PID:</span><span style="color:#e6db74">%(process)d</span><span style="color:#e6db74"> [</span><span style="color:#e6db74">%(asctime)s</span><span style="color:#e6db74">] </span><span style="color:#e6db74">%(name)s</span><span style="color:#e6db74"> </span><span style="color:#e6db74">%(levelname)s</span><span style="color:#e6db74">: </span><span style="color:#e6db74">%(message)s</span><span style="color:#e6db74">&#34;</span>
+    )
+    log_format <span style="color:#f92672">=</span> Formatter(fmt<span style="color:#f92672">=</span>format_template, datefmt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;%y-%m-</span><span style="color:#e6db74">%d</span><span style="color:#e6db74"> %H:%M:%S&#34;</span>)
+    rfh<span style="color:#f92672">.</span>setFormatter(log_format)
+    root_logger<span style="color:#f92672">.</span>addHandler(rfh)
+
+    logger<span style="color:#f92672">.</span>debug(<span style="color:#e6db74">&#34;スクリプト実行開始&#34;</span>)
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+    init()
+    <span style="color:#75715e"># 自作モジュールの関数を呼び出す</span>
+    sub<span style="color:#f92672">.</span>hello()
+</code></pre></div><p>module/sub.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> logging <span style="color:#f92672">import</span> getLogger
+
+logger <span style="color:#f92672">=</span> getLogger(__name__)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hello</span>():
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;hello! this is sub module.&#39;</span>)
+    logger<span style="color:#f92672">.</span>debug(<span style="color:#e6db74">&#39;sub moduleから出力&#39;</span>)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python main.py
+<span style="color:#f92672">[</span>20-06-25 14:20:56<span style="color:#f92672">]</span> __main__ DEBUG: スクリプト実行開始
+hello! this is sub module.
+<span style="color:#f92672">[</span>20-06-25 14:20:56<span style="color:#f92672">]</span> module.sub DEBUG: sub moduleから出力
+
+$ head log/test.log
+PID:15171 <span style="color:#f92672">[</span>20-06-25 14:20:56<span style="color:#f92672">]</span> __main__ DEBUG: スクリプト実行開始
+PID:15171 <span style="color:#f92672">[</span>20-06-25 14:20:56<span style="color:#f92672">]</span> module.sub DEBUG: sub moduleから出力
+</code></pre></div><h2 id="その他">その他</h2>
+<h3 id="ファイル件数取得">ファイル件数取得</h3>
+<ul>
+<li>1行でシェルコマンドを実行することなく取得可能。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">cnt <span style="color:#f92672">=</span> str(sum(<span style="color:#ae81ff">1</span> <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> open(<span style="color:#e6db74">&#39;test.tsv&#39;</span>)))
+</code></pre></div><h3 id="ファイルを1行の文字列にする">ファイルを1行の文字列にする</h3>
+<ul>
+<li>複数キーワードをOR条件で1行にする際に使用した。</li>
+</ul>
+<p>main.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> os
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">load_file_as_one_line</span>(file, sep):
+    <span style="color:#66d9ef">with</span> open(file) <span style="color:#66d9ef">as</span> f:
+        lines_one_str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+        <span style="color:#75715e"># a\nb\nc\n -&gt; a|b|c|d</span>
+        lines <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>readlines()
+        <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> lines:
+            w <span style="color:#f92672">=</span> line<span style="color:#f92672">.</span>rstrip(os<span style="color:#f92672">.</span>linesep)
+            <span style="color:#66d9ef">if</span>(w <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;&#39;</span>):
+                lines_one_str <span style="color:#f92672">+=</span> w <span style="color:#f92672">+</span> sep
+        <span style="color:#66d9ef">return</span> lines_one_str[:<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+
+<span style="color:#66d9ef">print</span>(load_file_as_one_line(<span style="color:#e6db74">&#39;data.txt&#39;</span>, <span style="color:#e6db74">&#39;|&#39;</span>))
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ cat data.txt
+テスト
+test
+テキスト
+text
+テースト
+$ python main.py
+テスト|test|テキスト|text|テースト|taste
+</code></pre></div><h3 id="日付パーティションのディレクトリを動的に生成する">日付パーティションのディレクトリを動的に生成する</h3>
+<ul>
+<li>データ分析では n ヵ月分のデータを読み込む，n 日分のデータを読み込むという場面がよくあるのでそういった時に使用する。</li>
+</ul>
+<p>main.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> datetime
+<span style="color:#f92672">from</span> dateutil.relativedelta <span style="color:#f92672">import</span> relativedelta
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">out_term</span>(year, month, term, base_dir):
+    d <span style="color:#f92672">=</span> datetime<span style="color:#f92672">.</span>date(year, month, <span style="color:#ae81ff">1</span>)
+    txt <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+
+    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(term):
+        txt <span style="color:#f92672">+=</span> base_dir <span style="color:#f92672">+</span> (d <span style="color:#f92672">+</span> relativedelta(months<span style="color:#f92672">=</span>i))<span style="color:#f92672">.</span>strftime(<span style="color:#e6db74">&#34;%Y/%m&#34;</span>)
+        <span style="color:#66d9ef">if</span>(i <span style="color:#f92672">!=</span> term <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) :
+            txt <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;,&#34;</span>
+    <span style="color:#66d9ef">return</span> txt
+    
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">out_reverse_term_by_day</span>(d, reverse_term, base_dir):
+    txt <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+    
+    d <span style="color:#f92672">=</span> d <span style="color:#f92672">-</span> relativedelta(days<span style="color:#f92672">=</span>reverse_term <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)
+    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(reverse_term):
+        txt <span style="color:#f92672">+=</span> base_dir <span style="color:#f92672">+</span> (d <span style="color:#f92672">+</span> relativedelta(days<span style="color:#f92672">=</span>i))<span style="color:#f92672">.</span>strftime(<span style="color:#e6db74">&#34;%Y/%m/</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">&#34;</span>)
+        <span style="color:#66d9ef">if</span>(i <span style="color:#f92672">!=</span> reverse_term <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) :
+            txt <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;,&#34;</span>
+    <span style="color:#66d9ef">return</span> txt
+
+<span style="color:#75715e"># 2019-11 から4ヵ月分のディレクトリを用意する</span>
+<span style="color:#66d9ef">print</span>(out_term(<span style="color:#ae81ff">2019</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#39;/tmp/input/&#39;</span>))
+<span style="color:#75715e"># 2019-11-02 から5日遡った分のディレクトリを用意する</span>
+<span style="color:#66d9ef">print</span>(out_reverse_term_by_day(datetime<span style="color:#f92672">.</span>date(<span style="color:#ae81ff">2019</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">2</span>), <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#39;/tmp/input/&#39;</span>))
+</code></pre></div><p>実行結果</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python main.py
+/tmp/input/2019/11,/tmp/input/2019/12,/tmp/input/2020/01,/tmp/input/2020/02
+/tmp/input/2019/10/29,/tmp/input/2019/10/30,/tmp/input/2019/10/31,/tmp/input/2019/11/01,/tmp/input/2019/11/02
+</code></pre></div><h3 id="pigテンプレートに条件式やパス等を動的に埋め込む">Pigテンプレートに条件式やパス等を動的に埋め込む</h3>
+<ul>
+<li>辞書で置換したい単語と代入したい値を定義し，テンプレートに埋め込んだPigを生成する。</li>
+<li>複雑な条件式や動的に変わるパスを埋め込みたい時に使用する。</li>
+</ul>
+<p>main.py</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">substitute_condition</span>(template, output, target_word, condition):
+    txt <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+    <span style="color:#66d9ef">with</span> open(template) <span style="color:#66d9ef">as</span> f:
+        lines_one_str <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
+        txt <span style="color:#f92672">=</span> lines_one_str<span style="color:#f92672">.</span>replace(target_word, condition)
+    <span style="color:#66d9ef">with</span> open(output, mode<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;w&#39;</span>) <span style="color:#66d9ef">as</span> f:
+        f<span style="color:#f92672">.</span>write(txt)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">translate</span>(template: str, output: str, d: {str, str}):
+    <span style="color:#66d9ef">for</span> i, (k, v) <span style="color:#f92672">in</span> enumerate(d<span style="color:#f92672">.</span>items()):
+        <span style="color:#66d9ef">if</span> i <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+            substitute_condition(template, output, k, v)
+        <span style="color:#66d9ef">else</span>:
+            substitute_condition(output, output, k, v)
+    
+d <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;$INPUT&#39;</span>: <span style="color:#e6db74">&#39;/tmp/input&#39;</span>, <span style="color:#e6db74">&#39;$COND&#39;</span>: <span style="color:#e6db74">&#39;テスト|test&#39;</span>, <span style="color:#e6db74">&#39;$OUTPUT&#39;</span>: <span style="color:#e6db74">&#39;/tmp/output&#39;</span>}
+translate(<span style="color:#e6db74">&#39;template.pig&#39;</span>, <span style="color:#e6db74">&#39;output.pig&#39;</span>, d)
+</code></pre></div><p>実行</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python main.py
+</code></pre></div><p>template.pig</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">L <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;$INPUT&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\t&#39;</span>);
+F <span style="color:#f92672">=</span> FILTER L <span style="color:#66d9ef">BY</span> note matches <span style="color:#e6db74">&#39;$COND&#39;</span>;
+FS <span style="color:#f92672">-</span>rm <span style="color:#f92672">-</span>r <span style="color:#f92672">-</span>f <span style="color:#f92672">-</span>skipTrash <span style="color:#960050;background-color:#1e0010">$</span><span style="color:#66d9ef">OUTPUT</span>
+STORE F <span style="color:#66d9ef">INTO</span> <span style="color:#e6db74">&#39;$OUTPUT&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\t&#39;</span>, <span style="color:#e6db74">&#39;-schema&#39;</span>);
+</code></pre></div><p>output.pig</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">L <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/input&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\t&#39;</span>);
+F <span style="color:#f92672">=</span> FILTER L <span style="color:#66d9ef">BY</span> note matches <span style="color:#e6db74">&#39;テスト|test&#39;</span>;
+FS <span style="color:#f92672">-</span>rm <span style="color:#f92672">-</span>r <span style="color:#f92672">-</span>f <span style="color:#f92672">-</span>skipTrash <span style="color:#f92672">/</span>tmp<span style="color:#f92672">/</span><span style="color:#66d9ef">output</span>
+STORE F <span style="color:#66d9ef">INTO</span> <span style="color:#e6db74">&#39;/tmp/output&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\t&#39;</span>, <span style="color:#e6db74">&#39;-schema&#39;</span>);
+</code></pre></div><h3 id="メール送信">メール送信</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">send_mail</span>(subject: str, body: str, from: str, to: str, svr: str, port: str, id: str, password: str):
+    msg <span style="color:#f92672">=</span> MIMEText(body, <span style="color:#e6db74">&#39;html&#39;</span>)
+    msg[<span style="color:#e6db74">&#39;Subject&#39;</span>] <span style="color:#f92672">=</span> subject
+    msg[<span style="color:#e6db74">&#39;From&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#f92672">from</span>
+    msg[<span style="color:#e6db74">&#39;To&#39;</span>] <span style="color:#f92672">=</span> to
+
+    server <span style="color:#f92672">=</span> smtplib<span style="color:#f92672">.</span>SMTP_SSL(svr, port)
+    <span style="color:#75715e"># SSL の場合</span>
+    <span style="color:#75715e"># server = smtplib.SMTP_SSL(svr, port, context=ssl.create_default_context())</span>
+    server<span style="color:#f92672">.</span>login(id, password)
+    server<span style="color:#f92672">.</span>send_message(msg)
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

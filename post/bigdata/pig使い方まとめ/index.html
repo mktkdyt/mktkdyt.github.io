@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Pig使い方まとめ</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Pig使い方まとめ</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Pig使い方まとめ</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h2 id="テキスト処理">テキスト処理</h2>
+<h2 id="改行除く">改行除く</h2>
+<ul>
+<li>^M（CR）も除く。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">REPLACE</span>(<span style="color:#66d9ef">REPLACE</span>(<span style="color:#66d9ef">REPLACE</span>(<span style="color:#66d9ef">REPLACE</span>(text, <span style="color:#e6db74">&#39;\\t&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>), <span style="color:#e6db74">&#39;\\r\\n&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>), <span style="color:#e6db74">&#39;\\n&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>), <span style="color:#e6db74">&#39;\\\\^M&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</code></pre></div><h3 id="concat">CONCAT</h3>
+<ul>
+<li>文字列を結合する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">CONCAT(<span style="color:#e6db74">&#39;https://sample.jp?user=&#39;</span>, <span style="color:#66d9ef">user</span>)
+</code></pre></div><h2 id="条件演算">条件演算</h2>
+<h3 id="indexof">INDEXOF</h3>
+<ul>
+<li>指定した文字列がカラムに含まれているかを見る。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#75715e">-- text に「プレゼント」が含まれていないレコードを抽出する
+</span><span style="color:#75715e"></span>FILTERED <span style="color:#f92672">=</span> FILTER <span style="color:#66d9ef">DATA</span> <span style="color:#66d9ef">BY</span> INDEXOF(text, <span style="color:#e6db74">&#39;プレゼント&#39;</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>
+<span style="color:#75715e">-- text に「ビッグデータ」が含まれているレコードを抽出する
+</span><span style="color:#75715e"></span>FILTERED <span style="color:#f92672">=</span> FILTER <span style="color:#66d9ef">DATA</span> <span style="color:#66d9ef">BY</span> INDEXOF(text, <span style="color:#e6db74">&#39;ビッグデータ&#39;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>
+</code></pre></div><h2 id="日時フィルター">日時フィルター</h2>
+<ul>
+<li>ToDate() で文字列を日時に変換可能。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#75715e">-- 2019-05-31 00:00:00 から 2019-06-01 00:00:00 に登録されたユーザを抽出する
+</span><span style="color:#75715e"></span>FILTERED_USER <span style="color:#f92672">=</span> FILTER <span style="color:#66d9ef">USER</span> <span style="color:#66d9ef">BY</span> ToDate(<span style="color:#e6db74">&#39;2019-05-31 00:00:00&#39;</span>,<span style="color:#e6db74">&#39;yyyy-MM-dd HH:mm:ss&#39;</span>) <span style="color:#f92672">&lt;=</span> ToDate(created,<span style="color:#e6db74">&#39;yyyy-MM-dd HH:mm:ss&#39;</span>) <span style="color:#66d9ef">AND</span> ToDate(created,<span style="color:#e6db74">&#39;yyyy-MM-dd HH:mm:ss&#39;</span>) <span style="color:#f92672">&lt;</span> ToDate(<span style="color:#e6db74">&#39;2019-06-01 00:00:00&#39;</span>,<span style="color:#e6db74">&#39;yyyy-MM-dd HH:mm:ss&#39;</span>);
+</code></pre></div><h2 id="関係演算">関係演算</h2>
+<h3 id="ユニークを取る">ユニークを取る</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#75715e">-- 重複を除く
+</span><span style="color:#75715e"></span>UNIQ_USER <span style="color:#f92672">=</span> <span style="color:#66d9ef">DISTINCT</span> <span style="color:#66d9ef">USER</span>;
+</code></pre></div><h3 id="取得件数を制限する">取得件数を制限する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#75715e">-- 5 件に制限する
+</span><span style="color:#75715e"></span>L <span style="color:#f92672">=</span> <span style="color:#66d9ef">LIMIT</span> <span style="color:#66d9ef">DATA</span> <span style="color:#ae81ff">5</span>;
+</code></pre></div><h2 id="集合演算">集合演算</h2>
+<h3 id="内部結合する">内部結合する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">USER1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/user1&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\\t&#39;</span>) <span style="color:#66d9ef">AS</span> (id:chararray);
+USER2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/user1&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\\t&#39;</span>) <span style="color:#66d9ef">AS</span> (id:chararray);
+J <span style="color:#f92672">=</span> <span style="color:#66d9ef">JOIN</span> USER1 <span style="color:#66d9ef">BY</span> id, USER2 <span style="color:#66d9ef">BY</span> id;
+</code></pre></div><h3 id="外部結合する">外部結合する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">USER1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/user1&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\\t&#39;</span>) <span style="color:#66d9ef">AS</span> (id:chararray);
+USER2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/user1&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\\t&#39;</span>) <span style="color:#66d9ef">AS</span> (id:chararray);
+J <span style="color:#f92672">=</span> <span style="color:#66d9ef">JOIN</span> USER1 <span style="color:#66d9ef">BY</span> id <span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">OUTER</span>, USER2 <span style="color:#66d9ef">BY</span> id;
+</code></pre></div><h3 id="差集合を取る">差集合を取る</h3>
+<ul>
+<li>JOIN して片方の Relation が NULL なレコードを抽出する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">USER1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/user1&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\\t&#39;</span>) <span style="color:#66d9ef">AS</span> (id:chararray);
+USER2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/user1&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\\t&#39;</span>) <span style="color:#66d9ef">AS</span> (id:chararray);
+J <span style="color:#f92672">=</span> <span style="color:#66d9ef">JOIN</span> USER1 <span style="color:#66d9ef">BY</span> id <span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">OUTER</span>, USER2 <span style="color:#66d9ef">BY</span> id;
+USER1_MINUS_USER2 <span style="color:#f92672">=</span> FILTER J <span style="color:#66d9ef">BY</span> USER2::id <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">NULL</span>;
+</code></pre></div><h3 id="積集合を取る">積集合を取る</h3>
+<ul>
+<li>JOIN して片方の Relation が not NULL なレコードを抽出する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">USER1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/user1&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\\t&#39;</span>) <span style="color:#66d9ef">AS</span> (id:chararray);
+USER2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/user1&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\\t&#39;</span>) <span style="color:#66d9ef">AS</span> (id:chararray);
+J <span style="color:#f92672">=</span> <span style="color:#66d9ef">JOIN</span> USER1 <span style="color:#66d9ef">BY</span> id <span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">OUTER</span>, USER2 <span style="color:#66d9ef">BY</span> id;
+USER1_AND_USER2 <span style="color:#f92672">=</span> FILTER J <span style="color:#66d9ef">BY</span> USER2::id <span style="color:#66d9ef">is</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">NULL</span>;
+</code></pre></div><h2 id="出力">出力</h2>
+<h3 id="tsv-出力">TSV 出力</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">FS <span style="color:#f92672">-</span>rm <span style="color:#f92672">-</span>r <span style="color:#f92672">-</span>f <span style="color:#f92672">-</span>skipTrash <span style="color:#f92672">/</span>tmp<span style="color:#f92672">/</span>some_dir<span style="color:#f92672">/</span>
+STORE <span style="color:#66d9ef">DATA</span> <span style="color:#66d9ef">INTO</span> <span style="color:#e6db74">&#39;/tmp/some_dir&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\t&#39;</span>);
+</code></pre></div><ul>
+<li>-schema オプションを付与することで load するときにカラム名と型を指定しなくてよくなる。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">FS <span style="color:#f92672">-</span>rm <span style="color:#f92672">-</span>r <span style="color:#f92672">-</span>f <span style="color:#f92672">-</span>skipTrash <span style="color:#f92672">/</span>tmp<span style="color:#f92672">/</span>some_dir<span style="color:#f92672">/</span>
+STORE <span style="color:#66d9ef">DATA</span> <span style="color:#66d9ef">INTO</span> <span style="color:#e6db74">&#39;/tmp/some_dir&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\t&#39;</span>, <span style="color:#e6db74">&#39;-schema&#39;</span>);
+</code></pre></div><h3 id="orc-出力">ORC 出力</h3>
+<ul>
+<li>データ量を削減したい場合に使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">FS <span style="color:#f92672">-</span>rm <span style="color:#f92672">-</span>r <span style="color:#f92672">-</span>f <span style="color:#f92672">-</span>skipTrash <span style="color:#f92672">/</span>tmp<span style="color:#f92672">/</span>some_dir<span style="color:#f92672">/</span>
+STORE <span style="color:#66d9ef">DATA</span> <span style="color:#66d9ef">INTO</span> <span style="color:#e6db74">&#39;/tmp/some_dir&#39;</span> <span style="color:#66d9ef">USING</span> OrcStorage(<span style="color:#e6db74">&#39;-c ZLIB&#39;</span>);
+</code></pre></div><h2 id="pig-実行">Pig 実行</h2>
+<h3 id="コマンド実行">コマンド実行</h3>
+<ul>
+<li>Pig ファイルを指定し pig コマンドを実行する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">pig test.pig
+</code></pre></div><h2 id="pig-でパラメータ埋め込み">pig でパラメータ埋め込み</h2>
+<ul>
+<li>パラメータをファイルの前に指定する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ INPUT_DIR<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/tmp/input&#34;</span>
+$ OUTPUT_DIR<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/tmp/output&#34;</span>
+$ pig -param INPUT_DIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>INPUT_DIR<span style="color:#e6db74">}</span> -param OUTPUT_DIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>OUTPUT_DIR<span style="color:#e6db74">}</span> test.pig
+</code></pre></div><h3 id="パラメータ数が多い場合">パラメータ数が多い場合</h3>
+<ul>
+<li>パラメータ数が多すぎると下記エラーが発生する。</li>
+<li>Pigファイルのテンプレートを用意し，パラメータを動的に埋め込み，引数でパラメータの指定をしないようにすれば回避可能。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">2020-01-09 15:50:39,492 <span style="color:#f92672">[</span>MainThread<span style="color:#f92672">]</span> ERROR org.apache.pig.tools.grunt.GruntParser - ERROR 2998: Unhandled internal error. Vertex failed, vertexName<span style="color:#f92672">=</span>scope-4152, vertexId<span style="color:#f92672">=</span>vertex_1507856747070_358659_1_00, diagnostics<span style="color:#f92672">=[</span>Task failed, taskId<span style="color:#f92672">=</span>task_1507856747070_358659_1_00_000101, diagnostics<span style="color:#f92672">=[</span>TaskAttempt <span style="color:#ae81ff">0</span> failed, info<span style="color:#f92672">=[</span>Error: Fatal Error cause TezChild exit.:java.lang.StackOverflowError at java.io.ObjectInputStream$BlockDataInputStream.readInt<span style="color:#f92672">(</span>ObjectInputStream.java:2828<span style="color:#f92672">)</span>
+</code></pre></div><h3 id="pigファイルの条件が多い場合">Pigファイルの条件が多い場合</h3>
+<ul>
+<li>下記例外が発生するため， -t PredicatePushdownOptimizer を付与する。</li>
+</ul>
+<pre><code>2020-01-29 10:21:32,056 [MainThread] ERROR org.apache.pig.tools.grunt.Grunt - ERROR 2000: Error processing rule PredicatePushdownOptimizer. Try -t PredicatePushdownOptimizer
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">pig <span style="color:#66d9ef">large</span>.pig <span style="color:#f92672">-</span>t PredicatePushdownOptimizer
+</code></pre></div><h2 id="対話モードで実行">対話モードで実行</h2>
+<h3 id="スキーマを確認する">スキーマを確認する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ pig
+grunt&gt; U <span style="color:#f92672">=</span> LOAD <span style="color:#e6db74">&#39;/tmp/user&#39;</span> USING PigStorage<span style="color:#f92672">(</span><span style="color:#e6db74">&#39;\\t&#39;</span><span style="color:#f92672">)</span> AS <span style="color:#f92672">(</span>id:chararray, name:chararray<span style="color:#f92672">)</span>;
+grunt&gt; DESCRIBE U;
+U: <span style="color:#f92672">{</span>id: chararray, name:chararray<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="行数を取得する">行数を取得する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ pig
+U <span style="color:#f92672">=</span> LOAD <span style="color:#e6db74">&#39;/tmp/user&#39;</span> USING PigStorage<span style="color:#f92672">(</span><span style="color:#e6db74">&#39;\\t&#39;</span><span style="color:#f92672">)</span> AS <span style="color:#f92672">(</span>id:chararray, name:chararray<span style="color:#f92672">)</span>;
+grunt&gt; U_COUNT <span style="color:#f92672">=</span> FOREACH <span style="color:#f92672">(</span>GROUP U ALL<span style="color:#f92672">)</span> GENERATE COUNT<span style="color:#f92672">(</span>U<span style="color:#f92672">)</span>;
+grunt&gt; DUMP U_COUNT;
+<span style="color:#f92672">(</span>1024<span style="color:#f92672">)</span>
+</code></pre></div><h3 id="出力する">出力する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">＄ pig
+grunt&gt; U <span style="color:#f92672">=</span> LOAD <span style="color:#e6db74">&#39;/tmp/user&#39;</span> USING PigStorage<span style="color:#f92672">(</span><span style="color:#e6db74">&#39;\\t&#39;</span><span style="color:#f92672">)</span> AS <span style="color:#f92672">(</span>id:chararray, name:chararray<span style="color:#f92672">)</span>;
+grunt&gt; L <span style="color:#f92672">=</span> LIMIT U 5;
+grunt&gt; DUMP L;
+<span style="color:#f92672">(</span>00001, user1<span style="color:#f92672">)</span>
+<span style="color:#f92672">(</span>00002, user2<span style="color:#f92672">)</span>
+<span style="color:#f92672">(</span>00003, user3<span style="color:#f92672">)</span>
+<span style="color:#f92672">(</span>00004, user4<span style="color:#f92672">)</span>
+<span style="color:#f92672">(</span>00005, user5<span style="color:#f92672">)</span>
+</code></pre></div><h2 id="マクロ">マクロ</h2>
+<ul>
+<li>Pig に関数を記述し外部から読み込むことが出来る。</li>
+<li>IMPORT で外部ファイルを読み込んで関数を使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">DEFINE exclude_advertisement(<span style="color:#66d9ef">DATA</span>) <span style="color:#66d9ef">RETURNS</span> FILTERED <span style="color:#960050;background-color:#1e0010">{</span>
+    <span style="color:#960050;background-color:#1e0010">$</span>FILTERED <span style="color:#f92672">=</span> FILTER <span style="color:#960050;background-color:#1e0010">$</span><span style="color:#66d9ef">DATA</span> <span style="color:#66d9ef">BY</span>
+        INDEXOF(text, <span style="color:#e6db74">&#39;広告&#39;</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>
+        <span style="color:#66d9ef">AND</span> INDEXOF(text, <span style="color:#e6db74">&#39;プレゼント&#39;</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>
+        ;
+<span style="color:#960050;background-color:#1e0010">}</span>;
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">IMPORT <span style="color:#e6db74">&#39;macro.pig&#39;</span>;
+
+L <span style="color:#f92672">=</span> <span style="color:#66d9ef">LOAD</span> <span style="color:#e6db74">&#39;/tmp/data&#39;</span> <span style="color:#66d9ef">USING</span> PigStorage(<span style="color:#e6db74">&#39;\t&#39;</span>) <span style="color:#66d9ef">AS</span> (id:chararray, text:chararray);
+F <span style="color:#f92672">=</span> exclude_advertisement(L);
+</code></pre></div><h2 id="参考">参考</h2>
+<table>
+<thead>
+<tr>
+<th>サイト名</th>
+<th>URL</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pig Latinの基本（和訳版）</td>
+<td><a href="http://s3-ap-northeast-1.amazonaws.com/pig.doc.ja/basic.html">http://s3-ap-northeast-1.amazonaws.com/pig.doc.ja/basic.html</a></td>
+<td>翻訳元のバージョンが古いため、最新版のリファレンスも参照すること。  データ型などはこちらでも十分理解できる。</td>
+</tr>
+<tr>
+<td>Pig Latinの基本</td>
+<td><a href="http://pig.apache.org/docs/r0.17.0/basic.html">http://pig.apache.org/docs/r0.17.0/basic.html</a></td>
+<td>組み込み関数などはこちらの情報の方が新しい</td>
+</tr>
+<tr>
+<td>Pig Latinメモ(Hishidama&rsquo;s Apache Pig Latin Memo) - Ne</td>
+<td><a href="http://www.ne.jp/asahi/hishidama/home/tech/apache/pig/latin.html">http://www.ne.jp/asahi/hishidama/home/tech/apache/pig/latin.html</a></td>
+<td>基本的なコマンドの解説が載っている</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Solr(Standalone) を構築する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Solr(Standalone) を構築する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Solr(Standalone) を構築する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="solrstandalone-を構築する">Solr(Standalone) を構築する</h1>
+<p>Vagrant で Solr を Standalone で構築しました．<br>
+Solr のバージョンは 6.2.0 です．</p>
+<h2 id="構成">構成</h2>
+<p>Solr の構築はシェルでやることにしました．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">D:\vagrant\solr-standalone
+┣Vagrantfile
+┗create_solr.sh
+</code></pre></div><h3 id="vagrantfile">Vagrantfile</h3>
+<ul>
+<li>OS は CentOS 7 を使用します．</li>
+<li>プロビジョナでシェルを実行します．</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#66d9ef">Vagrant</span><span style="color:#f92672">.</span>configure(<span style="color:#e6db74">&#34;2&#34;</span>) <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>config<span style="color:#f92672">|</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>box <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;centos/7&#34;</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.30&#34;</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./create_solr.sh&#34;</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><h3 id="create_solrsh">create_solr.sh</h3>
+<ul>
+<li>Java をインストールします．</li>
+<li>Solr のアーカイブを取得して展開しシェルを実行します．</li>
+<li>Solr で使用する Port を開放します．</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Java をインストールする</span>
+yum install -y java-1.8.0-openjdk
+
+<span style="color:#75715e"># Solr を構築する</span>
+cd /usr/local/src/
+yum install -y wget
+wget https://archive.apache.org/dist/lucene/solr/6.2.0/solr-6.2.0.tgz
+tar xzf solr-6.2.0.tgz
+./solr-6.2.0/bin/install_solr_service.sh solr-6.2.0.tgz
+
+<span style="color:#75715e"># Port を開放する</span>
+systemctl enable firewalld.service
+systemctl start firewalld.service
+firewall-cmd --zone<span style="color:#f92672">=</span>public --add-port<span style="color:#f92672">=</span>8983/tcp --permanent
+firewall-cmd --reload
+</code></pre></div><h2 id="solr-を構築する">Solr を構築する</h2>
+<p>Vagrantfile があるディレクトリで vagrant up します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; pwd
+D:\vagrant\solr-standalone
+&gt; vagrant up
+</code></pre></div><p>これだけで Solr 導入済みの VM が完成しました．</p>
+<p>http://192.168.33.30:8983/solr/#/ にアクセスすると Solr の管理画面にアクセスできます．</p>
+<p><img src="images/00.png" alt="images/00.png"></p>
+<p>まだ core がないので作成します．</p>
+<h2 id="core-を作成する">core を作成する</h2>
+<p>core とは RDB でいう schema に相当します．<br>
+core には Solr の設定(solrconfig.xml)や Solr に取り込むデータの型やフィールド，tokenizer 等の設定(managed_schema または schema.xml)が含まれています．</p>
+<p>core を作成するには Solr をインストールしたディレクトリにあるシェルを実行します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh -c <span style="color:#e6db74">&#34;sudo -u solr /opt/solr/bin/solr create -c examplecore&#34;</span>
+
+Copying configuration to new core instance directory<span style="color:#960050;background-color:#1e0010">:</span>
+/var/solr/data/examplecore
+
+Creating new core <span style="color:#e6db74">&#39;examplecore&#39;</span> using command<span style="color:#960050;background-color:#1e0010">:</span>
+http<span style="color:#960050;background-color:#1e0010">:</span>//localhost<span style="color:#960050;background-color:#1e0010">:</span>8983/solr/admin/cores<span style="color:#66d9ef">?</span>action=CREATE&amp;name=examplecore&amp;instanceDir=examplecore
+
+{
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span><span style="color:#960050;background-color:#1e0010">:</span>{
+    <span style="color:#e6db74">&#34;status&#34;</span><span style="color:#960050;background-color:#1e0010">:</span>0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span><span style="color:#960050;background-color:#1e0010">:</span>2701},
+  <span style="color:#e6db74">&#34;core&#34;</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#e6db74">&#34;examplecore&#34;</span>}
+</code></pre></div><p>/var/solr/data 配下に core が作成されたことが確認できます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh -c <span style="color:#e6db74">&#34;sudo -u solr ls /var/solr/data&#34;</span>
+examplecore  solr.xml
+&gt; vagrant ssh -c <span style="color:#e6db74">&#34;sudo -u solr ls /var/solr/data/examplecore&#34;</span>
+conf  core.properties  data
+</code></pre></div><p>core.properties には core の名前が記載されています．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh -c <span style="color:#e6db74">&#34;sudo -u solr cat /var/solr/data/examplecore/core.properties&#34;</span>
+<span style="color:#75715e">#Written by CorePropertiesLocator</span>
+<span style="color:#75715e">#Mon Jun 10 02:06:21 UTC 2019</span>
+name=examplecore
+</code></pre></div><p>core のルートディレクトリの下にある conf を見ると managed-schema や solrconfig.xml がありました．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh -c <span style="color:#e6db74">&#34;sudo -u solr ls /var/solr/data/examplecore/conf&#34;</span>
+currency.xml  elevate.xml  lang  managed-schema  params.json  protwords.txt  solrconfig.xml  stopwords.txt  synonyms.txt
+</code></pre></div><p>managed-schema を見てみます．</p>
+<p>fieldType で Solr で扱うデータの型が定義されています．<br>
+analizer で tokenizer(文字列を解析して単語分割をおこなう) や filter(トークンを取り除いたり変換したりする処理をおこなう)が定義されています．<br>
+また analizer は fieldType ごとに設定できます．<br>
+field では core で扱うデータのフィールドを定義します．<br>
+dynamicField では field に定義していないフィールドを登録出来るようにします．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh -c <span style="color:#e6db74">&#34;sudo -u solr cat /var/solr/data/examplecore/conf/managed-schema&#34;</span>
+&lt;<span style="color:#66d9ef">?</span>xml version=<span style="color:#e6db74">&#34;1.0&#34;</span> encoding=<span style="color:#e6db74">&#34;UTF-8&#34;</span>?&gt;
+&lt;!-- Solr managed schema - automatically generated - <span style="color:#66d9ef">DO</span> NOT EDIT --&gt;
+&lt;schema name=<span style="color:#e6db74">&#34;example-data-driven-schema&#34;</span> version=<span style="color:#e6db74">&#34;1.6&#34;</span>&gt;
+  &lt;uniqueKey&gt;id&lt;/uniqueKey&gt;
+  ...
+  &lt;fieldType name=<span style="color:#e6db74">&#34;int&#34;</span> class=<span style="color:#e6db74">&#34;solr.TrieIntField&#34;</span> positionIncrementGap=<span style="color:#e6db74">&#34;0&#34;</span> docValues=<span style="color:#e6db74">&#34;true&#34;</span> precisionStep=<span style="color:#e6db74">&#34;0&#34;</span>/&gt;
+  &lt;fieldType name=<span style="color:#e6db74">&#34;ints&#34;</span> class=<span style="color:#e6db74">&#34;solr.TrieIntField&#34;</span> positionIncrementGap=<span style="color:#e6db74">&#34;0&#34;</span> docValues=<span style="color:#e6db74">&#34;true&#34;</span> multiValued=<span style="color:#e6db74">&#34;true&#34;</span> precisionStep=<span style="color:#e6db74">&#34;0&#34;</span>/&gt;
+  ...
+  &lt;fieldType name=<span style="color:#e6db74">&#34;text_ja&#34;</span> class=<span style="color:#e6db74">&#34;solr.TextField&#34;</span> autoGeneratePhraseQueries=<span style="color:#e6db74">&#34;false&#34;</span> positionIncrementGap=<span style="color:#e6db74">&#34;100&#34;</span>&gt;
+    &lt;analyzer&gt;
+      &lt;tokenizer class=<span style="color:#e6db74">&#34;solr.JapaneseTokenizerFactory&#34;</span> mode=<span style="color:#e6db74">&#34;search&#34;</span>/&gt;
+      &lt;<span style="color:#66d9ef">filter</span> class=<span style="color:#e6db74">&#34;solr.JapaneseBaseFormFilterFactory&#34;</span>/&gt;
+      &lt;<span style="color:#66d9ef">filter</span> class=<span style="color:#e6db74">&#34;solr.JapanesePartOfSpeechStopFilterFactory&#34;</span> tags=<span style="color:#e6db74">&#34;lang/stoptags_ja.txt&#34;</span>/&gt;
+      &lt;<span style="color:#66d9ef">filter</span> class=<span style="color:#e6db74">&#34;solr.CJKWidthFilterFactory&#34;</span>/&gt;
+      &lt;<span style="color:#66d9ef">filter</span> class=<span style="color:#e6db74">&#34;solr.StopFilterFactory&#34;</span> words=<span style="color:#e6db74">&#34;lang/stopwords_ja.txt&#34;</span> ignoreCase=<span style="color:#e6db74">&#34;true&#34;</span>/&gt;
+      &lt;<span style="color:#66d9ef">filter</span> class=<span style="color:#e6db74">&#34;solr.JapaneseKatakanaStemFilterFactory&#34;</span> minimumLength=<span style="color:#e6db74">&#34;4&#34;</span>/&gt;
+      &lt;<span style="color:#66d9ef">filter</span> class=<span style="color:#e6db74">&#34;solr.LowerCaseFilterFactory&#34;</span>/&gt;
+    &lt;/analyzer&gt;
+  &lt;/fieldType&gt;
+  ...
+  &lt;field name=<span style="color:#e6db74">&#34;id&#34;</span> type=<span style="color:#e6db74">&#34;string&#34;</span> multiValued=<span style="color:#e6db74">&#34;false&#34;</span> indexed=<span style="color:#e6db74">&#34;true&#34;</span> required=<span style="color:#e6db74">&#34;true&#34;</span> stored=<span style="color:#e6db74">&#34;true&#34;</span>/&gt;
+  ...
+  &lt;dynamicField name=<span style="color:#e6db74">&#34;*_txt_ja&#34;</span> type=<span style="color:#e6db74">&#34;text_ja&#34;</span> indexed=<span style="color:#e6db74">&#34;true&#34;</span> stored=<span style="color:#e6db74">&#34;true&#34;</span>/&gt;
+  ...
+&lt;/schema&gt;
+</code></pre></div><p>solrconfig.xml を見てみます．<br>
+version や キャッシュに関する情報等がありました(他にもいろいろありましたが今回は割愛させてください)．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh -c <span style="color:#e6db74">&#34;sudo -u solr cat /var/solr/data/examplecore/conf/solrconfig.xml&#34;</span>
+&lt;<span style="color:#66d9ef">?</span>xml version=<span style="color:#e6db74">&#34;1.0&#34;</span> encoding=<span style="color:#e6db74">&#34;UTF-8&#34;</span> ?&gt;
+...
+&lt;config&gt;
+  ...
+  &lt;luceneMatchVersion&gt;6.2.0&lt;/luceneMatchVersion&gt;
+  ...
+  &lt;dataDir&gt;${solr.data.dir<span style="color:#960050;background-color:#1e0010">:</span>}&lt;/dataDir&gt;
+  ...
+  &lt;query&gt;
+    ...
+    &lt;queryResultCache class=<span style="color:#e6db74">&#34;solr.LRUCache&#34;</span>          
+                      size=<span style="color:#e6db74">&#34;512&#34;</span>                     
+                      initialSize=<span style="color:#e6db74">&#34;512&#34;</span>              
+                      autowarmCount=<span style="color:#e6db74">&#34;0&#34;</span>/&gt;            
+    ...
+  &lt;/query&gt;
+  ...
+&lt;/config&gt;
+</code></pre></div><p>あっちこっちいきましたが 管理画面からも確認してみます．<br>
+http://192.168.33.30:8983/solr/#/ をリロードすると core が選択できるようになります．</p>
+<p><img src="images/01.png" alt="images/01.png"></p>
+<p><img src="images/02.png" alt="images/02.png"></p>
+<p>今度は core にインデクシング(文書登録)をします．</p>
+<h2 id="core-にインデクシングする">core にインデクシングする</h2>
+<p>Solr で検索をするには文書のインデックスを core に登録する必要があります．<br>
+Solr では転置インデックスを使います．<br>
+転置インデックスにはどの単語がどの文書のどの位置にあるかが格納されています．<br>
+この転置インデックスを使うことで全ての文書をフルスキャンするより圧倒的に早く検索することができるというわけです．</p>
+<p>Solr をインストールするとサンプルの文書が含まれているのでそれを利用します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh -c <span style="color:#e6db74">&#34;sudo -u solr /opt/solr/bin/post -c examplecore /opt/solr/example/exampledocs/*.xml&#34;</span>
+java -classpath /opt/solr/dist/solr-core-6.2.0.jar -Dauto=yes -Dc=examplecore -Ddata=files org.apache.solr.util.SimplePostTool /opt/solr/example/exampledocs/gb18030-example.xml /opt/solr/example/exampledocs/hd.xml /opt/solr/example/exampledocs/ipod_other.xml /opt/solr/example/exampledocs/ipod_video.xml /opt/solr/example/exampledocs/manufacturers.xml /opt/solr/example/exampledocs/mem.xml /opt/solr/example/exampledocs/money.xml /opt/solr/example/exampledocs/monitor2.xml /opt/solr/example/exampledocs/monitor.xml /opt/solr/example/exampledocs/mp500.xml /opt/solr/example/exampledocs/sd500.xml /opt/solr/example/exampledocs/solr.xml /opt/solr/example/exampledocs/utf8-example.xml /opt/solr/example/exampledocs/vidcard.xml
+SimplePostTool version 5.0.0
+Posting files to <span style="color:#66d9ef">[base]</span> url http<span style="color:#960050;background-color:#1e0010">:</span>//localhost<span style="color:#960050;background-color:#1e0010">:</span>8983/solr/examplecore/update...
+Entering auto mode. File endings considered are xml,json,jsonl,csv,pdf,doc,docx,ppt,pptx,xls,xlsx,odt,odp,ods,ott,otp,ots,rtf,htm,html,txt,log
+POSTing file gb18030-example.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file hd.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file ipod_other.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file ipod_video.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file manufacturers.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file mem.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file money.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file monitor2.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file monitor.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file mp500.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file sd500.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file solr.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file utf8-example.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+POSTing file vidcard.xml (application/xml) to <span style="color:#66d9ef">[base]</span>
+14 files indexed.
+COMMITting Solr index changes to http<span style="color:#960050;background-color:#1e0010">:</span>//localhost<span style="color:#960050;background-color:#1e0010">:</span>8983/solr/examplecore/update...
+Time spent<span style="color:#960050;background-color:#1e0010">:</span> 0<span style="color:#960050;background-color:#1e0010">:</span>00<span style="color:#960050;background-color:#1e0010">:</span>01.348
+</code></pre></div><p>http://192.168.33.30:8983/solr/#/examplecore/query にアクセスして Execute Query を実行すると文書がヒットしました．</p>
+<p><img src="images/03.png" alt="images/03.png"></p>
+<p>curl でこのように検索することもできます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">$ curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.30:8983/solr/examplecore/select?q=*:*&amp;fl=id&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.30
+{
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:0,
+    <span style="color:#e6db74">&#34;params&#34;</span>:{
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:32,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GB18030TEST&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;SP2514N&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;6H500F0&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;F8V7067-APL-KIT&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;IW-02&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;MA147LL/A&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;adata&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;apple&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;asus&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;ati&#34;</span>}]
+  }}
+</code></pre></div><p>これで Solr を構築して検索するところまで確認できました．</p>
+<h2 id="まとめ">まとめ</h2>
+<p>Solr で検索できるまでにおこなう手順は以下．</p>
+<ul>
+<li>Solr を構築する．</li>
+<li>core を作成する．</li>
+<li>core にインデクシングをおこなう．</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>用語</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Solr</td>
+<td>ソーラー． 全文検索システム． 検索ライブラリ Lucene をベースにしている．</td>
+</tr>
+<tr>
+<td>core</td>
+<td>RDBでいう shema に相当する． core には Solr の設定や　Solr に取り込むデータ型，フィールド，tokenizer 等を設定する．</td>
+</tr>
+<tr>
+<td>managed-schema</td>
+<td>Solr に取り込むデータ型，フィールド，tokenizer 等を定義する．</td>
+</tr>
+<tr>
+<td>fieldType</td>
+<td>Solr で扱うデータ型を定義する．</td>
+</tr>
+<tr>
+<td>analizer</td>
+<td>tokenizer や filter を定義する． fieldType ごとに analizer を定義できる．</td>
+</tr>
+<tr>
+<td>tokenizer</td>
+<td>文字列を解析して単語分割をおこなう．</td>
+</tr>
+<tr>
+<td>filter</td>
+<td>トークンを取り除いたり，変換したりする処理をおこなう．</td>
+</tr>
+<tr>
+<td>filed</td>
+<td>Solr で扱うデータのフィールドを定義する．</td>
+</tr>
+<tr>
+<td>dynamicField</td>
+<td>filed に定義していないフィールドを登録出来るようにする．</td>
+</tr>
+<tr>
+<td>solrconfig.xml</td>
+<td>データの格納先やキャッシュの設定等 Solr の設定を定義する．</td>
+</tr>
+<tr>
+<td>インデクシング</td>
+<td>文書を登録すること． Solr では core に文書を登録しインデックスを作成する．</td>
+</tr>
+<tr>
+<td>転置インデックス</td>
+<td>どの単語がどの文書のどの位置にあるかが格納される． Solr は転置インデックスで検索することで全文書をフルスキャンするより圧倒的に早く検索できる．</td>
+</tr>
+</tbody>
+</table>
+<h2 id="あとがき">あとがき</h2>
+<p>core 作成，文書登録までやってしまいたい場合のシェルを以下に記載します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#75715e"># Java をインストールする</span>
+yum install <span style="color:#f92672">-</span>y java<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span><span style="color:#f92672">.</span><span style="color:#ae81ff">8</span><span style="color:#f92672">.</span><span style="color:#ae81ff">0</span><span style="color:#f92672">-</span>openjdk
+
+<span style="color:#75715e"># Solr を構築する</span>
+cd <span style="color:#e6db74">/usr/</span>local<span style="color:#f92672">/</span>src<span style="color:#f92672">/</span>
+yum install <span style="color:#f92672">-</span>y wget
+wget <span style="color:#e6db74">https</span>:<span style="color:#e6db74">//</span>archive<span style="color:#f92672">.</span>apache<span style="color:#f92672">.</span>org<span style="color:#f92672">/</span>dist<span style="color:#f92672">/</span>lucene<span style="color:#f92672">/</span>solr<span style="color:#f92672">/</span><span style="color:#ae81ff">6</span><span style="color:#f92672">.</span><span style="color:#ae81ff">2</span><span style="color:#f92672">.</span><span style="color:#ae81ff">0</span><span style="color:#f92672">/</span>solr<span style="color:#f92672">-</span><span style="color:#ae81ff">6</span><span style="color:#f92672">.</span><span style="color:#ae81ff">2</span><span style="color:#f92672">.</span><span style="color:#ae81ff">0</span><span style="color:#f92672">.</span>tgz
+tar xzf solr<span style="color:#f92672">-</span><span style="color:#ae81ff">6</span><span style="color:#f92672">.</span><span style="color:#ae81ff">2</span><span style="color:#f92672">.</span><span style="color:#ae81ff">0</span><span style="color:#f92672">.</span>tgz
+<span style="color:#f92672">.</span>/solr<span style="color:#f92672">-</span><span style="color:#ae81ff">6</span><span style="color:#f92672">.</span><span style="color:#ae81ff">2</span><span style="color:#f92672">.</span><span style="color:#ae81ff">0</span><span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>install_solr_service<span style="color:#f92672">.</span>sh solr<span style="color:#f92672">-</span><span style="color:#ae81ff">6</span><span style="color:#f92672">.</span><span style="color:#ae81ff">2</span><span style="color:#f92672">.</span><span style="color:#ae81ff">0</span><span style="color:#f92672">.</span>tgz
+
+<span style="color:#75715e"># core を作成する</span>
+sudo <span style="color:#f92672">-</span>u solr <span style="color:#e6db74">/opt/so</span>lr<span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>solr create <span style="color:#f92672">-</span>c examplecore
+<span style="color:#75715e"># 文書を登録する</span>
+sudo <span style="color:#f92672">-</span>u solr <span style="color:#e6db74">/opt/so</span>lr<span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>post <span style="color:#f92672">-</span>c examplecore <span style="color:#e6db74">/opt/so</span>lr<span style="color:#f92672">/</span>example<span style="color:#f92672">/</span>exampledocs<span style="color:#f92672">/*.</span>xml
+
+<span style="color:#75715e"># Port を開放する</span>
+systemctl enable firewalld<span style="color:#f92672">.</span>service
+systemctl start firewalld<span style="color:#f92672">.</span>service
+firewall<span style="color:#f92672">-</span>cmd <span style="color:#f92672">--</span>zone<span style="color:#f92672">=</span><span style="color:#66d9ef">public</span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>port<span style="color:#f92672">=</span><span style="color:#ae81ff">8983</span><span style="color:#f92672">/</span>tcp <span style="color:#f92672">--</span>permanent
+firewall<span style="color:#f92672">-</span>cmd <span style="color:#f92672">--</span>reload
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

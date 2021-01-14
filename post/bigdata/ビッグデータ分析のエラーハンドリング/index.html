@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ビッグデータ分析のエラーハンドリング</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">ビッグデータ分析のエラーハンドリング</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>ビッグデータ分析のエラーハンドリング</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h2 id="リトライ時の処理スキップ">リトライ時の処理スキップ</h2>
+<ul>
+<li>Pig 実行前に Pig の成果物が既に HDFS に存在するか確認し存在する場合は処理をスキップするようにした。</li>
+<li>強制実行オプションを設け，指定された場合は成果物が既にある処理も実行されるようにした。</li>
+</ul>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e"># 強制実行オプション</span>
+<span style="color:#a6e22e">@click.option</span>(
+    <span style="color:#e6db74">&#39;--force&#39;</span>,  
+    <span style="color:#e6db74">&#39;-f&#39;</span>,
+    <span style="color:#e6db74">&#39;force&#39;</span>,
+    is_flag<span style="color:#f92672">=</span>True,
+    help<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;強制実行フラグ。これを立てたら既に抽出済みの処理も再実行する。&#39;</span>
+)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">exists_in_hdfs</span>(hdfs_path: str) <span style="color:#f92672">-&gt;</span> bool:
+    <span style="color:#e6db74">&#34;&#34;&#34;HDFS上のパスに指定したディレクトリ・ファイルが存在しているか否かを返す
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    Arguments:
+</span><span style="color:#e6db74">        hdfs_path {str} -- HDFS上のパス
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    Returns:
+</span><span style="color:#e6db74">        bool -- 存在していればTrue, していなければFalse
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>run([<span style="color:#e6db74">&#34;hadoop&#34;</span>, <span style="color:#e6db74">&#34;fs&#34;</span>, <span style="color:#e6db74">&#34;-test&#34;</span>, <span style="color:#e6db74">&#34;-e&#34;</span>, hdfs_path])
+
+    <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>returncode <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+        <span style="color:#66d9ef">return</span> True
+    <span style="color:#66d9ef">else</span>:
+        <span style="color:#66d9ef">return</span> False
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">exists_all_in_hdfs</span>(src_list) <span style="color:#f92672">-&gt;</span> bool:
+    <span style="color:#e6db74">&#34;&#34;&#34;リストで指定したディレクトリ・ファイルが全て HDFS に存在するかを検証します。
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    Arguments:
+</span><span style="color:#e6db74">        src_tupple -- HDFS のパス
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    Returns:
+</span><span style="color:#e6db74">        bool -- 全て存在すれば True，それ以外の場合は False
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    <span style="color:#66d9ef">for</span> src <span style="color:#f92672">in</span> src_list:
+        <span style="color:#66d9ef">if</span>(<span style="color:#f92672">not</span> exists_in_hdfs(src)):
+            logger<span style="color:#f92672">.</span>error(f<span style="color:#e6db74">&#39;{src} が存在しません。&#39;</span>)
+            <span style="color:#66d9ef">return</span> False
+    <span style="color:#66d9ef">return</span> True
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;input が HDFS に存在するか検証します。&#39;</span>)
+<span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> common_function<span style="color:#f92672">.</span>exists_all_in_hdfs(input):
+    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;input に不備があるため処理を終了します。&#39;</span>)
+    sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;input が HDFS に全て存在することを確認しました。&#39;</span>)
+</code></pre></div><!-- raw HTML omitted -->
+<h2 id="インプットの存在確認">インプットの存在確認</h2>
+<ul>
+<li>Pig 実行前に Pig で読み込むディレクトリが HDFS に存在するか確認し，存在しない場合は処理を終了するようにした。</li>
+</ul>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">exists_in_hdfs</span>(hdfs_path: str) <span style="color:#f92672">-&gt;</span> bool:
+    <span style="color:#e6db74">&#34;&#34;&#34;HDFS上のパスに指定したディレクトリ・ファイルが存在しているか否かを返す
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    Arguments:
+</span><span style="color:#e6db74">        hdfs_path {str} -- HDFS上のパス
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    Returns:
+</span><span style="color:#e6db74">        bool -- 存在していればTrue, していなければFalse
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>run([<span style="color:#e6db74">&#34;hadoop&#34;</span>, <span style="color:#e6db74">&#34;fs&#34;</span>, <span style="color:#e6db74">&#34;-test&#34;</span>, <span style="color:#e6db74">&#34;-e&#34;</span>, hdfs_path])
+
+    <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>returncode <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+        <span style="color:#66d9ef">return</span> True
+    <span style="color:#66d9ef">else</span>:
+        <span style="color:#66d9ef">return</span> False
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> force <span style="color:#f92672">and</span> common_function<span style="color:#f92672">.</span>exists_in_hdfs(f<span style="color:#e6db74">&#39;{output}/_SUCCESS&#39;</span>):
+    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;既に処理済みのため処理をスキップします。&#39;</span>)
+    <span style="color:#66d9ef">return</span>
+</code></pre></div><!-- raw HTML omitted -->
+<h2 id="リトライ時の多重処理検知">リトライ時の多重処理検知</h2>
+<ul>
+<li>実行するジョブがHadoopに既に登録されているかを確認することでリトライ時にジョブを多重起動しないようにした。</li>
+</ul>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">duplicate_job</span>(job_name: str):
+    <span style="color:#e6db74">&#34;&#34;&#34;
+</span><span style="color:#e6db74">    Hadoop に既にジョブが登録されているかを確認します。
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    c <span style="color:#f92672">=</span> f<span style="color:#e6db74">&#34;yarn application -list 2&gt; /dev/null | grep &#39;{job_name}&#39;&#34;</span>
+    logger<span style="color:#f92672">.</span>info(c)
+    p <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>run(c, stdout <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>PIPE, shell <span style="color:#f92672">=</span> True)
+    logger<span style="color:#f92672">.</span>info(f<span style="color:#e6db74">&#39;登録済みジョブ: {p.stdout.decode(&#34;utf8&#34;)}&#39;</span>)
+    <span style="color:#66d9ef">if</span>(p<span style="color:#f92672">.</span>stdout<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;utf8&#39;</span>) <span style="color:#f92672">and</span>  p<span style="color:#f92672">.</span>stdout<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;utf8&#39;</span>) <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;&#39;</span>):
+        logger<span style="color:#f92672">.</span>info(f<span style="color:#e6db74">&#39;ジョブ「{job_name}」が重複しています。&#39;</span>)
+        <span style="color:#66d9ef">return</span> True
+    <span style="color:#66d9ef">else</span>:
+        logger<span style="color:#f92672">.</span>info(f<span style="color:#e6db74">&#39;ジョブ「{job_name}」は重複していません。&#39;</span>)
+        <span style="color:#66d9ef">return</span> False
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;ジョブが重複起動していないか検証します。&#39;</span>)
+<span style="color:#66d9ef">if</span> common_function<span style="color:#f92672">.</span>duplicate_job(job_name):
+    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;同じジョブが既に Hadoop に登録されているため処理を終了します。&#39;</span>)
+    sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;ジョブが重複起動していないことを確認しました。&#39;</span>)
+</code></pre></div><!-- raw HTML omitted -->
+<h2 id="外部-api-並列処理">外部 API 並列処理</h2>
+<p>外部 API 周りで検討すべき異常ケースは以下。</p>
+<ol>
+<li>前のバッチで 外部 API 実行中に次のバッチが走り 外部 API を重複起動しようとしてしまう</li>
+<li>外部 API 異常終了後にデータが欠損したまま処理が進んでしまう</li>
+<li>外部 API 異常終了後に何らかの集計処理で異常終了し，次のバッチを起動しても 外部 API が再実行されない</li>
+<li>外部 API 正常終了後に何らかの集計処理で異常終了し，次のバッチでまた 外部 API を実行しようとする</li>
+</ol>
+<p>そこで，外部 API ラッパーにて 外部 API の処理状況を任意の場所に出力するようにした。</p>
+<ul>
+<li>処理を開始したら _RUNNING ファイルを置く</li>
+<li>処理中にエラーが発生したら _ERROR ファイルを置く</li>
+<li>処理が完了したら _SUCCESS ファイルを置く</li>
+</ul>
+<p>また，バッチにて 外部 API の処理状況を参照するようにした。</p>
+<ul>
+<li>外部 API 実行前に処理状況を確認する
+<ul>
+<li>_RUNNING の場合はケース 1 に該当するためバッチを終了する</li>
+<li>_ERROR の場合はケース 3 に該当するため外部 API を再実行する</li>
+<li>_SUCCESS の場合はケース 4 に該当するため処理をスキップする</li>
+</ul>
+</li>
+<li>外部 API 実行後に処理状況を確認する
+<ul>
+<li>_ERROR の場合はケース 2 に該当するためバッチを終了する</li>
+<li>_SUCCESS の場合は次の処理に進む</li>
+</ul>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> glob<span style="color:#f92672">.</span>glob(f<span style="color:#e6db74">&#39;{status_output_dir}/*&#39;</span>, recursive<span style="color:#f92672">=</span>True):
+    os<span style="color:#f92672">.</span>remove(f)
+status_running <span style="color:#f92672">=</span> pathlib<span style="color:#f92672">.</span>Path(f<span style="color:#e6db74">&#39;{status_output_dir}/_RUNNING&#39;</span>)
+status_running<span style="color:#f92672">.</span>touch()
+
+<span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> glob<span style="color:#f92672">.</span>glob(f<span style="color:#e6db74">&#39;{status_output_dir}/*&#39;</span>, recursive<span style="color:#f92672">=</span>True):
+    os<span style="color:#f92672">.</span>remove(f)
+status_error <span style="color:#f92672">=</span> pathlib<span style="color:#f92672">.</span>Path(f<span style="color:#e6db74">&#39;{status_output_dir}/_ERROR&#39;</span>)
+status_error<span style="color:#f92672">.</span>touch()
+
+<span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> glob<span style="color:#f92672">.</span>glob(f<span style="color:#e6db74">&#39;{status_output_dir}/*&#39;</span>, recursive<span style="color:#f92672">=</span>True):
+    os<span style="color:#f92672">.</span>remove(f)
+status_success <span style="color:#f92672">=</span> pathlib<span style="color:#f92672">.</span>Path(f<span style="color:#e6db74">&#39;{status_output_dir}/_SUCCESS&#39;</span>)
+status_success<span style="color:#f92672">.</span>touch()
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> force <span style="color:#f92672">and</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(f<span style="color:#e6db74">&#39;{status_output_dir}/_SUCCESS&#39;</span>):
+    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;既に処理済みのため処理をスキップします。&#39;</span>)
+    <span style="color:#66d9ef">return</span>
+
+<span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> common_function<span style="color:#f92672">.</span>exists_in_hdfs(f<span style="color:#e6db74">&#39;{text_hdfs_dir}/_SUCCESS&#39;</span>):
+    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;input に不備があるため処理を終了します。&#39;</span>)
+    sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+<span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(f<span style="color:#e6db74">&#39;{status_output_dir}/_RUNNING&#39;</span>):
+    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;外部 API で処理実行中のため処理を終了します。&#39;</span>)
+    sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+<span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(f<span style="color:#e6db74">&#39;{status_output_dir}/_ERROR&#39;</span>):
+    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;前回実行時にエラーが発生したため再実行します。&#39;</span>)
+<span style="color:#66d9ef">if</span> force:
+    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;強制実行オプションが指定されたため再実行します。&#39;</span>)
+
+<span style="color:#66d9ef">if</span> is_parallel:
+    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;並列処理で 外部 API を呼び出します。&#39;</span>)
+</code></pre></div><!-- raw HTML omitted -->
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

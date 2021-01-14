@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ZooKeeper を構築する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">ZooKeeper を構築する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>ZooKeeper を構築する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="zookeeper-を構築する">ZooKeeper を構築する</h1>
+<p>Solr Cloud を構築するには ZooKeeper を構築する必要があります．<br>
+そこで Vagrant で ZooKeeper を構築しました．
+ZooKeeper のバージョンは 3.4.14 です．</p>
+<h2 id="zookeeper">ZooKeeper???</h2>
+<p>Solr Cloud を構築する上で必須なサービスです．<br>
+Solr Cloud では collection を 複数の shard に分けることでインデックスを分散し，さらに shard を replication により複製し冗長構成をとることで可用性を向上させます．<br>
+ZooKeeper は分散アプリケーションの管理をおこない，Solr Cloud において shard の replica が格納された Solr の各 node の状態を管理します．</p>
+<h2 id="構成">構成</h2>
+<p>ZooKeeper の構築はシェルでやることにしました．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">D:\vagrant\zk
+┣Vagrantfile
+┗create_zk.sh
+</code></pre></div><h3 id="vagrantfile">Vagrantfile</h3>
+<ul>
+<li>OS は CentOS 7 を使用します．</li>
+<li>プロビジョナでシェルを実行します．</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#66d9ef">Vagrant</span><span style="color:#f92672">.</span>configure(<span style="color:#e6db74">&#34;2&#34;</span>) <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>config<span style="color:#f92672">|</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>box <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;centos/7&#34;</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.10&#34;</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./create_zk.sh&#34;</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><h3 id="create_zksh">create_zk.sh</h3>
+<ul>
+<li>Java をインストールします．</li>
+<li>ZooKeeper のアーカイブを取得して展開します．</li>
+<li>ZooKeeper で使用する Port を開放します．</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Java をインストールする</span>
+yum install -y java-1.8.0-openjdk
+
+<span style="color:#75715e"># ZooKeeper を構築する</span>
+cd /var/tmp
+yum install -y wget
+wget http://ftp.jaist.ac.jp/pub/apache/zookeeper/zookeeper-3.4.14/zookeeper-3.4.14.tar.gz
+tar xvf zookeeper-3.4.14.tar.gz
+cp -ar zookeeper-3.4.14 /opt/
+ln -s /opt/zookeeper-3.4.14 /opt/zookeeper
+
+<span style="color:#75715e"># ZooKeeper 用のユーザを作成する</span>
+groupadd zookeeper
+useradd -g zookeeper -d /opt/zookeeper -s /sbin/nologin zookeeper
+chown -R zookeeper.zookeeper /opt/zookeeper/*
+
+<span style="color:#75715e"># ZooKeeperの設定ファイルを用意する</span>
+cd /opt/zookeeper/conf
+cp zoo_sample.cfg zoo.cfg
+
+<span style="color:#75715e"># dataDir を tmp から var に変更する</span>
+mkdir /var/lib/zookeeper
+chown zookeeper.zookeeper /var/lib/zookeeper
+cd /opt/zookeeper/conf
+sed -i -e <span style="color:#e6db74">&#39;s#dataDir=.*$#dataDir=/var/lib/zookeeper#&#39;</span> zoo.cfg
+
+<span style="color:#75715e"># ZooKeeper を起動する</span>
+cd /opt/zookeeper
+bin/zkServer.sh start
+
+<span style="color:#75715e"># Port を開放する</span>
+systemctl enable firewalld.service
+systemctl start firewalld.service
+firewall-cmd --zone<span style="color:#f92672">=</span>public --add-port<span style="color:#f92672">=</span>2181/tcp --permanent
+firewall-cmd --reload
+</code></pre></div><h2 id="zookeeper-を構築する-1">ZooKeeper を構築する</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; pwd
+D:\vagrant\zk
+&gt; vagrant up
+</code></pre></div><h2 id="動作確認">動作確認</h2>
+<p>サービスの状態を確認します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh -c <span style="color:#e6db74">&#34;sudo /opt/zookeeper/bin/zkServer.sh status&#34;</span>
+ZooKeeper JMX enabled by <span style="color:#66d9ef">default</span>
+Using config<span style="color:#960050;background-color:#1e0010">:</span> /opt/zookeeper/bin/../conf/zoo.cfg
+Mode<span style="color:#960050;background-color:#1e0010">:</span> standalone
+</code></pre></div><p>nc(netcat) で ZooKeeper に Are you OK? と聞きます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh -c <span style="color:#e6db74">&#34;yum install -y nc&#34;</span>
+&gt; vagrant ssh -c <span style="color:#e6db74">&#34;echo ruok | nc localhost 2181&#34;</span>
+imok
+</code></pre></div><p>I&rsquo;m OK と答えたので問題ないです．</p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hadoopコマンドまとめ</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Hadoopコマンドまとめ</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Hadoopコマンドまとめ</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="hadoop-コマンドまとめ">Hadoop コマンドまとめ</h1>
+<h2 id="ジョブ関連">ジョブ関連</h2>
+<h3 id="hadoop-のジョブを一覧表示する">Hadoop のジョブを一覧表示する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ yarn application -list
+</code></pre></div><h3 id="hadoop-のジョブを強制終了する">Hadoop のジョブを強制終了する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ yarn application -kill $application_id
+</code></pre></div><h3 id="queue-を変更する">queue を変更する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ yarn application -movetoqueue $application_id -queue $queue_name
+</code></pre></div><h2 id="hdfs-ディレクトリ操作">HDFS ディレクトリ操作</h2>
+<h3 id="hdfs-のディレクトリの中身を確認する">HDFS のディレクトリの中身を確認する</h3>
+<pre><code class="language-shell=" data-lang="shell=">$ hadoop fs -ls /tmp/some_dir
+</code></pre><h3 id="hdfs-のディレクトリを削除する">HDFS のディレクトリを削除する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ hadoop fs -rm -r /tmp/some_dir
+</code></pre></div><h3 id="hdfs-にディレクトリを作成する">HDFS にディレクトリを作成する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ hadoop fs -mkdir /tmp/some_dir
+</code></pre></div><h2 id="hdfs-ファイル操作">HDFS ファイル操作</h2>
+<h3 id="hdfs-にローカルのファイルを置く">HDFS にローカルのファイルを置く</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ hadoop fs -put /home/user/some.tsv /tmp/some_dir/rawdata.tsv
+</code></pre></div><h3 id="hdfs-の中身を表示する">HDFS の中身を表示する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ hadoop fs -cat /tmp/some_dir/rawdata.tsv
+</code></pre></div><h3 id="hdfs-の中身をローカルに吐き出す">HDFS の中身をローカルに吐き出す</h3>
+<p>HDFS に TSV で格納した場合。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ hadoop fs -cat /tmp/some_dir/part-* &gt; /home/user/some.tsv
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h3 id="hdfs-のファイルサイズを確認する">HDFS のファイルサイズを確認する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ hadoop fs -du -h -s /tmp/some_dir
+</code></pre></div><h2 id="管理">管理</h2>
+<h3 id="hadoop-の空き容量を見る">Hadoop の空き容量を見る</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ hadoop fs -df -h
+Filesystem   Size   Used   Available  Use%
+hdfs://tfh   <span style="color:#ae81ff">10</span> T   8.0 T  2.0 T      80%
+</code></pre></div><h2 id="便利コマンド">便利コマンド</h2>
+<h3 id="日付パーティションで分割したhdfsの件数を見る">日付パーティションで分割したHDFSの件数を見る</h3>
+<ul>
+<li>ls | awk でファイル名を抜き出し，cat | cut | wc -l で件数を見る</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ hadoop fs -ls <span style="color:#e6db74">&#39;/tmp/some_dir/2019/06&#39;</span> | awk <span style="color:#e6db74">&#39;NR&gt;1 {print $8}&#39;</span> | xargs -L <span style="color:#ae81ff">1</span> -P <span style="color:#ae81ff">1</span> bash -c <span style="color:#e6db74">&#39;echo $0;hadoop fs -cat $0&#34;/part-*&#34; | cut -f1 | wc -l&#39;</span>
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

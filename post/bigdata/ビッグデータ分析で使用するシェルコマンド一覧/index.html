@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ビッグデータ分析で使用するシェルコマンド一覧</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">ビッグデータ分析で使用するシェルコマンド一覧</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>ビッグデータ分析で使用するシェルコマンド一覧</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><p>ビッグデータ分析で使用してきたシェルコマンドをまとめた。</p>
+<h2 id="ターミナル表示">ターミナル表示</h2>
+<h3 id="echo-で文字列エスケープ">echo で文字列エスケープ</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ echo <span style="color:#e6db74">&#34;\&#34;&#34;</span>
+<span style="color:#e6db74">&#34;
+</span></code></pre></div><h2 id="echo-で改行表示">echo で改行表示</h2>
+<ul>
+<li>-e で改行を表示出来る。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ txt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;a\nb\nc&#34;</span>
+$ echo -e <span style="color:#e6db74">&#34;</span>$txt<span style="color:#e6db74">&#34;</span>
+a
+b
+c
+</code></pre></div><h2 id="テキスト処理">テキスト処理</h2>
+<h3 id="文字列から-offset-を指定して抽出する">文字列から offset を指定して抽出する</h3>
+<ul>
+<li>日付文字列から年月日を抽出する際に使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ d<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;20190630&#34;</span>
+$ echo <span style="color:#e6db74">${</span>d:0:4<span style="color:#e6db74">}</span>
+<span style="color:#ae81ff">2019</span>
+$ echo <span style="color:#e6db74">${</span>d:4:2<span style="color:#e6db74">}</span>
+<span style="color:#ae81ff">06</span>
+</code></pre></div><h3 id="文字列の長さを取得する">文字列の長さを取得する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ txt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;abcdef&#34;</span>
+$ echo <span style="color:#e6db74">${#</span>txt<span style="color:#e6db74">}</span>
+<span style="color:#ae81ff">6</span>
+</code></pre></div><h2 id="ファイル処理">ファイル処理</h2>
+<h3 id="tsvから特定の列を抽出する">tsvから特定の列を抽出する</h3>
+<ul>
+<li>cut コマンドで取り出せる。</li>
+<li>ただし，複数列取り出せても順番を入れ替えることは出来ない。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ cat test.tsv | cut -f3,4
+</code></pre></div><ul>
+<li>awk でも可能。</li>
+<li>awk だと列を入れ替えることができる。</li>
+<li>-F で区切り文字を指定する</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ awk -F<span style="color:#e6db74">&#39;\t&#39;</span> <span style="color:#e6db74">&#39;{print $4 &#34;\t&#34; $3}&#39;</span> -f test.tsv
+</code></pre></div><h3 id="改行を除去する">改行を除去する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ cat test.txt | tr -d <span style="color:#e6db74">&#39;\n&#39;</span>
+</code></pre></div><h3 id="行をシャッフルしてランダム出力する">行をシャッフルしてランダム出力する</h3>
+<ul>
+<li>サンプリングで使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ cat test.txt | shuf -n <span style="color:#ae81ff">5</span>
+</code></pre></div><h3 id="先頭行を除いて表示する">先頭行を除いて表示する</h3>
+<ul>
+<li>tsv でヘッダーを除いて表示する際に使う。</li>
+<li>awk で NR（Number of Record：行数）を使用する。</li>
+<li>tail -n +数字 で先頭から指定した行以降を表示する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ awk <span style="color:#e6db74">&#39;NR&gt;1 {print}&#39;</span> test.tsv
+$ tail -n +2 test.tsv
+</code></pre></div><h3 id="ファイル分割">ファイル分割</h3>
+<ul>
+<li>- は標準出力を指す。例では cat の出力を split で受け取ってる。</li>
+<li>-l で分割したい行数を指定する。</li>
+<li>-d で分割した際のファイル名を数値とする。</li>
+<li>-a で分割ファイル名の桁数を指定する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ cat test.txt | split -l <span style="color:#ae81ff">100</span> -d -a <span style="color:#ae81ff">5</span> - tmp/
+$ ls tmp
+<span style="color:#ae81ff">00000</span>  <span style="color:#ae81ff">00001</span>  <span style="color:#ae81ff">00002</span>
+</code></pre></div><h3 id="複数ファイルを結合">複数ファイルを結合</h3>
+<ul>
+<li>cat（concatenate）で結合出来る。</li>
+<li>test1.txt の後ろに test2.txt を結合して test.txt として出力する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cat test1.txt test2.txt &gt; test.txt
+</code></pre></div><h3 id="ファイルを行単位で結合する">ファイルを行単位で結合する</h3>
+<ul>
+<li>-d , で行単位で複数ファイルを , 結合する。</li>
+<li>複数ファイルから必要な値を抜き出して1個のファイルにする際に使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ paste -d , test1.txt test2.txt
+</code></pre></div><h3 id="文字コードを変換する">文字コードを変換する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ iconv -f sjis -t utf8
+</code></pre></div><h3 id="ファイル監視">ファイル監視</h3>
+<ul>
+<li>実行ログを監視する際に使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ tail -f target.txt
+</code></pre></div><h2 id="検索">検索</h2>
+<h3 id="grep-でハイライト">grep でハイライト</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ grep <span style="color:#e6db74">&#39;検索&#39;</span> test.txt --color<span style="color:#f92672">=</span>always
+</code></pre></div><h3 id="grep-でヒットした行の行数を表示する">grep でヒットした行の行数を表示する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ grep xxxxx test.txt -n
+2588:xxxxx
+</code></pre></div><h2 id="grep-でヒットした前後の行を表示">grep でヒットした前後の行を表示</h2>
+<ul>
+<li>-A n で後ろn行を表示する。</li>
+<li>-B n で前n行を表示する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ grep ‘word’ test.txt -A <span style="color:#ae81ff">2</span> -B <span style="color:#ae81ff">2</span>
+</code></pre></div><h3 id="grep-の検索対象文字列に変数を使用する">grep の検索対象文字列に変数を使用する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ cond<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>cat cond.txt<span style="color:#e6db74">`</span>
+$ grep -E <span style="color:#e6db74">${</span>cond<span style="color:#e6db74">}</span> test.tsv
+</code></pre></div><h3 id="特定の列に条件を指定して検索する">特定の列に条件を指定して検索する</h3>
+<ul>
+<li>awk で実現可能。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ cat test.csv
+1,test
+2,テスト
+3,text
+4,テキスト
+5,taste
+6,テイスト
+$ awk -F<span style="color:#e6db74">&#39;,&#39;</span> <span style="color:#e6db74">&#39;$2~/test/&#39;</span> test.csv
+3,test
+</code></pre></div><ul>
+<li>変数を条件に指定することも可能。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ word<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;テスト&#34;</span>
+$ awk -v word<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>word<span style="color:#e6db74">}</span> <span style="color:#e6db74">&#39;$2 ~ word&#39;</span> test.csv
+</code></pre></div><h3 id="行数を取得する">行数を取得する</h3>
+<ul>
+<li>wc（word count）で行数を取得出来る。</li>
+<li>データの件数を見る際によく使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ cat test.txt | wc -l
+</code></pre></div><h3 id="重複を除いて行数を取得する">重複を除いて行数を取得する</h3>
+<ul>
+<li>ユニーク数を見る際によく使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ cat test.txt | sort | uniq | wc -l
+</code></pre></div><h3 id="ls-でフルパス表示する">ls でフルパス表示する</h3>
+<ul>
+<li>PWD（print working directory） を組み合わせる。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls -ld <span style="color:#e6db74">${</span>PWD<span style="color:#e6db74">}</span>/*
+</code></pre></div><h2 id="配列">配列</h2>
+<h3 id="文字列を特定の文字で区切って配列に格納する">文字列を特定の文字で区切って配列に格納する</h3>
+<ul>
+<li>複数のカラムのIDをアンダースコアで連結したものを分解する時に使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ text<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1_2_3&#34;</span>
+$ arr<span style="color:#f92672">=(</span><span style="color:#e6db74">`</span>echo $text | tr -s <span style="color:#e6db74">&#39;_&#39;</span> <span style="color:#e6db74">&#39; &#39;</span><span style="color:#e6db74">`</span><span style="color:#f92672">)</span>
+$ echo <span style="color:#e6db74">${</span>arr[0]<span style="color:#e6db74">}</span>
+<span style="color:#ae81ff">1</span>
+$ echo <span style="color:#e6db74">${</span>arr[1]<span style="color:#e6db74">}</span>
+<span style="color:#ae81ff">2</span>
+$ echo <span style="color:#e6db74">${</span>arr[2]<span style="color:#e6db74">}</span>
+<span style="color:#ae81ff">3</span>
+</code></pre></div><h3 id="配列の要素数を確認する">配列の要素数を確認する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ echo <span style="color:#e6db74">${#</span>array[@]<span style="color:#e6db74">}</span>
+</code></pre></div><h2 id="日時処理">日時処理</h2>
+<h3 id="date-で日時加減算">date で日時加減算</h3>
+<ul>
+<li>日時処理はよく使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># 2019-06-30 に1ヶ月加算し yyyy-mm 形式で出力する</span>
+$ date <span style="color:#e6db74">&#34;+%Y-%m&#34;</span> -d <span style="color:#e6db74">&#34;2019-06-30 1 month&#34;</span>
+2019-07
+<span style="color:#75715e"># 2019-06-01 に1日加算し yyyy-mm-dd 形式で出力する</span>
+$ date <span style="color:#e6db74">&#34;+%Y-%m-%d&#34;</span> -d <span style="color:#e6db74">&#34;2019-06-01 - 1 day&#34;</span>
+2019-05-31
+</code></pre></div><h2 id="計算処理">計算処理</h2>
+<h3 id="ターミナルで計算">ターミナルで計算</h3>
+<ul>
+<li>電卓開くのが面倒かつターミナルで作業してる時にちょっとした計算をする際によく使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ echo <span style="color:#66d9ef">$((</span><span style="color:#ae81ff">90</span><span style="color:#f92672">*</span><span style="color:#ae81ff">24</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#66d9ef">))</span>
+<span style="color:#ae81ff">7776000</span>
+</code></pre></div><h2 id="データ量確認">データ量確認</h2>
+<h3 id="ファイルのデータ量確認">ファイルのデータ量確認</h3>
+<ul>
+<li>-b でバイト単位で表示する。</li>
+<li>-h で見やすい形式で表示する。</li>
+<li>-s で合計容量を表示する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ du . -b
+<span style="color:#ae81ff">1024</span>    ./test1.txt
+<span style="color:#ae81ff">2048</span>    ./test2.txt
+$ du . -h
+1M    ./test1.txt
+2M    ./test2.txt
+$ du . -s
+<span style="color:#ae81ff">3072</span>    .
+</code></pre></div><h2 id="処理">処理</h2>
+<ul>
+<li>重いシェルを流す時によく使う。</li>
+</ul>
+<h3 id="ログアウトしても処理を続ける">ログアウトしても処理を続ける</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ nohup heavy_process.sh &amp;
+</code></pre></div><h3 id="バックグランドで処理を実行する">バックグランドで処理を実行する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ heavy_process.sh &amp;
+</code></pre></div><h3 id="並列で処理する">並列で処理する</h3>
+<ul>
+<li>xargs で並列処理が可能。</li>
+<li>ls で test ディレクトリのファイル一覧を表示して，並列数10で各ファイル名を引数に sample.sh を実行する。</li>
+<li>パフォーマンスチューニングでよく使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ ls test | xargs -L <span style="color:#ae81ff">1</span> -P <span style="color:#ae81ff">10</span> bash -c <span style="color:#e6db74">&#39;./sample.sh $0&#39;</span>
+</code></pre></div><h3 id="処理時間計測">処理時間計測</h3>
+<ul>
+<li>SECONDS を使うパターンと date コマンドの差分を取るパターンがある。</li>
+<li>シェルスクリプトでログに処理時間を出力したい時などに使う。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ SECONDS<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+$ test.sh
+$ echo $SECONDS
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ start_time<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>date +%s<span style="color:#66d9ef">)</span>
+$ test.sh
+$ end_time<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>date +%s<span style="color:#66d9ef">)</span>
+$ echo <span style="color:#66d9ef">$((</span><span style="color:#e6db74">${</span>end_time<span style="color:#e6db74">}</span><span style="color:#f92672">-</span><span style="color:#e6db74">${</span>start_time<span style="color:#e6db74">}</span><span style="color:#66d9ef">))</span>
+</code></pre></div><h2 id="その他">その他</h2>
+<h3 id="コマンドの出力を変数に格納する">コマンドの出力を変数に格納する</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ dict<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>cat dict.txt<span style="color:#66d9ef">)</span>
+$ echo $dict
+$ dict<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>cat dict.txt<span style="color:#e6db74">`</span>
+$ echo $dict
+</code></pre></div><h3 id="-ハイフンで標準入出力をコマンド引数で扱う">-（ハイフン）で標準入出力をコマンド引数で扱う</h3>
+<ul>
+<li>- で標準入出力をコマンド引数で扱うことが出来る。</li>
+<li>wget -O ファイル名 を wget -O - でダウンロードしたファイルを標準出力として扱う。</li>
+<li>apt-key add ファイル名 を apt-key add - で標準入力をaptの公開鍵として登録する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+</code></pre></div><h3 id="標準出力標準エラー出力のリダイレクト">標準出力・標準エラー出力のリダイレクト</h3>
+<ul>
+<li>&gt; または 1&gt; で標準出力をリダイレクトする。</li>
+<li>2&gt; で標準エラー出力をリダイレクトする。</li>
+<li>&amp;&gt; で標準出力・標準エラー出力をリダイレクトする。</li>
+<li>&gt; で標準出力をファイルに上書きする。</li>
+<li>&gt;&gt; で標準出力をファイルに上書きする。</li>
+<li>ログ出力や標準出力をファイルに書き出すとき等に使用する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># 標準出力をファイルにリダイレクトする</span>
+$ test.sh &gt; result.log
+$ test.sh 1&gt; result.log
+<span style="color:#75715e"># 標準エラー出力をファイルにリダイレクトする</span>
+$ test.sh 2&gt; error.log
+<span style="color:#75715e"># 標準出力・標準エラー出力を1ファイルにリダイレクトする</span>
+$ test.sh &amp;&gt; result.log
+<span style="color:#75715e"># 標準出力・標準エラー出力を別ファイルにリダイレクトする</span>
+$ test.sh 1&gt; result.log 2&gt; error.log
+<span style="color:#75715e"># 標準出力をファイルに上書きする</span>
+$ test.sh &gt; result.log
+<span style="color:#75715e"># 標準出力をファイルに追記する</span>
+$ test.sh &gt;&gt; result.log
+</code></pre></div><h3 id="for文">for 文</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">max<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+<span style="color:#66d9ef">for</span> <span style="color:#f92672">((</span>i<span style="color:#f92672">=</span>0; i &lt; $max; i++<span style="color:#f92672">))</span>; <span style="color:#66d9ef">do</span>
+    echo $i
+<span style="color:#66d9ef">done</span>
+</code></pre></div><h3 id="ログ出力関数">ログ出力関数</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#66d9ef">function</span> write_log<span style="color:#f92672">(){</span>
+    <span style="color:#75715e"># Usage:</span>
+    <span style="color:#75715e">#     $ write_log &#34;/tmp/test.log&#34; &#34;this is test.&#34;</span>
+    <span style="color:#75715e"># Description:</span>
+    <span style="color:#75715e">#     指定したファイルにログを出力します。</span>
+    <span style="color:#75715e"># Arguments:</span>
+    <span style="color:#75715e">#     $1: ログファイル</span>
+    <span style="color:#75715e">#     $2: ログ出力メッセージ</span>
+    <span style="color:#75715e">#</span>
+    echo <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>date <span style="color:#e6db74">&#39;+%Y-%m-%d %H:%M:%S&#39;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">: </span>$2<span style="color:#e6db74">&#34;</span> &gt;&gt; $1
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>
+<span style="color:#f92672">}</span>
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

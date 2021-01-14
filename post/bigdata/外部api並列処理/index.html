@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>外部 API 並列処理</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">外部 API 並列処理</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>外部 API 並列処理</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><ul>
+<li>HDFS から対象のIDを取り出す。
+<ul>
+<li>uniq で重複排除する。</li>
+</ul>
+</li>
+<li>標準入力を split で n 分割する。
+<ul>
+<li>行数にデータ件数の 1/n を指定することで標準入力を n 分割する。</li>
+<li>分割されたファイルは tmp/000* の形式で出力される（分割したらファイル出力されてしまう）。</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">split_cnt <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>
+text_hdfs_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/text&#39;</span>
+tmp_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;tmp&#39;</span>
+c <span style="color:#f92672">=</span> f<span style="color:#e6db74">&#39;hadoop fs -cat </span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">{text_hdfs_dir}/part-*</span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74"> | cut -f1 | grep -E </span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">^[0-9]{{1,30}}$</span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74"> | sort | uniq | split -l $(($(hadoop fs -cat </span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">{text_hdfs_dir}/part-*</span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74"> | cut -f1 | grep -E </span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">^[0-9]{{1,30}}$</span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74"> | sort | uniq | wc -l)/{split_cnt}+1)) -d -a 5 - {tmp_dir}/&#39;</span>
+subprocess<span style="color:#f92672">.</span>run(c, shell <span style="color:#f92672">=</span> True)
+</code></pre></div><ul>
+<li>xargs で API ラッパーを並列実行する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">split_cnt <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>
+text_hdfs_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/text&#39;</span>
+tmp_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;tmp&#39;</span>
+text_tsv <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;text.tsv&#39;</span>
+status_output_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;status&#39;</span>
+c <span style="color:#f92672">=</span> f<span style="color:#e6db74">&#39;ls {tmp_dir}/000* | xargs -L 1 -P {split_cnt} -t bash -c </span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">cat $0 | python3 api_wrapper.py -S {status_output_dir} 1&gt;&gt; {text_tsv}</span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">&#39;</span>
+p <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>Popen(c, shell <span style="color:#f92672">=</span> True)
+<span style="color:#75715e"># 並列処理が完了するまで待機する</span>
+p<span style="color:#f92672">.</span>wait()
+</code></pre></div><ul>
+<li>並列処理完了後に分割出力したID一覧を消す。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">tmp_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;tmp&#39;</span>
+c <span style="color:#f92672">=</span> f<span style="color:#e6db74">&#39;rm {tmp_dir}/000*&#39;</span>
+subprocess<span style="color:#f92672">.</span>run(c, shell <span style="color:#f92672">=</span> True)
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

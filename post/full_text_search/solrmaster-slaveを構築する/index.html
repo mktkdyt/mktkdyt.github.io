@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Solr(Master-Slave)を構築する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Solr(Master-Slave)を構築する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Solr(Master-Slave)を構築する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="solrmaster-slaveを構築する">Solr(Master-Slave)を構築する</h1>
+<p>Vagrant で Solr を Master-Slave で構築しました．<br>
+Solr のバージョンは 6.2.0 です．</p>
+<h2 id="構成">構成</h2>
+<p>Solr の構築はシェルでやることにしました．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">D:\vagrant\solrmasterslave
+┣Vagrantfile
+┗create_solr.sh
+</code></pre></div><h3 id="vagrantfile">Vagrantfile</h3>
+<ul>
+<li>OS は CentOS 7 を使用します．</li>
+<li>プロビジョナでシェルを実行します．</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">slave_cnt <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+
+<span style="color:#66d9ef">Vagrant</span><span style="color:#f92672">.</span>configure(<span style="color:#e6db74">&#34;2&#34;</span>) <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>config<span style="color:#f92672">|</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>box <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;centos/7&#34;</span>
+
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>define <span style="color:#e6db74">&#34;master&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span> master <span style="color:#f92672">|</span>
+    master<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;master&#34;</span>
+    master<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.40&#34;</span>
+    master<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:hosts</span>, <span style="color:#e6db74">:sync_hosts</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>
+    master<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./create_solr.sh&#34;</span>
+  <span style="color:#66d9ef">end</span>
+  
+  (<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span>slave_cnt)<span style="color:#f92672">.</span>each <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>i<span style="color:#f92672">|</span>
+    config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>define <span style="color:#e6db74">&#34;slave</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span> slave <span style="color:#f92672">|</span>
+      slave<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;slave</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      slave<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.4</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      slave<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:hosts</span>, <span style="color:#e6db74">:sync_hosts</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>
+      slave<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./create_solr.sh&#34;</span>
+    <span style="color:#66d9ef">end</span>
+  <span style="color:#66d9ef">end</span>
+  
+<span style="color:#66d9ef">end</span>
+</code></pre></div><h3 id="create_solrsh">create_solr.sh</h3>
+<p>Standalone のときと同じです．<br>
+ただ文書の登録は後のお楽しみにとっておきます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Java をインストールする</span>
+yum install -y java-1.8.0-openjdk
+
+<span style="color:#75715e"># Solr を構築する</span>
+cd /usr/local/src/
+yum install -y wget
+wget https://archive.apache.org/dist/lucene/solr/6.2.0/solr-6.2.0.tgz
+tar xzf solr-6.2.0.tgz
+./solr-6.2.0/bin/install_solr_service.sh solr-6.2.0.tgz
+
+<span style="color:#75715e"># core を作成する</span>
+sudo -u solr /opt/solr/bin/solr create -c examplecore
+<span style="color:#75715e"># 文書は登録しない</span>
+
+<span style="color:#75715e"># Port を開放する</span>
+systemctl enable firewalld.service
+systemctl start firewalld.service
+firewall-cmd --zone<span style="color:#f92672">=</span>public --add-port<span style="color:#f92672">=</span>8983/tcp --permanent
+firewall-cmd --reload
+</code></pre></div><h2 id="solr-を構築する">Solr を構築する</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; pwd
+D:\vagrant\solrmasterslave
+&gt; vagrant up
+</code></pre></div><h2 id="master-を設定する">Master を設定する</h2>
+<ul>
+<li>Solr を停止します．</li>
+<li>core にある solrconfig.xml に Master の設定を追加します．</li>
+<li>Solr を起動します．</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; vagrant ssh master
+$ su root
+$ service stop solr
+$ vi /var/solr/masterslave/master/data/examplecore/conf/solrconfig.xml
+$ service start solr
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml">  <span style="color:#f92672">&lt;requestHandler</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;/replication&#34;</span> <span style="color:#a6e22e">class=</span><span style="color:#e6db74">&#34;solr.ReplicationHandler&#34;</span> <span style="color:#f92672">&gt;</span>
+    <span style="color:#f92672">&lt;lst</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;master&#34;</span><span style="color:#f92672">&gt;</span>
+      <span style="color:#f92672">&lt;str</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;replicateAfter&#34;</span><span style="color:#f92672">&gt;</span>commit<span style="color:#f92672">&lt;/str&gt;</span>
+      <span style="color:#f92672">&lt;str</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;replicateAfter&#34;</span><span style="color:#f92672">&gt;</span>optimize<span style="color:#f92672">&lt;/str&gt;</span>
+      <span style="color:#f92672">&lt;str</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;replicateAfter&#34;</span><span style="color:#f92672">&gt;</span>startup<span style="color:#f92672">&lt;/str&gt;</span>
+      <span style="color:#f92672">&lt;str</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;confFiles&#34;</span><span style="color:#f92672">&gt;</span>schema.xml,stopwords.txt<span style="color:#f92672">&lt;/str&gt;</span>
+    <span style="color:#f92672">&lt;/lst&gt;</span>
+  <span style="color:#f92672">&lt;/requestHandler&gt;</span>
+</code></pre></div><h2 id="slave-を設定する">Slave を設定する</h2>
+<ul>
+<li>Solr を停止します．</li>
+<li>core にある solrconfig.xml に Slave の設定を追加します．</li>
+<li>Solr を起動します．</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; vagrant ssh slave1
+$ su root
+$ service stop solr
+$ vi /var/solr/masterslave/master/data/examplecore/conf/solrconfig.xml
+$ service start solr
+
+&gt; vagrant ssh slave2
+$ su root
+$ service stop solr
+$ vi /var/solr/masterslave/master/data/examplecore/conf/solrconfig.xml
+$ service start solr
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml">  <span style="color:#f92672">&lt;requestHandler</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;/replication&#34;</span> <span style="color:#a6e22e">class=</span><span style="color:#e6db74">&#34;solr.ReplicationHandler&#34;</span> <span style="color:#f92672">&gt;</span>
+    <span style="color:#f92672">&lt;lst</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;slave&#34;</span><span style="color:#f92672">&gt;</span>
+      <span style="color:#f92672">&lt;str</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;masterUrl&#34;</span><span style="color:#f92672">&gt;</span>http://master:8983/solr/examplecore<span style="color:#f92672">&lt;/str&gt;</span>
+      <span style="color:#f92672">&lt;str</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;pollInterval&#34;</span><span style="color:#f92672">&gt;</span>00:00:30<span style="color:#f92672">&lt;/str&gt;</span>
+    <span style="color:#f92672">&lt;/lst&gt;</span>
+  <span style="color:#f92672">&lt;/requestHandler&gt;</span>
+</code></pre></div><h2 id="replication-確認">Replication 確認</h2>
+<p>Master に文書を登録して Slave に反映されるか確認します．<br>
+まず，core を作成しただけなので検索結果が空であることを確認します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">&gt; curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.40:8983/solr/examplecore/select?q=*:*&amp;fl=id&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.40
+{
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:23,
+    <span style="color:#e6db74">&#34;params&#34;</span>:{
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:0,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[]
+  }}
+&gt; curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.41:8983/solr/examplecore/select?q=*:*&amp;fl=id&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.41
+{
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:23,
+    <span style="color:#e6db74">&#34;params&#34;</span>:{
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:0,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[]
+  }}
+&gt; curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.42:8983/solr/examplecore/select?q=*:*&amp;fl=id&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.42
+{
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:23,
+    <span style="color:#e6db74">&#34;params&#34;</span>:{
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:0,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[]
+  }}
+</code></pre></div><p>Master に文書を登録します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; vagrant ssh master -c <span style="color:#e6db74">&#34;sudo -u solr /opt/solr/bin/post -c examplecore -p 8983 /opt/solr/example/exampledocs/*.xml&#34;</span>
+</code></pre></div><p>再度検索してみます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">&gt; curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.40:8983/solr/examplecore/select?q=*:*&amp;fl=id&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.40
+{
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:6,
+    <span style="color:#e6db74">&#34;params&#34;</span>:{
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:32,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GB18030TEST&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;SP2514N&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;6H500F0&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;F8V7067-APL-KIT&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;IW-02&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;MA147LL/A&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;adata&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;apple&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;asus&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;ati&#34;</span>}]
+  }}
+&gt; curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.41:8983/solr/examplecore/select?q=*:*&amp;fl=id&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.41
+{
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:11,
+    <span style="color:#e6db74">&#34;params&#34;</span>:{
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:32,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GB18030TEST&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;SP2514N&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;6H500F0&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;F8V7067-APL-KIT&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;IW-02&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;MA147LL/A&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;adata&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;apple&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;asus&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;ati&#34;</span>}]
+  }}
+&gt; curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.42:8983/solr/examplecore/select?q=*:*&amp;fl=id&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.42
+{
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:27,
+    <span style="color:#e6db74">&#34;params&#34;</span>:{
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:32,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GB18030TEST&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;SP2514N&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;6H500F0&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;F8V7067-APL-KIT&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;IW-02&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;MA147LL/A&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;adata&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;apple&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;asus&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;ati&#34;</span>}]
+  }}
+</code></pre></div><p>Replication が実行されて Master のインデックスが Slave にも反映されました．</p>
+<h2 id="あとがき">あとがき</h2>
+<p>一気に Master-Slave 構成を構築する際の Vagrantfile，シェル，構成です．<br>
+共有ディレクトリを用意して，設定済みの solrconfig.xml を配布します(solrconfig.xml には Master，Slave の設定を追記しています)．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">slave_cnt <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+
+<span style="color:#66d9ef">Vagrant</span><span style="color:#f92672">.</span>configure(<span style="color:#e6db74">&#34;2&#34;</span>) <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>config<span style="color:#f92672">|</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>box <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;centos/7&#34;</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>synced_folder <span style="color:#e6db74">&#34;./shared&#34;</span>, <span style="color:#e6db74">&#34;/home/vagrant/shared&#34;</span>, <span style="color:#e6db74">owner</span>: <span style="color:#e6db74">&#34;vagrant&#34;</span>, <span style="color:#e6db74">group</span>: <span style="color:#e6db74">&#34;vagrant&#34;</span>
+
+  config<span style="color:#f92672">.</span>proxy<span style="color:#f92672">.</span>enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+  config<span style="color:#f92672">.</span>proxy<span style="color:#f92672">.</span>http     <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://user_id:password@proxy_address:proxy_port&#34;</span>
+  config<span style="color:#f92672">.</span>proxy<span style="color:#f92672">.</span>https    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://user_id:password@proxy_address:proxy_port&#34;</span>
+  config<span style="color:#f92672">.</span>proxy<span style="color:#f92672">.</span>no_proxy <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;localhost,127.0.0.1&#34;</span>
+
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>define <span style="color:#e6db74">&#34;master&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span> master <span style="color:#f92672">|</span>
+    master<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;master&#34;</span>
+    master<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.40&#34;</span>
+    master<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:hosts</span>, <span style="color:#e6db74">:sync_hosts</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>
+    master<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./create_solr.sh&#34;</span>
+    master<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./setup_master.sh&#34;</span>
+  <span style="color:#66d9ef">end</span>
+  
+  (<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span>slave_cnt)<span style="color:#f92672">.</span>each <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>i<span style="color:#f92672">|</span>
+    config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>define <span style="color:#e6db74">&#34;slave</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span> slave <span style="color:#f92672">|</span>
+      slave<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;slave</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      slave<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.4</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      slave<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:hosts</span>, <span style="color:#e6db74">:sync_hosts</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>
+      slave<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./create_solr.sh&#34;</span>
+      slave<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./setup_slave.sh&#34;</span>
+    <span style="color:#66d9ef">end</span>
+  <span style="color:#66d9ef">end</span>
+  
+<span style="color:#66d9ef">end</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">service solr stop
+<span style="color:#ae81ff">\c</span>p -f /home/vagrant/shared/master/solrconfig.xml /var/solr/data/examplecore/conf/solrconfig.xml
+service solr start
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">service solr stop
+<span style="color:#ae81ff">\c</span>p -f /home/vagrant/shared/slave/solrconfig.xml /var/solr/data/examplecore/conf/solrconfig.xml
+service solr start
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">D:\vagrant\solrmasterslave
+┣Vagrantfile
+┣shared
+┃┣master
+┃┃┗solrconfig.xml
+┃┗slvae
+┃  ┗solrconfig.xml
+┣create_solr.sh
+┣setup_master.sh
+┗setup_slave.sh
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

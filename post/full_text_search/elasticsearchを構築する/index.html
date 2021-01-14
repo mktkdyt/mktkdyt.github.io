@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Elasticsearch を構築する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Elasticsearch を構築する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Elasticsearch を構築する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="elasticsearch-を構築する">Elasticsearch を構築する</h1>
+<p>ローカルで Elasticsearch を構築しました。
+Elasticsearch 用に 3台，Kibana 用に 1台 VM を立てました。</p>
+<h1 id="vm-作成">VM 作成</h1>
+<p>Vagrantfile を作成して vagrant up します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#75715e"># Elasticsearch ノード数</span>
+es_cnt <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>
+cnt <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>
+
+<span style="color:#66d9ef">Vagrant</span><span style="color:#f92672">.</span>configure(<span style="color:#e6db74">&#34;2&#34;</span>) <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>config<span style="color:#f92672">|</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>box <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ubuntu/bionic64&#34;</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>synced_folder <span style="color:#e6db74">&#34;./share&#34;</span>, <span style="color:#e6db74">&#34;/home/vagrant/share&#34;</span>, <span style="color:#e6db74">owner</span>: <span style="color:#e6db74">&#34;vagrant&#34;</span>, <span style="color:#e6db74">group</span>: <span style="color:#e6db74">&#34;vagrant&#34;</span>
+
+  <span style="color:#75715e">#--- Elasticsearch 構築 ---#</span>
+  (<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span>es_cnt)<span style="color:#f92672">.</span>each <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>i<span style="color:#f92672">|</span>
+    config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>define <span style="color:#e6db74">&#34;es</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span> es <span style="color:#f92672">|</span>
+      es<span style="color:#f92672">.</span>disksize<span style="color:#f92672">.</span>size <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;50GB&#39;</span>
+      es<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provider <span style="color:#e6db74">&#34;virtualbox&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>vb<span style="color:#f92672">|</span>
+        vb<span style="color:#f92672">.</span>memory <span style="color:#f92672">=</span> <span style="color:#ae81ff">8192</span>
+      <span style="color:#66d9ef">end</span>
+      es<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;es</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      es<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.3</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      es<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:hosts</span>, <span style="color:#e6db74">:sync_hosts</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>
+    <span style="color:#66d9ef">end</span>
+  <span style="color:#66d9ef">end</span>
+  <span style="color:#75715e">#--- /Elasticsearch 構築 ---#</span>
+
+  <span style="color:#75715e">#--- Kibana 構築 ---#</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>define <span style="color:#e6db74">&#34;kibana&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span> kibana <span style="color:#f92672">|</span>
+    kibana<span style="color:#f92672">.</span>disksize<span style="color:#f92672">.</span>size <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;10GB&#39;</span>
+    kibana<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provider <span style="color:#e6db74">&#34;virtualbox&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>vb<span style="color:#f92672">|</span>
+      vb<span style="color:#f92672">.</span>memory <span style="color:#f92672">=</span> <span style="color:#ae81ff">2048</span>
+    <span style="color:#66d9ef">end</span>
+    kibana<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kibana&#34;</span>
+    kibana<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.34&#34;</span>
+    kibana<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:hosts</span>, <span style="color:#e6db74">:sync_hosts</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>
+  <span style="color:#66d9ef">end</span>
+  <span style="color:#75715e">#--- /Kibana 構築 ---#</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">&gt; pwd
+D:\vagrant\elasticsearch
+&gt; vagrant up
+</code></pre></div><h1 id="elasticsearch-構築">Elasticsearch 構築</h1>
+<p>各 VM で以下を実行します。</p>
+<h2 id="jdk">JDK</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo apt -y update
+$ sudo apt -y upgrade
+$ sudo apt install -y openjdk-11-jdk
+</code></pre></div><h2 id="elasticsaerch">Elasticsaerch</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+$ sudo apt install -y apt-transport-https
+$ echo <span style="color:#e6db74">&#34;deb https://artifacts.elastic.co/packages/7.x/apt stable main&#34;</span> | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+$ sudo apt -y update
+$ sudo apt -y install elasticsearch
+</code></pre></div><h2 id="elasticsearch-設定">Elasticsearch 設定</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo sed -i -e <span style="color:#e6db74">&#39;s|#cluster.name.*$|cluster.name: es|&#39;</span> /etc/elasticsearch/elasticsearch.yml
+sudo sed -i -e <span style="color:#e6db74">&#34;s|#node.name.*</span>$<span style="color:#e6db74">|node.name: </span><span style="color:#e6db74">${</span>HOSTNAME<span style="color:#e6db74">}</span><span style="color:#e6db74">|&#34;</span> /etc/elasticsearch/elasticsearch.yml
+sudo sed -i -e <span style="color:#e6db74">&#39;s|#bootstrap.memory_lock.*$|bootstrap.memory_lock: true|&#39;</span> /etc/elasticsearch/elasticsearch.yml
+<span style="color:#75715e"># 通常</span>
+<span style="color:#75715e"># sudo sed -i -e &#39;s|#network.host.*$|network.host: 0.0.0.0|&#39; /etc/elasticsearch/elasticsearch.yml</span>
+<span style="color:#75715e"># Vagrant 用</span>
+sudo sed -i -e <span style="color:#e6db74">&#34;s|#network.host.*</span>$<span style="color:#e6db74">|network.host: &#39;_enp0s8_&#39;|&#34;</span> /etc/elasticsearch/elasticsearch.yml
+sudo sed -i -e <span style="color:#e6db74">&#39;s|#discovery.seed_hosts.*$|discovery.seed_hosts: [&#34;es1&#34;, &#34;es2&#34;, &#34;es3&#34;]|&#39;</span> /etc/elasticsearch/elasticsearch.yml
+sudo sed -i -e <span style="color:#e6db74">&#39;s|#cluster.initial_master_nodes.*$|cluster.initial_master_nodes: [&#34;es1&#34;, &#34;es2&#34;, &#34;es3&#34;]|&#39;</span> /etc/elasticsearch/elasticsearch.yml
+echo <span style="color:#e6db74">&#39;# allow connection from elasticsearch-head&#39;</span> | sudo tee -a /etc/elasticsearch/elasticsearch.yml
+echo <span style="color:#e6db74">&#39;http.cors.enabled: true&#39;</span> | sudo tee -a /etc/elasticsearch/elasticsearch.yml
+echo <span style="color:#e6db74">&#39;http.cors.allow-origin: &#34;*&#34;&#39;</span> | sudo tee -a /etc/elasticsearch/elasticsearch.yml
+$ sudo grep -v -e <span style="color:#e6db74">&#39;^\s*#&#39;</span> -e <span style="color:#e6db74">&#39;^\s*$&#39;</span> /etc/elasticsearch/elasticsearch.yml
+cluster.name: es
+node.name: es1
+path.data: /var/lib/elasticsearch
+path.logs: /var/log/elasticsearch
+bootstrap.memory_lock: true
+network.host: 0.0.0.0
+discovery.seed_hosts: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;es1&#34;</span>, <span style="color:#e6db74">&#34;es2&#34;</span>, <span style="color:#e6db74">&#34;es3&#34;</span><span style="color:#f92672">]</span>
+cluster.initial_master_nodes: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;es1&#34;</span>, <span style="color:#e6db74">&#34;es2&#34;</span>, <span style="color:#e6db74">&#34;es3&#34;</span><span style="color:#f92672">]</span>
+http.cors.enabled: true
+http.cors.allow-origin: <span style="color:#e6db74">&#34;*&#34;</span>
+</code></pre></div><h2 id="jvm-設定">JVM 設定</h2>
+<ul>
+<li>メモリの半分を割り当てる</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo sed -i -e <span style="color:#e6db74">&#39;s|-Xms1g|-Xms4g|&#39;</span> /etc/elasticsearch/jvm.options
+$ sudo sed -i -e <span style="color:#e6db74">&#39;s|-Xmx1g|-Xmx4g|&#39;</span> /etc/elasticsearch/jvm.options
+$ sudo grep -e <span style="color:#e6db74">&#39;^-Xm&#39;</span> /etc/elasticsearch/jvm.options
+-Xms4g
+-Xmx4g
+</code></pre></div><h2 id="ulimits-変更">ulimits 変更</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo sed -i -e <span style="color:#e6db74">&#39;s|# End of file|elasticsearch    -       nofile          65536\n# End of file|&#39;</span> /etc/security/limits.conf
+$ sudo sed -i -e <span style="color:#e6db74">&#39;s|# End of file|elasticsearch    -       memlock         unlimited\n# End of file|&#39;</span> /etc/security/limits.conf
+$ sudo sed -i -e <span style="color:#e6db74">&#39;s|# End of file|root             -       memlock         unlimited\n# End of file|&#39;</span> /etc/security/limits.conf
+$ sudo grep -v -e <span style="color:#e6db74">&#39;^\s*#&#39;</span> -e <span style="color:#e6db74">&#39;^\s*$&#39;</span> /etc/security/limits.conf
+elasticsearch    -       nofile          <span style="color:#ae81ff">65536</span>
+elasticsearch    -       memlock         unlimited
+root             -       memlock         unlimited
+</code></pre></div><h2 id="swap-しないようにする設定">SWAP しないようにする設定</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo sed -i -e <span style="color:#e6db74">&#39;s|#MAX_LOCKED_MEMORY=unlimited|MAX_LOCKED_MEMORY=unlimited|&#39;</span> /etc/default/elasticsearch
+$ sudo grep -v -e <span style="color:#e6db74">&#39;^\s*#&#39;</span> -e <span style="color:#e6db74">&#39;^\s*$&#39;</span> /etc/default/elasticsearch
+ES_PATH_CONF<span style="color:#f92672">=</span>/etc/elasticsearch
+ES_STARTUP_SLEEP_TIME<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>
+MAX_LOCKED_MEMORY<span style="color:#f92672">=</span>unlimited
+$ sudo sed -i -e <span style="color:#e6db74">&#39;s|\[Service\]|[Service]\nLimitMEMLOCK=infinity|&#39;</span> /usr/lib/systemd/system/elasticsearch.service
+$ head -n <span style="color:#ae81ff">10</span> /usr/lib/systemd/system/elasticsearch.service
+<span style="color:#f92672">[</span>Unit<span style="color:#f92672">]</span>
+Description<span style="color:#f92672">=</span>Elasticsearch
+Documentation<span style="color:#f92672">=</span>http://www.elastic.co
+Wants<span style="color:#f92672">=</span>network-online.target
+After<span style="color:#f92672">=</span>network-online.target
+
+<span style="color:#f92672">[</span>Service<span style="color:#f92672">]</span>
+LimitMEMLOCK<span style="color:#f92672">=</span>infinity
+RuntimeDirectory<span style="color:#f92672">=</span>elasticsearch
+PrivateTmp<span style="color:#f92672">=</span>true
+$ sudo systemctl daemon-reload
+</code></pre></div><h2 id="サービス起動設定">サービス起動設定</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo systemctl enable elasticsearch
+</code></pre></div><h2 id="plugin">Plugin</h2>
+<h3 id="kuromoji">Kuromoji</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-kuromoji
+</code></pre></div><h3 id="icu">ICU</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-icu
+</code></pre></div><h2 id="firewall">FireWall</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo ufw --force enable
+$ sudo ufw allow <span style="color:#ae81ff">22</span>
+$ sudo ufw allow <span style="color:#ae81ff">80</span>
+$ sudo ufw allow <span style="color:#ae81ff">9200</span>
+$ sudo ufw allow <span style="color:#ae81ff">9300</span>
+</code></pre></div><h2 id="起動">起動</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo systemctl start elasticsearch
+$ curl http://192.168.33.31:9200/_cluster/health?pretty
+<span style="color:#f92672">{</span>
+  <span style="color:#e6db74">&#34;cluster_name&#34;</span> : <span style="color:#e6db74">&#34;es&#34;</span>,
+  <span style="color:#e6db74">&#34;status&#34;</span> : <span style="color:#e6db74">&#34;green&#34;</span>,
+  <span style="color:#e6db74">&#34;timed_out&#34;</span> : false,
+  <span style="color:#e6db74">&#34;number_of_nodes&#34;</span> : 3,
+  <span style="color:#e6db74">&#34;number_of_data_nodes&#34;</span> : 3,
+  <span style="color:#e6db74">&#34;active_primary_shards&#34;</span> : 0,
+  <span style="color:#e6db74">&#34;active_shards&#34;</span> : 0,
+  <span style="color:#e6db74">&#34;relocating_shards&#34;</span> : 0,
+  <span style="color:#e6db74">&#34;initializing_shards&#34;</span> : 0,
+  <span style="color:#e6db74">&#34;unassigned_shards&#34;</span> : 0,
+  <span style="color:#e6db74">&#34;delayed_unassigned_shards&#34;</span> : 0,
+  <span style="color:#e6db74">&#34;number_of_pending_tasks&#34;</span> : 0,
+  <span style="color:#e6db74">&#34;number_of_in_flight_fetch&#34;</span> : 0,
+  <span style="color:#e6db74">&#34;task_max_waiting_in_queue_millis&#34;</span> : 0,
+  <span style="color:#e6db74">&#34;active_shards_percent_as_number&#34;</span> : 100.0
+<span style="color:#f92672">}</span>
+</code></pre></div><p>無事 Elasticsearch が起動しました。</p>
+<h1 id="kibana-構築">Kibana 構築</h1>
+<h2 id="インストール">インストール</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo apt -y update
+$ sudo apt -y upgrade
+$ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+$ sudo apt-get install apt-transport-https
+$ echo <span style="color:#e6db74">&#34;deb https://artifacts.elastic.co/packages/7.x/apt stable main&#34;</span> | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+$ sudo apt-get update <span style="color:#f92672">&amp;&amp;</span> sudo apt-get install kibana
+</code></pre></div><h2 id="設定">設定</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo sed -i -e <span style="color:#e6db74">&#34;s|#server.name.*</span>$<span style="color:#e6db74">|server.name: &#39;kibana&#39;|&#34;</span> /etc/kibana/kibana.yml
+$ sudo sed -i -e <span style="color:#e6db74">&#39;s|#server.host.*$|server.host: 0.0.0.0|&#39;</span> /etc/kibana/kibana.yml
+$ sudo sed -i -e <span style="color:#e6db74">&#39;s|#elasticsearch.hosts.*$|elasticsearch.hosts: [&#34;http://es1:9200&#34;]|&#39;</span> /etc/kibana/kibana.yml
+$ grep -v -e <span style="color:#e6db74">&#39;^\s*#&#39;</span> -e <span style="color:#e6db74">&#39;^\s*$&#39;</span> /etc/kibana/kibana.yml
+server.host: 0.0.0.0
+server.name: kibana
+elasticsearch.hosts: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;http://es1:9200&#34;</span><span style="color:#f92672">]</span>
+</code></pre></div><h2 id="起動設定">起動設定</h2>
+<pre><code>$ sudo systemctl daemon-reload
+$ sudo systemctl enable kibana
+</code></pre><h2 id="起動-1">起動</h2>
+<pre><code>$ sudo systemctl start kibana
+</code></pre><h2 id="analyze_api_ui">analyze_api_ui</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ cd /usr/share/kibana/
+$ sudo ./bin/kibana-plugin --allow-root install https://github.com/johtani/analyze-api-ui-plugin/releases/download/7.3.0/analyze_api_ui-7.3.0.zip
+</code></pre></div><h2 id="firewall-1">FireWall</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo ufw --force enable
+$ sudo ufw allow <span style="color:#ae81ff">22</span>
+$ sudo ufw allow <span style="color:#ae81ff">80</span>
+$ sudo ufw allow <span style="color:#ae81ff">5601</span>
+</code></pre></div><h2 id="kibana-使用">kibana 使用</h2>
+<p>http://192.168.33.34:5601/</p>
+<p><img src="images/00.PNG" alt="a"></p>
+<h1 id="elasticsearch-head">elasticsearch-head</h1>
+<h2 id="インストール-1">インストール</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo apt -y install nodejs
+$ sudo apt -y install npm
+$ sudo git clone https://github.com/mobz/elasticsearch-head.git
+$ cd elasticsearch-head
+$ sudo npm install
+</code></pre></div><h2 id="起動-2">起動</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ pwd
+/home/vagrant/elasticsearch-head
+$ npm run start
+</code></pre></div><h2 id="firewall-2">FireWall</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ sudo ufw allow <span style="color:#ae81ff">9100</span>
+</code></pre></div><h2 id="elasticsearch-head-使用">elasticsearch-head 使用</h2>
+<p>http://192.168.33.34:9100</p>
+<p><img src="images/01.PNG" alt="es-head-cluster-health"></p>
+<p><img src="images/02.PNG" alt="es-head-search"></p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

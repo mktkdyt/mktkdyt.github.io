@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Solr Cloud を構築する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Solr Cloud を構築する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Solr Cloud を構築する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="solr-cloud-を構築する">Solr Cloud を構築する</h1>
+<p>Solr Cloud を Vagrant で構築します．<br>
+Solr Cloud を構築するには，Solr はもちろん ZooKeeper も必要です．</p>
+<h2 id="solr-cloud">Solr Cloud</h2>
+<p>イメージはこんな感じです．</p>
+<ul>
+<li>ZooKeeper : 3</li>
+<li>Solr node: 4</li>
+<li>shard : 2</li>
+<li>replica : 2</li>
+</ul>
+<p>Zookeeper 3 個，Solr node 4 個の計 7 個の VM を構築します．</p>
+<p><img src="images/solr_cloud_image.png" alt="images/solr_cloud_image.png"></p>
+<h2 id="構成">構成</h2>
+<p>構成を以下に示します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">D:\vagrant\solrcloud
+┣Vagrantfile
+┣create_zkensemble.sh
+┗create_solrnode.sh
+</code></pre></div><h3 id="vagrantfile">Vagrantfile</h3>
+<p>Zookeeper 3 個，Solr node 4 個の計 7 個の VM を構築します．<br>
+Solr を Cloud モードで起動する際に ZooKeeper の接続先を指定する必要があるので Vagrantfile で接続先文字列を用意するのがポイントです．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#75715e"># ZooKeeper 数</span>
+zk_cnt <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>
+<span style="color:#75715e"># Solr node 数</span>
+node_cnt <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>
+
+<span style="color:#66d9ef">Vagrant</span><span style="color:#f92672">.</span>configure(<span style="color:#e6db74">&#34;2&#34;</span>) <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>config<span style="color:#f92672">|</span>
+  config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>box <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;centos/7&#34;</span>
+
+  <span style="color:#75715e">#--- ZooKeeper アンサンブル構築 ---#</span>
+  (<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span>zk_cnt)<span style="color:#f92672">.</span>each <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>i<span style="color:#f92672">|</span>
+    config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>define <span style="color:#e6db74">&#34;zk</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span> zk <span style="color:#f92672">|</span>
+      zk<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;zk</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      zk<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.1</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      zk<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:hosts</span>, <span style="color:#e6db74">:sync_hosts</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>
+      zk<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./create_zkensemble.sh&#34;</span>, <span style="color:#e6db74">args</span>: <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">#{</span>zk_cnt<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+    <span style="color:#66d9ef">end</span>
+  <span style="color:#66d9ef">end</span>
+  <span style="color:#75715e">#--- /ZooKeeper アンサンブル構築 ---#</span>
+
+  <span style="color:#75715e">#--- ZooKeeper アンサンブルの接続先文字列 ---#</span>
+  zkensemble <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+  (<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span>zk_cnt)<span style="color:#f92672">.</span>each <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>i<span style="color:#f92672">|</span>
+    zkensemble <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;192.168.33.1</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">:2181,&#34;</span>
+  <span style="color:#66d9ef">end</span>
+  zkensemble<span style="color:#f92672">.</span>slice!(<span style="color:#e6db74">/,$/</span>)
+  <span style="color:#75715e">#--- /ZooKeeper アンサンブルの接続先文字列 ---#</span>
+
+  <span style="color:#75715e">#--- Solr Cloud 構築 ---#</span>
+  (<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span>node_cnt)<span style="color:#f92672">.</span>each <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>i<span style="color:#f92672">|</span>
+    config<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>define <span style="color:#e6db74">&#34;node</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span> node <span style="color:#f92672">|</span>
+      node<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provider <span style="color:#e6db74">:virtualbox</span> <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>vb<span style="color:#f92672">|</span>
+          <span style="color:#75715e"># Solr node だけメモリ増やしてます</span>
+          vb<span style="color:#f92672">.</span>customize <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;modifyvm&#34;</span>, <span style="color:#e6db74">:id</span>, <span style="color:#e6db74">&#34;--memory&#34;</span>, <span style="color:#e6db74">&#34;2048&#34;</span><span style="color:#f92672">]</span>
+          vb<span style="color:#f92672">.</span>customize <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;modifyvm&#34;</span>, <span style="color:#e6db74">:id</span>, <span style="color:#e6db74">&#34;--cpus&#34;</span>, <span style="color:#e6db74">&#34;2&#34;</span><span style="color:#f92672">]</span>
+      <span style="color:#66d9ef">end</span>
+      node<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;node</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      node<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>network <span style="color:#e6db74">&#34;private_network&#34;</span>, <span style="color:#e6db74">ip</span>: <span style="color:#e6db74">&#34;192.168.33.2</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      node<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:hosts</span>, <span style="color:#e6db74">:sync_hosts</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>
+      node<span style="color:#f92672">.</span>vm<span style="color:#f92672">.</span>provision <span style="color:#e6db74">:shell</span>, <span style="color:#e6db74">path</span>: <span style="color:#e6db74">&#34;./create_solrcloud.sh&#34;</span>, <span style="color:#e6db74">args</span>: <span style="color:#e6db74">&#34;192.168.33.2</span><span style="color:#e6db74">#{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">#{</span>zkensemble<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+    <span style="color:#66d9ef">end</span>
+  <span style="color:#66d9ef">end</span>
+  <span style="color:#75715e">#--- /Solr Cloud 構築 ---#</span>
+
+<span style="color:#66d9ef">end</span>
+</code></pre></div><h3 id="create_zkensemblesh">create_zkensemble.sh</h3>
+<p>ZooKeeper Ensemble を構築したときと同じです．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># Java をインストールする</span>
+yum install -y java-1.8.0-openjdk
+
+<span style="color:#75715e"># ZooKeeper を構築する</span>
+cd /var/tmp
+yum install -y wget
+wget http://ftp.jaist.ac.jp/pub/apache/zookeeper/zookeeper-3.4.14/zookeeper-3.4.14.tar.gz
+tar xvf zookeeper-3.4.14.tar.gz
+cp -ar zookeeper-3.4.14 /opt/
+ln -s /opt/zookeeper-3.4.14 /opt/zookeeper
+
+<span style="color:#75715e"># ZooKeeper 用のユーザを作成する</span>
+groupadd zookeeper
+useradd -g zookeeper -d /opt/zookeeper -s /sbin/nologin zookeeper
+chown -R zookeeper.zookeeper /opt/zookeeper/*
+
+<span style="color:#75715e"># ZooKeeperの設定ファイルを用意する</span>
+cd /opt/zookeeper/conf
+cp zoo_sample.cfg zoo.cfg
+
+<span style="color:#75715e"># dataDir を tmp から var に変更する</span>
+mkdir /var/lib/zookeeper
+chown zookeeper.zookeeper /var/lib/zookeeper
+cd /opt/zookeeper/conf
+sed -i -e <span style="color:#e6db74">&#39;s#dataDir=.*$#dataDir=/var/lib/zookeeper#&#39;</span> zoo.cfg
+
+<span style="color:#75715e"># ZooKeeper アンサンブルの設定を追記する</span>
+<span style="color:#75715e"># $1 : ZooKeeper のノードID</span>
+<span style="color:#75715e"># $2 : ZooKeeper アンサンブルの構成ノード数</span>
+echo <span style="color:#e6db74">&#34;# ZooKeeper Ensemble&#34;</span> &gt;&gt; /opt/zookeeper/conf/zoo.cfg
+<span style="color:#66d9ef">for</span> i in <span style="color:#e6db74">`</span>seq <span style="color:#ae81ff">1</span> $2<span style="color:#e6db74">`</span>
+<span style="color:#66d9ef">do</span>
+  <span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $i <span style="color:#f92672">=</span> $1 <span style="color:#f92672">]</span> ; <span style="color:#66d9ef">then</span>
+    <span style="color:#75715e"># ノードIDが自分のものと一致する場合は 0.0.0.0 とする．</span>
+    echo <span style="color:#e6db74">&#34;server.</span><span style="color:#e6db74">${</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">=0.0.0.0:2888:3888&#34;</span> &gt;&gt; /opt/zookeeper/conf/zoo.cfg
+  <span style="color:#66d9ef">else</span>
+    echo <span style="color:#e6db74">&#34;server.</span><span style="color:#e6db74">${</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">=192.168.33.1</span><span style="color:#e6db74">${</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">:2888:3888&#34;</span> &gt;&gt; /opt/zookeeper/conf/zoo.cfg
+  <span style="color:#66d9ef">fi</span>
+<span style="color:#66d9ef">done</span>
+<span style="color:#75715e"># dataDir にノードIDが記載された myid ファイルを用意する必要がある</span>
+echo $1 &gt;&gt; /var/lib/zookeeper/myid
+
+<span style="color:#75715e"># ZooKeeper を起動する</span>
+cd /opt/zookeeper
+bin/zkServer.sh start
+
+<span style="color:#75715e"># Port を開放する</span>
+systemctl enable firewalld.service
+systemctl start firewalld.service
+firewall-cmd --zone<span style="color:#f92672">=</span>public --add-port<span style="color:#f92672">=</span>2181/tcp --add-port<span style="color:#f92672">=</span>2888/tcp --add-port<span style="color:#f92672">=</span>3888/tcp --permanent
+firewall-cmd --reload
+
+<span style="color:#75715e"># ZooKeeper の状態を確認する</span>
+cd /opt/zookeeper
+bin/zkServer.sh status
+yum install -y nc
+echo ruok | nc localhost <span style="color:#ae81ff">2181</span>
+
+<span style="color:#75715e"># 終了ステータスが 0 でない場合に Vagrant が異常終了とみなし VM が連続生成されないことがあるので明示する</span>
+exit <span style="color:#ae81ff">0</span>
+</code></pre></div><h3 id="create_solrcloudsh">create_solrcloud.sh</h3>
+<p>Solr を Cloud モードで起動します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># Java をインストールする</span>
+yum install -y java-1.8.0-openjdk
+
+<span style="color:#75715e"># Solr を構築する</span>
+cd /usr/local/src/
+yum install -y wget
+wget http://ftp.jaist.ac.jp/pub/apache/lucene/solr/8.1.1/solr-8.1.1.tgz
+tar xzf solr-8.1.1.tgz
+./solr-8.1.1/bin/install_solr_service.sh solr-8.1.1.tgz
+
+<span style="color:#75715e"># Solr を Cloud モードで起動する</span>
+<span style="color:#75715e"># $1 : Solr node の IPアドレス</span>
+<span style="color:#75715e"># $2 : ZooKeeper アンサンブルの接続先文字列</span>
+sudo -u solr /opt/solr/bin/solr stop
+sudo -u solr /opt/solr/bin/solr start -cloud -s /var/solr/data -p <span style="color:#ae81ff">8983</span> -z $2 -h $1
+
+<span style="color:#75715e"># Port を開放する</span>
+systemctl enable firewalld.service
+systemctl start firewalld.service
+firewall-cmd --zone<span style="color:#f92672">=</span>public --add-port<span style="color:#f92672">=</span>8983/tcp --permanent
+firewall-cmd --reload
+
+<span style="color:#75715e"># 終了ステータスが 0 でない場合に Vagrant が異常終了とみなし VM が連続生成されないことがあるので明示する</span>
+exit <span style="color:#ae81ff">0</span>
+</code></pre></div><h2 id="solr-cloud-を構築する-1">Solr Cloud を構築する</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">cd D:\vagrant\solrcloud
+vagrant up
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>http://192.168.33.21:8983/solr/#/ にアクセスすると Cloud という項目が追加されていることがわかります．</p>
+<p><img src="images/solr_dashboard.png" alt="images/solr_dashboard.png"></p>
+<p>Cloud をクリックすると node が一覧に表示されます．<br>
+4個 node を作成したので4個表示されています．<br>
+まだ collection を作成していないので Collections，Replicas は空です．</p>
+<p><img src="images/solr_cloud_nodes.png" alt="images/solr_cloud_nodes.png"></p>
+<p>ZK Status をクリックすると ZooKeeper が一覧に表示されます．<br>
+3個 ZooKeeper を作成したので3個でアンサンブルが構成されています．<br>
+今回は 192.168.33.12 が leader に選出されたようです．</p>
+<p><img src="images/solr_cloud_zk_status.png" alt="images/solr_cloud_zk_status.png"></p>
+<p>Graph をクリックすると Solr Cloud の構成が可視化されます．<br>
+まだ collection を作成していないので何も表示されません．</p>
+<p><img src="images/solr_cloud_graph_empty.png" alt="images/solr_cloud_graph_empty.png"></p>
+<h2 id="collection-を作成する">collection を作成する</h2>
+<p>早速 collection を作ります．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">vagrant ssh node1 -c <span style="color:#e6db74">&#34;sudo -u solr /opt/solr/bin/solr create_collection -c examplecollection -p 8983 -shards 2 -replicationFactor 2&#34;</span>
+</code></pre></div><p>Dashboard を見ると collection が追加されていることがわかります．</p>
+<p><img src="images/solr_dashborad_collection.png" alt="images/solr_dashborad_collection.png"></p>
+<p>collection を選択すると shard 2 replication 2 で構成されていることがわかります．</p>
+<p><img src="images/solr_collection_overview.png" alt="images/solr_collection_overview.png"></p>
+<p>Cloud の Graph を見ると collection の shard に各 node が割り当てられていることがわかります．</p>
+<p><img src="images/solr_cloud_graph_collection_created.png" alt="images/solr_cloud_graph_collection_created.png"></p>
+<h2 id="インデクシング文書登録する">インデクシング(文書登録)する</h2>
+<p>collection にインデクシングをおこないます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">vagrant ssh node1 -c <span style="color:#e6db74">&#34;sudo -u solr /opt/solr/bin/post -c examplecollection -p 8983 /opt/solr/example/exampledocs/*.xml&#34;</span>
+</code></pre></div><p>検索してみます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">$ curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.21:8983/solr/examplecollection/select?q=*:*&amp;fl=id&amp;sort=id</span>%2<span style="color:#e6db74">0asc&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.21                
+{                                                                                                                                                          
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{                                                                                                                                       
+    <span style="color:#e6db74">&#34;zkConnected&#34;</span>:true,                                                                                                                                    
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,                                                                                                                                            
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:7,                                                                                                                                             
+    <span style="color:#e6db74">&#34;params&#34;</span>:{                                                                                                                                             
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,                                                                                                                                           
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,                                                                                                                                       
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,                                                                                                                                           
+      <span style="color:#e6db74">&#34;sort&#34;</span>:<span style="color:#e6db74">&#34;id asc&#34;</span>,                                                                                                                                     
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},                                                                                                                                       
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:32,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[                                                                                                             
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;0579B002&#34;</span>},                                                                                                                                  
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;100-435805&#34;</span>},                                                                                                                                
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;3007WFP&#34;</span>},                                                                                                                                   
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;6H500F0&#34;</span>},                                                                                                                                   
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;9885A004&#34;</span>},                                                                                                                                  
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;EN7800GTX/2DHTV/256M&#34;</span>},                                                                                                                      
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;EUR&#34;</span>},                                                                                                                                       
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;F8V7067-APL-KIT&#34;</span>},                                                                                                                           
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GB18030TEST&#34;</span>},                                                                                                                               
+      {                                                                                                                                                    
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GBP&#34;</span>}]                                                                                                                                       
+  }}                                                                                                                                                       
+</code></pre></div><p>32件ヒットしました．
+rows を指定していないので id は 10 件のみの表示となっています．
+これで構築が完了しました．</p>
+<h2 id="shard-を指定した検索">shard を指定した検索</h2>
+<p>まずは shard1 を指定して検索します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">$ curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.21:8983/solr/examplecollection/select?q=*:*&amp;fl=id&amp;shards=shard1&amp;sort=id</span>%2<span style="color:#e6db74">0asc&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.21    
+{                                                                                                                                                            
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{                                                                                                                                         
+    <span style="color:#e6db74">&#34;zkConnected&#34;</span>:true,                                                                                                                                      
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,                                                                                                                                              
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:4,                                                                                                                                               
+    <span style="color:#e6db74">&#34;params&#34;</span>:{                                                                                                                                               
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,                                                                                                                                             
+      <span style="color:#e6db74">&#34;shards&#34;</span>:<span style="color:#e6db74">&#34;shard1&#34;</span>,                                                                                                                                     
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,                                                                                                                                         
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,                                                                                                                                             
+      <span style="color:#e6db74">&#34;sort&#34;</span>:<span style="color:#e6db74">&#34;id asc&#34;</span>,                                                                                                                                       
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},                                                                                                                                         
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:14,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[                                                                                                               
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;3007WFP&#34;</span>},                                                                                                                                     
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;EN7800GTX/2DHTV/256M&#34;</span>},                                                                                                                        
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GB18030TEST&#34;</span>},                                                                                                                                 
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GBP&#34;</span>},                                                                                                                                         
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;IW-02&#34;</span>},                                                                                                                                       
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;MA147LL/A&#34;</span>},                                                                                                                                   
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;TWINX2048-3200PRO&#34;</span>},                                                                                                                           
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;USD&#34;</span>},                                                                                                                                         
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;VDBDB1A16&#34;</span>},                                                                                                                                   
+      {                                                                                                                                                      
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;VS1GB400C3&#34;</span>}]                                                                                                                                  
+  }}                                                                                                                                                         
+</code></pre></div><p>14件ヒットしました．</p>
+<p>次に shard2 を指定して検索します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">$ curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.21:8983/solr/examplecollection/select?q=*:*&amp;fl=id&amp;shards=shard2&amp;sort=id</span>%2<span style="color:#e6db74">0asc&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.21
+{
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{
+    <span style="color:#e6db74">&#34;zkConnected&#34;</span>:true,
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:0,
+    <span style="color:#e6db74">&#34;params&#34;</span>:{
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,
+      <span style="color:#e6db74">&#34;shards&#34;</span>:<span style="color:#e6db74">&#34;shard2&#34;</span>,
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,
+      <span style="color:#e6db74">&#34;sort&#34;</span>:<span style="color:#e6db74">&#34;id asc&#34;</span>,
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:18,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;0579B002&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;100-435805&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;6H500F0&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;9885A004&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;EUR&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;F8V7067-APL-KIT&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;NOK&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;SOLR1000&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;SP2514N&#34;</span>},
+      {
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;UTF8TEST&#34;</span>}]
+  }}
+</code></pre></div><p>18件ヒットしました．</p>
+<p>各 shard から異なる結果が得られたことから，文書を登録すると自動で各 shard に文書が登録されることがわかりました．</p>
+<p>今度は shard1 と shard2 両方指定して検索します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">$ curl -X GET <span style="color:#e6db74">&#34;http://192.168.33.21:8983/solr/examplecollection/select?q=*:*&amp;fl=id&amp;shards=shard1,shard2&amp;sort=id</span>%2<span style="color:#e6db74">0asc&amp;wt=json&amp;indent=on&#34;</span> --noproxy 192.168.33.21                                
+{                                                                                                                                                                                               
+  <span style="color:#e6db74">&#34;responseHeader&#34;</span>:{                                                                                                                                                                            
+    <span style="color:#e6db74">&#34;zkConnected&#34;</span>:true,                                                                                                                                                                         
+    <span style="color:#e6db74">&#34;status&#34;</span>:0,                                                                                                                                                                                 
+    <span style="color:#e6db74">&#34;QTime&#34;</span>:17,                                                                                                                                                                                 
+    <span style="color:#e6db74">&#34;params&#34;</span>:{                                                                                                                                                                                  
+      <span style="color:#e6db74">&#34;q&#34;</span>:<span style="color:#e6db74">&#34;*:*&#34;</span>,                                                                                                                                                                                
+      <span style="color:#e6db74">&#34;shards&#34;</span>:<span style="color:#e6db74">&#34;shard1,shard2&#34;</span>,                                                                                                                                                                 
+      <span style="color:#e6db74">&#34;indent&#34;</span>:<span style="color:#e6db74">&#34;on&#34;</span>,                                                                                                                                                                            
+      <span style="color:#e6db74">&#34;fl&#34;</span>:<span style="color:#e6db74">&#34;id&#34;</span>,                                                                                                                                                                                
+      <span style="color:#e6db74">&#34;sort&#34;</span>:<span style="color:#e6db74">&#34;id asc&#34;</span>,                                                                                                                                                                          
+      <span style="color:#e6db74">&#34;wt&#34;</span>:<span style="color:#e6db74">&#34;json&#34;</span>}},                                                                                                                                                                            
+  <span style="color:#e6db74">&#34;response&#34;</span>:{<span style="color:#e6db74">&#34;numFound&#34;</span>:32,<span style="color:#e6db74">&#34;start&#34;</span>:0,<span style="color:#e6db74">&#34;docs&#34;</span>:[                                                                                                                                                  
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;0579B002&#34;</span>},                                                                                                                                                                       
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;100-435805&#34;</span>},                                                                                                                                                                     
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;3007WFP&#34;</span>},                                                                                                                                                                        
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;6H500F0&#34;</span>},                                                                                                                                                                        
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;9885A004&#34;</span>},                                                                                                                                                                       
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;EN7800GTX/2DHTV/256M&#34;</span>},                                                                                                                                                           
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;EUR&#34;</span>},                                                                                                                                                                            
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;F8V7067-APL-KIT&#34;</span>},                                                                                                                                                                
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GB18030TEST&#34;</span>},                                                                                                                                                                    
+      {                                                                                                                                                                                         
+        <span style="color:#e6db74">&#34;id&#34;</span>:<span style="color:#e6db74">&#34;GBP&#34;</span>}]                                                                                                                                                                            
+  }}                                                                                                                                                                                            
+</code></pre></div><p>shard を指定しない場合と同じ結果になりました．
+つまりクエリで shard を全て指定しなくても全ての shard から検索することがわかりました．</p>
+<h2 id="まとめ">まとめ</h2>
+<ul>
+<li>collection を作成すると shard に各 node が自動で割り当てられます．</li>
+<li>Solr Cloud の collection に文書を登録すると自動で各 shard に文書が登録されます．</li>
+<li>Solr Cloud の collection を検索する際に shard を指定しなくても全 shard から検索されます．</li>
+</ul>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
