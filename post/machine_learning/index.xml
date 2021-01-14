@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>機械学習 on mktkdyt</title>
+    <link>https://mktkdyt.github.io/post/machine_learning/</link>
+    <description>Recent content in 機械学習 on mktkdyt</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Thu, 14 Jan 2021 17:24:23 +0900</lastBuildDate><atom:link href="https://mktkdyt.github.io/post/machine_learning/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AI をアプリに組み込む</title>
+      <link>https://mktkdyt.github.io/post/machine_learning/ai%E3%82%92%E3%82%A2%E3%83%97%E3%83%AA%E3%81%AB%E7%B5%84%E3%81%BF%E8%BE%BC%E3%82%80/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/machine_learning/ai%E3%82%92%E3%82%A2%E3%83%97%E3%83%AA%E3%81%AB%E7%B5%84%E3%81%BF%E8%BE%BC%E3%82%80/</guid>
+      <description>AI をアプリに組み込む シェルティー判定AIを作成する で作成したシェルティー判定 AI を Flask に組み込んでみます。
+構成 Vagrant で構築した ubuntu 上で実施しました。 IP は 192.168.33.31 です。
+~/python/api├─app.py├─ai.py├─model : 事前に作成したモデル│ ├─model_predict.json│ └─model_predict.hdf5├─static│ ├─favicon.ico : ファビコン（任意）│ └─style.css : スタイルシート├─templates : 画面テンプレート│ └─index.html├─images : アップロードされた画像を格納するディレクトリ└─uwsgi.ini : uWSGI の設定ファイルイメージ アプリケーション配備先を用意する $ mkdir -p ~/python/api $ cd ~/python/api $ python3 -m venv api $ source api/bin/activate # ai の実行に必要なライブラリをインストールする $ pip install werkzeug $ pip install numpy==1.</description>
+    </item>
+    
+    <item>
+      <title>シェルティー判定 AI を作成する</title>
+      <link>https://mktkdyt.github.io/post/machine_learning/%E3%82%B7%E3%82%A7%E3%83%AB%E3%83%86%E3%82%A3%E3%83%BC%E5%88%A4%E5%AE%9Aai%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/machine_learning/%E3%82%B7%E3%82%A7%E3%83%AB%E3%83%86%E3%82%A3%E3%83%BC%E5%88%A4%E5%AE%9Aai%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B/</guid>
+      <description>シェルティー判定 AI を作成する 謝辞 まず初めに参考にさせていただきました。 大変感謝申し上げます。
+https://qiita.com/yottyann1221/items/a08300b572206075ee9f https://qiita.com/tomo_20180402/items/e8c55bdca648f4877188 https://qiita.com/mainvoidllll/items/db991dc30d3ddced6250 https://newtechnologylifestyle.net/keras_imagedatagenerator/
+掲載している画像はフリー画像を使用させていただきました。 https://pixabay.com/ja/
+序 機械学習に入門しました。 ざっとぐぐったところこんな感じで進めていくようです。
+ 大量の画像を用意する 教師／テストデータを作成する モデルを作成する モデルで評価する  今回は、画像認識でシェルティー判定プログラムを作成することにしました。
+環境構築 Windows 10 に chocolatey で python3 を入れました。 venv で仮想環境を構築し、必要なライブラリを入れます。
+&amp;gt; mkdir -p e:\python\ml &amp;gt; cd e:\python\ml &amp;gt; python -m venv ml &amp;gt; .\ml\Scripts\activate (ml)&amp;gt; pip install requests (ml)&amp;gt; pip install beautifulsoup4 # lxml を入れないと下のエラーが出る # bs4.FeatureNotFound: Couldn&amp;#39;t find a tree builder with the features you requested: lxml. Do you need to install a parser library?</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>シェルティー判定 AI を作成する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">シェルティー判定 AI を作成する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>シェルティー判定 AI を作成する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="シェルティー判定-ai-を作成する">シェルティー判定 AI を作成する</h1>
+<h1 id="謝辞">謝辞</h1>
+<p>まず初めに参考にさせていただきました。
+大変感謝申し上げます。</p>
+<p><a href="https://qiita.com/yottyann1221/items/a08300b572206075ee9f">https://qiita.com/yottyann1221/items/a08300b572206075ee9f</a>
+<a href="https://qiita.com/tomo_20180402/items/e8c55bdca648f4877188">https://qiita.com/tomo_20180402/items/e8c55bdca648f4877188</a>
+<a href="https://qiita.com/mainvoidllll/items/db991dc30d3ddced6250">https://qiita.com/mainvoidllll/items/db991dc30d3ddced6250</a>
+<a href="https://newtechnologylifestyle.net/keras_imagedatagenerator/">https://newtechnologylifestyle.net/keras_imagedatagenerator/</a></p>
+<p>掲載している画像はフリー画像を使用させていただきました。
+<a href="https://pixabay.com/ja/">https://pixabay.com/ja/</a></p>
+<h1 id="序">序</h1>
+<p>機械学習に入門しました。
+ざっとぐぐったところこんな感じで進めていくようです。</p>
+<ol>
+<li>大量の画像を用意する</li>
+<li>教師／テストデータを作成する</li>
+<li>モデルを作成する</li>
+<li>モデルで評価する</li>
+</ol>
+<p>今回は、画像認識でシェルティー判定プログラムを作成することにしました。</p>
+<h1 id="環境構築">環境構築</h1>
+<p>Windows 10 に chocolatey で python3 を入れました。
+venv で仮想環境を構築し、必要なライブラリを入れます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; mkdir -p e:<span style="color:#ae81ff">\p</span>ython<span style="color:#ae81ff">\m</span>l
+&gt; cd e:<span style="color:#ae81ff">\p</span>ython<span style="color:#ae81ff">\m</span>l
+&gt; python -m venv ml
+&gt; .<span style="color:#ae81ff">\m</span>l<span style="color:#ae81ff">\S</span>cripts<span style="color:#ae81ff">\a</span>ctivate
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; pip install requests
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; pip install beautifulsoup4
+<span style="color:#75715e"># lxml を入れないと下のエラーが出る</span>
+<span style="color:#75715e"># bs4.FeatureNotFound: Couldn&#39;t find a tree builder with the features you requested: lxml. Do you need to install a parser library?</span>
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; pip install lxml
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; pip install pillow
+<span style="color:#75715e"># 最新の numpy 入れて np.load() すると下のエラーが出るので古いバージョンを指定する</span>
+<span style="color:#75715e"># ValueError: Object arrays cannot be loaded when allow_pickle=False</span>
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; pip install numpy<span style="color:#f92672">==</span>1.16.2
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; pip install sklearn
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; pip install tensorflow
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; pip install keras
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; pip install matplotlib
+</code></pre></div><h1 id="構成">構成</h1>
+<p>こんな構成にしました。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">e:\python\ml
+├─ml
+└─src
+   ├─data
+   │ ├─img
+   │ │ ├─original              : スクレイピングして取得した元画像
+   │ │ │ ├─シェルティー 
+   │ │ │ ├─コーギー
+   │ │ │ └─ボーダーコリー
+   │ │ ├─trimmed               : 不要な画像を取り除いて残った画像
+   │ │ │ ├─シェルティー 
+   │ │ │ ├─コーギー
+   │ │ │ └─ボーダーコリー
+   │ │ ├─excluded              : 不要な画像
+   │ │ │ ├─シェルティー 
+   │ │ │ ├─コーギー
+   │ │ │ └─ボーダーコリー
+   │ │ ├─extended              : 残った画像を加工して水増しした画像
+   │ │ │ ├─シェルティー 
+   │ │ │ ├─コーギー
+   │ │ │ └─ボーダーコリー
+   │ │ └─test                  : AI の動作確認用の画像
+   │ ├─train_test_data
+   │ │ └─data.npy              : extended の画像を使って作成した教師／テストデータ
+   │ ├─model                   : 作成したモデル
+   │ │ ├─Training_and_validation_accuracy.png
+   │ │ ├─Training_and_validation_loss.png
+   │ │ ├─model_predict.hdf5
+   │ │ └─model_predict.json
+   ├─img_scraper               : 画像スクレイピング
+   │ ├─google_search.py
+   │ └─main.py
+   ├─img_trimmer               : 画像除去
+   │ └─main.py
+   ├─img_duplicator            : 画像水増し
+   │ └─main.py
+   ├─train_test_data_generator : 教師／テストデータ作成
+   │ └─main.py
+   ├─model_generator           : モデル生成
+   │ └─main.py
+   └─ai                        : シェルティー判定
+     └─main.py
+</code></pre></div><h1 id="画像スクレイピング">画像スクレイピング</h1>
+<p>まずは画像を用意します。
+今回は 300 枚ずつスクレイピングしました。</p>
+<p><strong>img_scraper\google_search.py</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># -- coding: utf-8 --</span>
+
+<span style="color:#f92672">import</span> json
+<span style="color:#f92672">from</span> urllib <span style="color:#f92672">import</span> parse
+<span style="color:#f92672">import</span> requests
+<span style="color:#f92672">from</span> bs4 <span style="color:#f92672">import</span> BeautifulSoup
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Google</span>:
+    <span style="color:#66d9ef">def</span> __init__(self):
+        self<span style="color:#f92672">.</span>GOOGLE_SEARCH_URL <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.google.co.jp/search&#39;</span>
+        self<span style="color:#f92672">.</span>session <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>session()
+        self<span style="color:#f92672">.</span>session<span style="color:#f92672">.</span>headers<span style="color:#f92672">.</span>update({
+            <span style="color:#e6db74">&#39;User-Agent&#39;</span>: <span style="color:#e6db74">&#39;Mozilla/5.0 (X11; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/57.0&#39;</span>})
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">Search</span>(self, keyword, type<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;text&#39;</span>, maximum<span style="color:#f92672">=</span><span style="color:#ae81ff">1000</span>):
+        <span style="color:#e6db74">&#39;&#39;&#39;Google検索&#39;&#39;&#39;</span>
+        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;Google&#39;</span>, type<span style="color:#f92672">.</span>capitalize(), <span style="color:#e6db74">&#39;Search :&#39;</span>, keyword)
+        result, total <span style="color:#f92672">=</span> [], <span style="color:#ae81ff">0</span>
+        query <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>query_gen(keyword, type)
+        <span style="color:#66d9ef">while</span> True:
+            <span style="color:#75715e"># 検索</span>
+            html <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>session<span style="color:#f92672">.</span>get(next(query))<span style="color:#f92672">.</span>text
+            links <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>get_links(html, type)
+
+            <span style="color:#75715e"># 検索結果の追加</span>
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> len(links):
+                <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;-&gt; No more links&#39;</span>)
+                <span style="color:#66d9ef">break</span>
+            <span style="color:#66d9ef">elif</span> len(links) <span style="color:#f92672">&gt;</span> maximum <span style="color:#f92672">-</span> total:
+                result <span style="color:#f92672">+=</span> links[:maximum <span style="color:#f92672">-</span> total]
+                <span style="color:#66d9ef">break</span>
+            <span style="color:#66d9ef">else</span>:
+                result <span style="color:#f92672">+=</span> links
+                total <span style="color:#f92672">+=</span> len(links)
+
+        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;-&gt; 結果&#39;</span>, str(len(result)), <span style="color:#e6db74">&#39;のlinksを取得しました&#39;</span>)
+        <span style="color:#66d9ef">return</span> result
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">query_gen</span>(self, keyword, type):
+        <span style="color:#e6db74">&#39;&#39;&#39;検索クエリジェネレータ&#39;&#39;&#39;</span>
+        page <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+        <span style="color:#66d9ef">while</span> True:
+            <span style="color:#66d9ef">if</span> type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;text&#39;</span>:
+                params <span style="color:#f92672">=</span> parse<span style="color:#f92672">.</span>urlencode({
+                    <span style="color:#e6db74">&#39;q&#39;</span>: keyword,
+                    <span style="color:#e6db74">&#39;num&#39;</span>: <span style="color:#e6db74">&#39;100&#39;</span>,
+                    <span style="color:#e6db74">&#39;filter&#39;</span>: <span style="color:#e6db74">&#39;0&#39;</span>,
+                    <span style="color:#e6db74">&#39;start&#39;</span>: str(page <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>)})
+            <span style="color:#66d9ef">elif</span> type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;image&#39;</span>:
+                params <span style="color:#f92672">=</span> parse<span style="color:#f92672">.</span>urlencode({
+                    <span style="color:#e6db74">&#39;q&#39;</span>: keyword,
+                    <span style="color:#e6db74">&#39;tbm&#39;</span>: <span style="color:#e6db74">&#39;isch&#39;</span>,
+                    <span style="color:#e6db74">&#39;filter&#39;</span>: <span style="color:#e6db74">&#39;0&#39;</span>,
+                    <span style="color:#e6db74">&#39;ijn&#39;</span>: str(page)})
+
+            <span style="color:#66d9ef">yield</span> self<span style="color:#f92672">.</span>GOOGLE_SEARCH_URL <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;?&#39;</span> <span style="color:#f92672">+</span> params
+            page <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_links</span>(self, html, type):
+        <span style="color:#e6db74">&#39;&#39;&#39;リンク取得&#39;&#39;&#39;</span>
+        soup <span style="color:#f92672">=</span> BeautifulSoup(html, <span style="color:#e6db74">&#39;lxml&#39;</span>)
+        <span style="color:#66d9ef">if</span> type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;text&#39;</span>:
+            elements <span style="color:#f92672">=</span> soup<span style="color:#f92672">.</span>select(<span style="color:#e6db74">&#39;.rc &gt; .r &gt; a&#39;</span>)
+            links <span style="color:#f92672">=</span> [e[<span style="color:#e6db74">&#39;href&#39;</span>] <span style="color:#66d9ef">for</span> e <span style="color:#f92672">in</span> elements]
+        <span style="color:#66d9ef">elif</span> type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;image&#39;</span>:
+            elements <span style="color:#f92672">=</span> soup<span style="color:#f92672">.</span>select(<span style="color:#e6db74">&#39;.rg_meta.notranslate&#39;</span>)
+            jsons <span style="color:#f92672">=</span> [json<span style="color:#f92672">.</span>loads(e<span style="color:#f92672">.</span>get_text()) <span style="color:#66d9ef">for</span> e <span style="color:#f92672">in</span> elements]
+            links <span style="color:#f92672">=</span> [js[<span style="color:#e6db74">&#39;ou&#39;</span>] <span style="color:#66d9ef">for</span> js <span style="color:#f92672">in</span> jsons]
+        <span style="color:#66d9ef">return</span> links
+</code></pre></div><p><strong>img_scraper\main.py</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># -- coding: utf-8 --</span>
+
+<span style="color:#f92672">import</span> os
+<span style="color:#f92672">import</span> requests
+<span style="color:#f92672">import</span> google_search
+
+<span style="color:#75715e"># 検索キーワード</span>
+KEYWORDS <span style="color:#f92672">=</span> [<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;シェルティー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;コーギー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;ボーダーコリー&#39;</span>]
+<span style="color:#75715e"># 取得する画像数</span>
+IMG_CNT <span style="color:#f92672">=</span> <span style="color:#ae81ff">300</span>
+
+g <span style="color:#f92672">=</span> google_search<span style="color:#f92672">.</span>Google()
+<span style="color:#66d9ef">for</span> keyword <span style="color:#f92672">in</span> KEYWORDS:
+    <span style="color:#75715e"># 保存先作成</span>
+    img_dir <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./../data/img/original&#39;</span>, keyword)
+    os<span style="color:#f92672">.</span>makedirs(img_dir, exist_ok<span style="color:#f92672">=</span>True)
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;保存先: {}&#39;</span><span style="color:#f92672">.</span>format(img_dir))
+    <span style="color:#75715e"># 画像検索</span>
+    img_urls <span style="color:#f92672">=</span> g<span style="color:#f92672">.</span>Search(<span style="color:#e6db74">&#39;{} filetype:jpg -柴犬 -フェルト -商品 -おもちゃ -ぬいぐるみ -置物 -アイテム -マスコット -本 -表紙 -映画 -漫画 -チャーム -jpg -楽天市場 -イラスト -ステッカー -通販 -LINE -スタンプ -シルエット -デザイン -マグカップ -ブリーダー -ジモティー -集団 -群れ -ネイル -クレーン -景品 -製品&#39;</span><span style="color:#f92672">.</span>format(keyword), type<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;image&#39;</span>, maximum<span style="color:#f92672">=</span>IMG_CNT)   
+    <span style="color:#75715e"># 画像保存</span>
+    total_cnt <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">for</span> i,img_url <span style="color:#f92672">in</span> enumerate(img_urls):
+        <span style="color:#66d9ef">try</span>:
+            <span style="color:#75715e"># 画像パス</span>
+            img_full_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(img_dir, (str(i) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;.jpg&#39;</span>))
+            <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;{}: {} -&gt; {}&#39;</span><span style="color:#f92672">.</span>format(str(i), img_url, img_full_path))
+            re <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(img_url, allow_redirects<span style="color:#f92672">=</span>False)
+            <span style="color:#66d9ef">if</span> len(re<span style="color:#f92672">.</span>content) <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">0</span>:
+                <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;{}: レスポンスの中身が空のためスキップします。&#39;</span><span style="color:#f92672">.</span>format(str(i)))
+                <span style="color:#66d9ef">continue</span>
+            <span style="color:#66d9ef">with</span> open(img_full_path, <span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+                f<span style="color:#f92672">.</span>write(re<span style="color:#f92672">.</span>content)
+                total_cnt <span style="color:#f92672">=</span> total_cnt <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+        <span style="color:#66d9ef">except</span> requests<span style="color:#f92672">.</span>exceptions<span style="color:#f92672">.</span>ConnectionError:
+            <span style="color:#66d9ef">continue</span>
+        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">UnicodeEncodeError</span>:
+            <span style="color:#66d9ef">continue</span>
+        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">UnicodeError</span>:
+            <span style="color:#66d9ef">continue</span>
+        <span style="color:#66d9ef">except</span> IsADirectoryError:
+            <span style="color:#66d9ef">continue</span>
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;{}: {} 件の画像を取得しました。&#39;</span><span style="color:#f92672">.</span>format(keyword, total_cnt))
+
+<span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;保存完了しました。&#39;</span>)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; cd e:<span style="color:#ae81ff">\p</span>ython<span style="color:#ae81ff">\m</span>l<span style="color:#ae81ff">\s</span>rc<span style="color:#ae81ff">\i</span>mg_scraper
+&gt; python main.py
+シェルティー: <span style="color:#ae81ff">270</span> 件の画像を取得しました。
+コーギー: <span style="color:#ae81ff">286</span> 件の画像を取得しました。
+ボーダーコリー: <span style="color:#ae81ff">281</span> 件の画像を取得しました。
+</code></pre></div><p>数件はうまく画像を保存できなかったようです。</p>
+<h1 id="画像精査">画像精査</h1>
+<p>教師データとして使えない画像を取り除きます。
+例えば他の犬種が一緒に写っていたりテキストが大量に入っていたり…しているのでそういった画像の番号をメモします。
+あとは Python で教師データに使用するデータと除外対象とを仕分けします。</p>
+<p><strong>img_trimmer\main.py</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># -- coding: utf-8 --</span>
+
+<span style="color:#f92672">import</span> os<span style="color:#f92672">,</span> glob
+<span style="color:#f92672">import</span> shutil
+
+<span style="color:#75715e"># 検索キーワード</span>
+KEYWORDS <span style="color:#f92672">=</span> [<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;シェルティー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;コーギー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;ボーダーコリー&#39;</span>]
+
+targets <span style="color:#f92672">=</span> [
+    [<span style="color:#ae81ff">19</span>, <span style="color:#ae81ff">25</span>, <span style="color:#ae81ff">34</span>, <span style="color:#ae81ff">40</span>, <span style="color:#ae81ff">41</span>, <span style="color:#ae81ff">49</span>, <span style="color:#ae81ff">54</span>, <span style="color:#ae81ff">74</span>, <span style="color:#ae81ff">77</span>, <span style="color:#ae81ff">81</span>, <span style="color:#ae81ff">86</span>, <span style="color:#ae81ff">89</span>, <span style="color:#ae81ff">91</span>, <span style="color:#ae81ff">93</span>, <span style="color:#ae81ff">102</span>, <span style="color:#ae81ff">104</span>, <span style="color:#ae81ff">108</span>, <span style="color:#ae81ff">111</span>, <span style="color:#ae81ff">118</span>, <span style="color:#ae81ff">119</span>, <span style="color:#ae81ff">124</span>, <span style="color:#ae81ff">127</span>, <span style="color:#ae81ff">130</span>, <span style="color:#ae81ff">131</span>, <span style="color:#ae81ff">132</span>, <span style="color:#ae81ff">136</span>, <span style="color:#ae81ff">152</span>, <span style="color:#ae81ff">154</span>, <span style="color:#ae81ff">158</span>, <span style="color:#ae81ff">159</span>, <span style="color:#ae81ff">161</span>, <span style="color:#ae81ff">168</span>, <span style="color:#ae81ff">169</span>, <span style="color:#ae81ff">173</span>, <span style="color:#ae81ff">178</span>, <span style="color:#ae81ff">181</span>, <span style="color:#ae81ff">183</span>, <span style="color:#ae81ff">184</span>, <span style="color:#ae81ff">192</span>, <span style="color:#ae81ff">193</span>, <span style="color:#ae81ff">198</span>, <span style="color:#ae81ff">201</span>, <span style="color:#ae81ff">202</span>, <span style="color:#ae81ff">213</span>, <span style="color:#ae81ff">218</span>, <span style="color:#ae81ff">233</span>, <span style="color:#ae81ff">235</span>, <span style="color:#ae81ff">236</span>, <span style="color:#ae81ff">238</span>, <span style="color:#ae81ff">240</span>, <span style="color:#ae81ff">243</span>, <span style="color:#ae81ff">245</span>, <span style="color:#ae81ff">246</span>, <span style="color:#ae81ff">248</span>, <span style="color:#ae81ff">249</span>, <span style="color:#ae81ff">252</span>, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">264</span>, <span style="color:#ae81ff">265</span>, <span style="color:#ae81ff">269</span>, <span style="color:#ae81ff">271</span>, <span style="color:#ae81ff">272</span>, <span style="color:#ae81ff">280</span>, <span style="color:#ae81ff">283</span>, <span style="color:#ae81ff">284</span>, <span style="color:#ae81ff">287</span>, <span style="color:#ae81ff">294</span>, <span style="color:#ae81ff">295</span>],
+    [<span style="color:#ae81ff">19</span>, <span style="color:#ae81ff">29</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">40</span>, <span style="color:#ae81ff">45</span>, <span style="color:#ae81ff">67</span>, <span style="color:#ae81ff">69</span>, <span style="color:#ae81ff">73</span>, <span style="color:#ae81ff">76</span>, <span style="color:#ae81ff">78</span>, <span style="color:#ae81ff">80</span>, <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">101</span>, <span style="color:#ae81ff">105</span>, <span style="color:#ae81ff">117</span>, <span style="color:#ae81ff">120</span>, <span style="color:#ae81ff">132</span>, <span style="color:#ae81ff">136</span>, <span style="color:#ae81ff">141</span>, <span style="color:#ae81ff">143</span>, <span style="color:#ae81ff">149</span>, <span style="color:#ae81ff">151</span>, <span style="color:#ae81ff">154</span>, <span style="color:#ae81ff">158</span>, <span style="color:#ae81ff">167</span>, <span style="color:#ae81ff">170</span>, <span style="color:#ae81ff">179</span>, <span style="color:#ae81ff">180</span>, <span style="color:#ae81ff">183</span>, <span style="color:#ae81ff">186</span>, <span style="color:#ae81ff">200</span>, <span style="color:#ae81ff">201</span>, <span style="color:#ae81ff">208</span>, <span style="color:#ae81ff">213</span>, <span style="color:#ae81ff">220</span>, <span style="color:#ae81ff">224</span>, <span style="color:#ae81ff">225</span>, <span style="color:#ae81ff">228</span>, <span style="color:#ae81ff">234</span>, <span style="color:#ae81ff">235</span>, <span style="color:#ae81ff">241</span>, <span style="color:#ae81ff">243</span>, <span style="color:#ae81ff">247</span>, <span style="color:#ae81ff">248</span>, <span style="color:#ae81ff">250</span>, <span style="color:#ae81ff">253</span>, <span style="color:#ae81ff">259</span>, <span style="color:#ae81ff">262</span>, <span style="color:#ae81ff">264</span>, <span style="color:#ae81ff">266</span>, <span style="color:#ae81ff">273</span>, <span style="color:#ae81ff">277</span>, <span style="color:#ae81ff">278</span>, <span style="color:#ae81ff">279</span>, <span style="color:#ae81ff">281</span>, <span style="color:#ae81ff">282</span>, <span style="color:#ae81ff">283</span>, <span style="color:#ae81ff">285</span>, <span style="color:#ae81ff">290</span>, <span style="color:#ae81ff">293</span>, <span style="color:#ae81ff">294</span>, <span style="color:#ae81ff">298</span>, <span style="color:#ae81ff">299</span>],
+    [<span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">21</span>, <span style="color:#ae81ff">25</span>, <span style="color:#ae81ff">37</span>, <span style="color:#ae81ff">38</span>, <span style="color:#ae81ff">40</span>, <span style="color:#ae81ff">41</span>, <span style="color:#ae81ff">42</span>, <span style="color:#ae81ff">49</span>, <span style="color:#ae81ff">52</span>, <span style="color:#ae81ff">55</span>, <span style="color:#ae81ff">61</span>, <span style="color:#ae81ff">65</span>, <span style="color:#ae81ff">66</span>, <span style="color:#ae81ff">71</span>, <span style="color:#ae81ff">72</span>, <span style="color:#ae81ff">78</span>, <span style="color:#ae81ff">80</span>, <span style="color:#ae81ff">89</span>, <span style="color:#ae81ff">93</span>, <span style="color:#ae81ff">96</span>, <span style="color:#ae81ff">103</span>, <span style="color:#ae81ff">108</span>, <span style="color:#ae81ff">110</span>, <span style="color:#ae81ff">113</span>, <span style="color:#ae81ff">114</span>, <span style="color:#ae81ff">118</span>, <span style="color:#ae81ff">122</span>, <span style="color:#ae81ff">126</span>, <span style="color:#ae81ff">127</span>, <span style="color:#ae81ff">128</span>, <span style="color:#ae81ff">145</span>, <span style="color:#ae81ff">146</span>, <span style="color:#ae81ff">152</span>, <span style="color:#ae81ff">158</span>, <span style="color:#ae81ff">160</span>, <span style="color:#ae81ff">161</span>, <span style="color:#ae81ff">164</span>, <span style="color:#ae81ff">166</span>, <span style="color:#ae81ff">167</span>, <span style="color:#ae81ff">171</span>, <span style="color:#ae81ff">174</span>, <span style="color:#ae81ff">175</span>, <span style="color:#ae81ff">176</span>, <span style="color:#ae81ff">182</span>, <span style="color:#ae81ff">183</span>, <span style="color:#ae81ff">186</span>, <span style="color:#ae81ff">187</span>, <span style="color:#ae81ff">193</span>, <span style="color:#ae81ff">194</span>, <span style="color:#ae81ff">196</span>, <span style="color:#ae81ff">197</span>, <span style="color:#ae81ff">200</span>, <span style="color:#ae81ff">202</span>, <span style="color:#ae81ff">203</span>, <span style="color:#ae81ff">206</span>, <span style="color:#ae81ff">207</span>, <span style="color:#ae81ff">222</span>, <span style="color:#ae81ff">223</span>, <span style="color:#ae81ff">224</span>, <span style="color:#ae81ff">226</span>, <span style="color:#ae81ff">228</span>, <span style="color:#ae81ff">230</span>, <span style="color:#ae81ff">232</span>, <span style="color:#ae81ff">233</span>, <span style="color:#ae81ff">234</span>, <span style="color:#ae81ff">237</span>, <span style="color:#ae81ff">238</span>, <span style="color:#ae81ff">241</span>, <span style="color:#ae81ff">243</span>, <span style="color:#ae81ff">244</span>, <span style="color:#ae81ff">257</span>, <span style="color:#ae81ff">259</span>, <span style="color:#ae81ff">260</span>, <span style="color:#ae81ff">262</span>, <span style="color:#ae81ff">263</span>, <span style="color:#ae81ff">264</span>, <span style="color:#ae81ff">265</span>, <span style="color:#ae81ff">267</span>, <span style="color:#ae81ff">268</span>, <span style="color:#ae81ff">270</span>, <span style="color:#ae81ff">273</span>, <span style="color:#ae81ff">275</span>, <span style="color:#ae81ff">276</span>, <span style="color:#ae81ff">277</span>, <span style="color:#ae81ff">278</span>, <span style="color:#ae81ff">281</span>, <span style="color:#ae81ff">282</span>, <span style="color:#ae81ff">283</span>, <span style="color:#ae81ff">287</span>, <span style="color:#ae81ff">289</span>, <span style="color:#ae81ff">292</span>, <span style="color:#ae81ff">293</span>, <span style="color:#ae81ff">295</span>]
+    ]
+
+<span style="color:#66d9ef">for</span> idx, keyword <span style="color:#f92672">in</span> enumerate(KEYWORDS):
+    total_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#75715e"># コピー元</span>
+    img_dir <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./../data/img/original&#39;</span>, keyword)
+    <span style="color:#75715e"># コピー先</span>
+    os<span style="color:#f92672">.</span>makedirs(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./../data/img/trimmed&#39;</span>, keyword), exist_ok<span style="color:#f92672">=</span>True)
+    os<span style="color:#f92672">.</span>makedirs(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./../data/img/excluded&#39;</span>, keyword), exist_ok<span style="color:#f92672">=</span>True)
+    files <span style="color:#f92672">=</span> glob<span style="color:#f92672">.</span>glob(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(img_dir, <span style="color:#e6db74">&#39;*.jpg&#39;</span>))
+    <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> files:
+        <span style="color:#66d9ef">if</span> int(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>splitext(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(f))[<span style="color:#ae81ff">0</span>]) <span style="color:#f92672">in</span> targets[idx]:
+            shutil<span style="color:#f92672">.</span>copy2(f, os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./../data/img/excluded&#39;</span>, keyword))
+            <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;{} : 除外対象です。&#39;</span><span style="color:#f92672">.</span>format(f))
+        <span style="color:#66d9ef">else</span>:
+            shutil<span style="color:#f92672">.</span>copy2(f, os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./../data/img/trimmed&#39;</span>, keyword))
+            <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;{} : 教師データに使用します。&#39;</span><span style="color:#f92672">.</span>format(f))
+            total_count <span style="color:#f92672">=</span> total_count <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;{} : 使用できるデータ数は {} 件です。&#39;</span><span style="color:#f92672">.</span>format(keyword, total_count))
+
+
+<span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;保存完了しました。&#39;</span>)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; cd e:<span style="color:#ae81ff">\p</span>ython<span style="color:#ae81ff">\m</span>l<span style="color:#ae81ff">\s</span>rc<span style="color:#ae81ff">\i</span>mg_trimmer
+&gt; python main.py
+シェルティー : 使用できるデータ数は <span style="color:#ae81ff">202</span> 件です。
+コーギー : 使用できるデータ数は <span style="color:#ae81ff">223</span> 件です。
+ボーダーコリー : 使用できるデータ数は <span style="color:#ae81ff">187</span> 件です。
+</code></pre></div><p>教師データとして使用できるのは 6 ～ 7 割となりました。</p>
+<h1 id="画像複製">画像複製</h1>
+<p>Keras の ImageDataGenerator で画像を複製、加工することでデータ数を水増しします。</p>
+<p><strong>img_duplicator\main.py</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># -- coding: utf-8 --</span>
+
+<span style="color:#f92672">import</span> os
+<span style="color:#f92672">import</span> glob
+<span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
+<span style="color:#f92672">from</span> keras.preprocessing.image <span style="color:#f92672">import</span> ImageDataGenerator, load_img, img_to_array, array_to_img
+
+
+CATEGORIES <span style="color:#f92672">=</span> [<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;シェルティー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;コーギー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;ボーダーコリー&#39;</span>]
+<span style="color:#75715e"># 画像サイズ</span>
+IMG_SIZE <span style="color:#f92672">=</span> <span style="color:#ae81ff">150</span>
+
+<span style="color:#75715e"># ImageDataGeneratorを定義</span>
+DATA_GENERATOR <span style="color:#f92672">=</span> ImageDataGenerator(horizontal_flip<span style="color:#f92672">=</span><span style="color:#ae81ff">0.3</span>, zoom_range<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>)
+
+<span style="color:#66d9ef">for</span> idx, category <span style="color:#f92672">in</span> enumerate(CATEGORIES):
+    <span style="color:#75715e"># コピー元</span>
+    img_dir <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./../data/img/trimmed&#39;</span>, category)
+    <span style="color:#75715e"># コピー先</span>
+    out_dir <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./../data/img/extended&#39;</span>, category)
+    os<span style="color:#f92672">.</span>makedirs(out_dir, exist_ok<span style="color:#f92672">=</span>True)
+
+    files <span style="color:#f92672">=</span> glob<span style="color:#f92672">.</span>glob(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(img_dir, <span style="color:#e6db74">&#39;*.jpg&#39;</span>))
+    <span style="color:#66d9ef">for</span> i, file <span style="color:#f92672">in</span> enumerate(files):
+        img <span style="color:#f92672">=</span> load_img(file)
+        img <span style="color:#f92672">=</span> img<span style="color:#f92672">.</span>resize((IMG_SIZE, IMG_SIZE))
+        x <span style="color:#f92672">=</span> img_to_array(img)
+        x <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>expand_dims(x, axis<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+        g <span style="color:#f92672">=</span> DATA_GENERATOR<span style="color:#f92672">.</span>flow(x, batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, save_to_dir<span style="color:#f92672">=</span>out_dir, save_prefix<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;img&#39;</span>, save_format<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;jpg&#39;</span>)
+        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">10</span>):
+            batch <span style="color:#f92672">=</span> g<span style="color:#f92672">.</span>next()
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;{} : ファイル数は {} 件です。&#39;</span><span style="color:#f92672">.</span>format(category, len(os<span style="color:#f92672">.</span>listdir(out_dir))))
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; cd e:<span style="color:#ae81ff">\p</span>ython<span style="color:#ae81ff">\m</span>l<span style="color:#ae81ff">\s</span>rc<span style="color:#ae81ff">\i</span>mg_duplicator
+&gt; python main.py
+Using TensorFlow backend.
+シェルティー : ファイル数は <span style="color:#ae81ff">1817</span> 件です。
+コーギー : ファイル数は <span style="color:#ae81ff">1983</span> 件です。
+ボーダーコリー : ファイル数は <span style="color:#ae81ff">1708</span> 件です。
+</code></pre></div><h1 id="教師データ作成">教師データ作成</h1>
+<p>大量の画像を用意したので教師データを作成します。
+画像をラベリングしていきます。
+全データの 2 割ほどをテストデータにまわします。
+作成した教師／テストデータは保存しておきます。</p>
+<p><strong>train_test_data_generator\main.py</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># -*- coding: utf-8 -*-</span>
+
+<span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+<span style="color:#f92672">import</span> os<span style="color:#f92672">,</span> glob
+<span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
+<span style="color:#f92672">import</span> random<span style="color:#f92672">,</span> math
+<span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> train_test_split
+<span style="color:#f92672">from</span> keras.utils <span style="color:#f92672">import</span> np_utils
+
+<span style="color:#75715e"># 画像が保存されているルートディレクトリのパス</span>
+IMG_ROOT_DIR <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./../data/img/extended&#39;</span>
+<span style="color:#75715e"># カテゴリ</span>
+CATEGORIES <span style="color:#f92672">=</span> [<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;シェルティー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;コーギー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;ボーダーコリー&#39;</span>]
+<span style="color:#75715e"># 密度</span>
+DENSE_SIZE <span style="color:#f92672">=</span> len(CATEGORIES)
+<span style="color:#75715e"># 画像サイズ</span>
+IMG_SIZE <span style="color:#f92672">=</span> <span style="color:#ae81ff">150</span>
+<span style="color:#75715e"># 画像データ</span>
+X <span style="color:#f92672">=</span> []
+<span style="color:#75715e"># カテゴリデータ</span>
+Y <span style="color:#f92672">=</span> []
+<span style="color:#75715e"># 教師データ</span>
+X_TRAIN <span style="color:#f92672">=</span> []
+Y_TRAIN <span style="color:#f92672">=</span> []
+<span style="color:#75715e"># テストデータ</span>
+X_TEST <span style="color:#f92672">=</span> []
+Y_TEST <span style="color:#f92672">=</span> []
+<span style="color:#75715e"># データ保存先</span>
+TRAIN_TEST_DATA <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./../data/train_test_data/data.npy&#39;</span>
+
+
+<span style="color:#75715e"># カテゴリごとに処理する</span>
+<span style="color:#66d9ef">for</span> idx, category <span style="color:#f92672">in</span> enumerate(CATEGORIES):
+    <span style="color:#75715e"># 各ラベルの画像ディレクトリ</span>
+    image_dir <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(IMG_ROOT_DIR, category)
+    files <span style="color:#f92672">=</span> glob<span style="color:#f92672">.</span>glob(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(image_dir, <span style="color:#e6db74">&#39;*.jpg&#39;</span>))
+    <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> files:
+        <span style="color:#75715e"># 各画像をリサイズしてデータに変換する</span>
+        img <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</span>open(f)
+        img <span style="color:#f92672">=</span> img<span style="color:#f92672">.</span>convert(<span style="color:#e6db74">&#39;RGB&#39;</span>)
+        img <span style="color:#f92672">=</span> img<span style="color:#f92672">.</span>resize((IMG_SIZE, IMG_SIZE))
+        data <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>asarray(img)
+        X<span style="color:#f92672">.</span>append(data)
+        Y<span style="color:#f92672">.</span>append(idx)
+
+X <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>array(X)
+Y <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>array(Y)
+
+<span style="color:#75715e"># 正規化</span>
+X <span style="color:#f92672">=</span> X<span style="color:#f92672">.</span>astype(<span style="color:#e6db74">&#39;float32&#39;</span>) <span style="color:#f92672">/</span><span style="color:#ae81ff">255</span>
+Y <span style="color:#f92672">=</span> np_utils<span style="color:#f92672">.</span>to_categorical(Y, DENSE_SIZE)
+
+<span style="color:#75715e"># 教師データとテストデータを分ける</span>
+X_TRAIN, X_TEST, Y_TRAIN, Y_TEST <span style="color:#f92672">=</span> train_test_split(X, Y, test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.20</span>)
+
+<span style="color:#75715e">#　教師／テストデータを保存する</span>
+np<span style="color:#f92672">.</span>save(TRAIN_TEST_DATA, (X_TRAIN, X_TEST, Y_TRAIN, Y_TEST))
+<span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;教師／テストデータの作成が完了しました。: {}&#39;</span><span style="color:#f92672">.</span>format(TRAIN_TEST_DATA))
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; cd e:<span style="color:#ae81ff">\p</span>ython<span style="color:#ae81ff">\m</span>l<span style="color:#ae81ff">\s</span>rc<span style="color:#ae81ff">\t</span>rain_test_data_generator
+&gt; python main.py
+Using TensorFlow backend.
+教師／テストデータの作成が完了しました。: ./../data/train_test_data/data.npy
+</code></pre></div><h1 id="モデル構築">モデル構築</h1>
+<p>教師／テストデータを用意できたのでいよいよモデルを構築します。
+構築したモデルは保存しておきます。</p>
+<p><strong>model_generator\main.py</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># -*- coding: utf-8 -*-</span>
+
+<span style="color:#75715e">#モデルの構築</span>
+
+<span style="color:#f92672">from</span> keras <span style="color:#f92672">import</span> layers, models
+<span style="color:#f92672">from</span> keras <span style="color:#f92672">import</span> optimizers
+<span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
+<span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#f92672">as</span> plt
+<span style="color:#f92672">import</span> os
+
+<span style="color:#75715e"># カテゴリ</span>
+CATEGORIES <span style="color:#f92672">=</span> [<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;シェルティー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;コーギー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;ボーダーコリー&#39;</span>]
+<span style="color:#75715e"># 密度</span>
+DENSE_SIZE <span style="color:#f92672">=</span> len(CATEGORIES)
+<span style="color:#75715e"># 画像サイズ</span>
+IMG_SIZE <span style="color:#f92672">=</span> <span style="color:#ae81ff">150</span>
+INPUT_SHAPE <span style="color:#f92672">=</span> (IMG_SIZE, IMG_SIZE,<span style="color:#ae81ff">3</span>)
+<span style="color:#75715e"># 教師データ</span>
+X_TRAIN <span style="color:#f92672">=</span> []
+Y_TRAIN <span style="color:#f92672">=</span> []
+<span style="color:#75715e"># テストデータ</span>
+X_TEST <span style="color:#f92672">=</span> []
+Y_TEST <span style="color:#f92672">=</span> []
+<span style="color:#75715e"># データ保存先</span>
+TRAIN_TEST_DATA <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./../data/train_test_data/data.npy&#39;</span>
+<span style="color:#75715e"># モデル保存先</span>
+MODEL_ROOT_DIR <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./../data/model/&#39;</span>
+
+
+<span style="color:#75715e"># ----- モデル構築 ----- #</span>
+model <span style="color:#f92672">=</span> models<span style="color:#f92672">.</span>Sequential()
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>Conv2D(<span style="color:#ae81ff">32</span>,(<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">3</span>),activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;relu&#34;</span>,input_shape<span style="color:#f92672">=</span>INPUT_SHAPE))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>MaxPooling2D((<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>)))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>Conv2D(<span style="color:#ae81ff">64</span>,(<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">3</span>),activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;relu&#34;</span>))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>MaxPooling2D((<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>)))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>Conv2D(<span style="color:#ae81ff">128</span>,(<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">3</span>),activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;relu&#34;</span>))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>MaxPooling2D((<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>)))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>Conv2D(<span style="color:#ae81ff">128</span>,(<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">3</span>),activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;relu&#34;</span>))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>MaxPooling2D((<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>)))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>Flatten())
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>Dropout(<span style="color:#ae81ff">0.5</span>))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>Dense(<span style="color:#ae81ff">512</span>,activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;relu&#34;</span>))
+model<span style="color:#f92672">.</span>add(layers<span style="color:#f92672">.</span>Dense(DENSE_SIZE,activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;sigmoid&#34;</span>))
+
+<span style="color:#75715e">#モデル構成の確認</span>
+model<span style="color:#f92672">.</span>summary()
+<span style="color:#75715e"># ----- /モデル構築 ----- #</span>
+
+<span style="color:#75715e"># ----- モデルコンパイル ----- #</span>
+model<span style="color:#f92672">.</span>compile(loss<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;binary_crossentropy&#34;</span>,
+              optimizer<span style="color:#f92672">=</span>optimizers<span style="color:#f92672">.</span>RMSprop(lr<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-4</span>),
+              metrics<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;acc&#34;</span>])
+<span style="color:#75715e"># ----- /モデル構築 ----- #</span>
+
+<span style="color:#75715e"># ----- モデル学習 ----- #</span>
+<span style="color:#75715e"># 教師データとテストデータを読み込む</span>
+X_TRAIN, X_TEST, Y_TRAIN, Y_TEST <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>load(TRAIN_TEST_DATA)
+model <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>fit(X_TRAIN,
+                  Y_TRAIN,
+                  epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>,
+                  batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">6</span>,
+                  validation_data<span style="color:#f92672">=</span>(X_TEST, Y_TEST))
+<span style="color:#75715e"># ----- /モデル学習 ----- #</span>
+
+<span style="color:#75715e"># ----- 学習結果プロット ----- #</span>
+acc <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>history[<span style="color:#e6db74">&#39;acc&#39;</span>]
+val_acc <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>history[<span style="color:#e6db74">&#39;val_acc&#39;</span>]
+loss <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>history[<span style="color:#e6db74">&#39;loss&#39;</span>]
+val_loss <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>history[<span style="color:#e6db74">&#39;val_loss&#39;</span>]
+
+epochs <span style="color:#f92672">=</span> range(len(acc))
+
+plt<span style="color:#f92672">.</span>plot(epochs, acc, <span style="color:#e6db74">&#39;bo&#39;</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Training acc&#39;</span>)
+plt<span style="color:#f92672">.</span>plot(epochs, val_acc, <span style="color:#e6db74">&#39;b&#39;</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Validation acc&#39;</span>)
+plt<span style="color:#f92672">.</span>title(<span style="color:#e6db74">&#39;Training and validation accuracy&#39;</span>)
+plt<span style="color:#f92672">.</span>legend()
+plt<span style="color:#f92672">.</span>savefig(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(MODEL_ROOT_DIR, <span style="color:#e6db74">&#39;Training_and_validation_accuracy.png&#39;</span>))
+
+plt<span style="color:#f92672">.</span>figure()
+
+plt<span style="color:#f92672">.</span>plot(epochs, loss, <span style="color:#e6db74">&#39;bo&#39;</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Training loss&#39;</span>)
+plt<span style="color:#f92672">.</span>plot(epochs, val_loss, <span style="color:#e6db74">&#39;b&#39;</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Validation loss&#39;</span>)
+plt<span style="color:#f92672">.</span>title(<span style="color:#e6db74">&#39;Training and validation loss&#39;</span>)
+plt<span style="color:#f92672">.</span>legend()
+plt<span style="color:#f92672">.</span>savefig(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(MODEL_ROOT_DIR, <span style="color:#e6db74">&#39;Training_and_validation_loss.png&#39;</span>))
+<span style="color:#75715e"># ----- /学習結果プロット ----- #</span>
+
+<span style="color:#75715e"># ----- モデル保存 ----- #</span>
+<span style="color:#75715e"># モデル保存</span>
+json_string <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>model<span style="color:#f92672">.</span>to_json()
+open(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(MODEL_ROOT_DIR, <span style="color:#e6db74">&#39;model_predict.json&#39;</span>), <span style="color:#e6db74">&#39;w&#39;</span>)<span style="color:#f92672">.</span>write(json_string)
+
+<span style="color:#75715e">#重み保存</span>
+model<span style="color:#f92672">.</span>model<span style="color:#f92672">.</span>save_weights(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(MODEL_ROOT_DIR, <span style="color:#e6db74">&#39;model_predict.hdf5&#39;</span>))
+<span style="color:#75715e"># ----- /モデル保存 ----- #</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; cd e:<span style="color:#ae81ff">\p</span>ython<span style="color:#ae81ff">\m</span>l<span style="color:#ae81ff">\s</span>rc<span style="color:#ae81ff">\m</span>odel_generator
+&gt; python main.py
+Using TensorFlow backend.
+2019-11-15 17:02:03.400229: I tensorflow/core/platform/cpu_feature_guard.cc:142<span style="color:#f92672">]</span> Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2
+Model: <span style="color:#e6db74">&#34;sequential_1&#34;</span>
+_________________________________________________________________
+Layer <span style="color:#f92672">(</span>type<span style="color:#f92672">)</span>                 Output Shape              Param <span style="color:#75715e">#</span>
+<span style="color:#f92672">=================================================================</span>
+conv2d_1 <span style="color:#f92672">(</span>Conv2D<span style="color:#f92672">)</span>            <span style="color:#f92672">(</span>None, 148, 148, 32<span style="color:#f92672">)</span>      <span style="color:#ae81ff">896</span>
+_________________________________________________________________
+max_pooling2d_1 <span style="color:#f92672">(</span>MaxPooling2 <span style="color:#f92672">(</span>None, 74, 74, 32<span style="color:#f92672">)</span>        <span style="color:#ae81ff">0</span>
+_________________________________________________________________
+conv2d_2 <span style="color:#f92672">(</span>Conv2D<span style="color:#f92672">)</span>            <span style="color:#f92672">(</span>None, 72, 72, 64<span style="color:#f92672">)</span>        <span style="color:#ae81ff">18496</span>
+_________________________________________________________________
+max_pooling2d_2 <span style="color:#f92672">(</span>MaxPooling2 <span style="color:#f92672">(</span>None, 36, 36, 64<span style="color:#f92672">)</span>        <span style="color:#ae81ff">0</span>
+_________________________________________________________________
+conv2d_3 <span style="color:#f92672">(</span>Conv2D<span style="color:#f92672">)</span>            <span style="color:#f92672">(</span>None, 34, 34, 128<span style="color:#f92672">)</span>       <span style="color:#ae81ff">73856</span>
+_________________________________________________________________
+max_pooling2d_3 <span style="color:#f92672">(</span>MaxPooling2 <span style="color:#f92672">(</span>None, 17, 17, 128<span style="color:#f92672">)</span>       <span style="color:#ae81ff">0</span>
+_________________________________________________________________
+conv2d_4 <span style="color:#f92672">(</span>Conv2D<span style="color:#f92672">)</span>            <span style="color:#f92672">(</span>None, 15, 15, 128<span style="color:#f92672">)</span>       <span style="color:#ae81ff">147584</span>
+_________________________________________________________________
+max_pooling2d_4 <span style="color:#f92672">(</span>MaxPooling2 <span style="color:#f92672">(</span>None, 7, 7, 128<span style="color:#f92672">)</span>         <span style="color:#ae81ff">0</span>
+_________________________________________________________________
+flatten_1 <span style="color:#f92672">(</span>Flatten<span style="color:#f92672">)</span>          <span style="color:#f92672">(</span>None, 6272<span style="color:#f92672">)</span>              <span style="color:#ae81ff">0</span>
+_________________________________________________________________
+dropout_1 <span style="color:#f92672">(</span>Dropout<span style="color:#f92672">)</span>          <span style="color:#f92672">(</span>None, 6272<span style="color:#f92672">)</span>              <span style="color:#ae81ff">0</span>
+_________________________________________________________________
+dense_1 <span style="color:#f92672">(</span>Dense<span style="color:#f92672">)</span>              <span style="color:#f92672">(</span>None, 512<span style="color:#f92672">)</span>               <span style="color:#ae81ff">3211776</span>
+_________________________________________________________________
+dense_2 <span style="color:#f92672">(</span>Dense<span style="color:#f92672">)</span>              <span style="color:#f92672">(</span>None, 3<span style="color:#f92672">)</span>                 1539
+<span style="color:#f92672">=================================================================</span>
+Total params: 3,454,147
+Trainable params: 3,454,147
+Non-trainable params: <span style="color:#ae81ff">0</span>
+_________________________________________________________________
+Train on <span style="color:#ae81ff">4396</span> samples, validate on <span style="color:#ae81ff">1100</span> samples
+Epoch 1/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 103s 23ms/step - loss: 0.5434 - acc: 0.7298 - val_loss: 0.5780 - val_acc: 0.7067
+Epoch 2/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 109s 25ms/step - loss: 0.4457 - acc: 0.7989 - val_loss: 0.4288 - val_acc: 0.8024
+Epoch 3/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 103s 23ms/step - loss: 0.3874 - acc: 0.8318 - val_loss: 0.3992 - val_acc: 0.8170
+Epoch 4/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 106s 24ms/step - loss: 0.3483 - acc: 0.8469 - val_loss: 0.3476 - val_acc: 0.8476
+Epoch 5/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 107s 24ms/step - loss: 0.3029 - acc: 0.8717 - val_loss: 0.3085 - val_acc: 0.8603
+Epoch 6/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 109s 25ms/step - loss: 0.2580 - acc: 0.8947 - val_loss: 0.2918 - val_acc: 0.8736
+Epoch 7/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 107s 24ms/step - loss: 0.2182 - acc: 0.9084 - val_loss: 0.2481 - val_acc: 0.8970
+Epoch 8/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 113s 26ms/step - loss: 0.1855 - acc: 0.9217 - val_loss: 0.1920 - val_acc: 0.9209
+Epoch 9/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 120s 27ms/step - loss: 0.1548 - acc: 0.9394 - val_loss: 0.1775 - val_acc: 0.9345
+Epoch 10/10
+4396/4396 <span style="color:#f92672">[==============================]</span> - 114s 26ms/step - loss: 0.1243 - acc: 0.9530 - val_loss: 0.1738 - val_acc: 0.9412
+</code></pre></div><p><img src="images/00.png" alt=""></p>
+<p><img src="images/01.png" alt=""></p>
+<h1 id="シェルティー判定プログラム作成">シェルティー判定プログラム作成</h1>
+<p>いよいよシェルティー判定プログラムを用意するときがきました。
+確認用の画像を用意していよいよ実行です。</p>
+<p><strong>ai\main.py</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># -*- coding: utf-8 -*-</span>
+
+<span style="color:#f92672">from</span> keras <span style="color:#f92672">import</span> models
+<span style="color:#f92672">from</span> keras.models <span style="color:#f92672">import</span> model_from_json
+<span style="color:#f92672">from</span> keras.preprocessing <span style="color:#f92672">import</span> image
+<span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
+<span style="color:#f92672">import</span> sys
+<span style="color:#f92672">import</span> os
+<span style="color:#f92672">from</span> keras.preprocessing.image <span style="color:#f92672">import</span> ImageDataGenerator, load_img, img_to_array, array_to_img
+
+<span style="color:#75715e"># モデル保存先</span>
+MODEL_ROOT_DIR <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./../data/model/&#39;</span>
+MODEL_PATH <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(MODEL_ROOT_DIR, <span style="color:#e6db74">&#39;model_predict.json&#39;</span>)
+WEIGHT_PATH <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(MODEL_ROOT_DIR, <span style="color:#e6db74">&#39;model_predict.hdf5&#39;</span>)
+<span style="color:#75715e"># カテゴリ</span>
+CATEGORIES <span style="color:#f92672">=</span> [<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;シェルティー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;コーギー&#39;</span>, <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;ボーダーコリー&#39;</span>]
+<span style="color:#75715e"># 画像サイズ</span>
+IMG_SIZE <span style="color:#f92672">=</span> <span style="color:#ae81ff">150</span>
+INPUT_SHAPE <span style="color:#f92672">=</span> (IMG_SIZE, IMG_SIZE,<span style="color:#ae81ff">3</span>)
+
+<span style="color:#75715e"># モデルを読み込む</span>
+model <span style="color:#f92672">=</span> model_from_json(open(MODEL_PATH)<span style="color:#f92672">.</span>read())
+model<span style="color:#f92672">.</span>load_weights(WEIGHT_PATH)
+
+<span style="color:#75715e"># 入力引数から画像を読み込む</span>
+args <span style="color:#f92672">=</span> sys<span style="color:#f92672">.</span>argv
+img <span style="color:#f92672">=</span> image<span style="color:#f92672">.</span>load_img(args[<span style="color:#ae81ff">1</span>], target_size<span style="color:#f92672">=</span>INPUT_SHAPE)
+x <span style="color:#f92672">=</span> image<span style="color:#f92672">.</span>img_to_array(img)
+x <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>expand_dims(x, axis<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+
+<span style="color:#75715e"># モデルで予測する</span>
+features <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>predict(x)
+
+<span style="color:#66d9ef">print</span>(features)
+
+<span style="color:#66d9ef">if</span> features[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;シェルティーです。&#39;</span>)
+<span style="color:#66d9ef">else</span>:
+    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(CATEGORIES)):
+        <span style="color:#66d9ef">if</span> features[<span style="color:#ae81ff">0</span>, i] <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+            <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;シェルティーではないようです。{}です。&#39;</span><span style="color:#f92672">.</span>format(CATEGORIES[i]))
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; cd e:<span style="color:#ae81ff">\p</span>ython<span style="color:#ae81ff">\m</span>l<span style="color:#ae81ff">\s</span>rc<span style="color:#ae81ff">\a</span>i
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; python .<span style="color:#ae81ff">\m</span>ain.py <span style="color:#e6db74">&#39;..\data\img\test\sheltie_00.jpg&#39;</span>
+Using TensorFlow backend.
+2019-11-15 17:58:44.863437: I tensorflow/core/platform/cpu_feature_guard.cc:142<span style="color:#f92672">]</span> Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2
+<span style="color:#f92672">[[</span>1. 0. 0.<span style="color:#f92672">]]</span>
+シェルティーです。
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; python .<span style="color:#ae81ff">\m</span>ain.py <span style="color:#e6db74">&#39;..\data\img\test\corgi_00.jpg&#39;</span>
+Using TensorFlow backend.
+2019-11-15 17:58:55.519838: I tensorflow/core/platform/cpu_feature_guard.cc:142<span style="color:#f92672">]</span> Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2
+<span style="color:#f92672">[[</span>0. 1. 0.<span style="color:#f92672">]]</span>
+シェルティーではないようです。コーギーです。
+<span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; python .<span style="color:#ae81ff">\m</span>ain.py <span style="color:#e6db74">&#39;..\data\img\test\bordercollie_00.jpg&#39;</span>
+Using TensorFlow backend.
+2019-11-15 17:59:06.457517: I tensorflow/core/platform/cpu_feature_guard.cc:142<span style="color:#f92672">]</span> Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2
+<span style="color:#f92672">[[</span>0. 0. 1.<span style="color:#f92672">]]</span>
+シェルティーではないようです。ボーダーコリーです。
+</code></pre></div><p>sheltie_00.jpg
+シェルティーです。</p>
+<p><img src="images/02.jpg" alt=""></p>
+<p>cogy_00.jpg
+シェルティーではないようです。コーギーです。</p>
+<p><img src="images/03.jpg" alt=""></p>
+<p>bordercolli_00.png
+シェルティーではないようです。ボーダーコリーです。</p>
+<p><img src="images/04.jpg" alt=""></p>
+<p>いい感じに判定できました。</p>
+<h1 id="フランちゃんはシェルティー">フランちゃんはシェルティー？</h1>
+<p>アイコンにも使用しているフランちゃんはどう判定されるでしょう。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>ml<span style="color:#f92672">)</span>&gt; python .<span style="color:#ae81ff">\m</span>ain.py <span style="color:#e6db74">&#39;..\data\img\test\fran.jpg&#39;</span>
+Using TensorFlow backend.
+2019-11-15 17:59:28.118592: I tensorflow/core/platform/cpu_feature_guard.cc:142<span style="color:#f92672">]</span> Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2
+<span style="color:#f92672">[[</span>0. 0. 1.<span style="color:#f92672">]]</span>
+シェルティーではないようです。ボーダーコリーです。
+</code></pre></div><p>fran.png
+シェルティーではないようです。ボーダーコリーです。</p>
+<p><img src="images/05.jpg" alt=""></p>
+<p>残念。。。
+うちのフランちゃんはシェルティーなのに「シェルティーではないようです。ボーダーコリーです。」と判定されました。
+理由はおそらく教師データに黒いシェルティーが少なかったからだと考えられます。
+教師データの重要性を痛感しました。</p>
+<h1 id="展望">展望</h1>
+<ul>
+<li>教師データに黒いシェルティーを追加してリベンジする</li>
+<li>Web アプリに AI を組み込む</li>
+</ul>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
