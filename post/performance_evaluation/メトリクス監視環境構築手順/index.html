@@ -222,7 +222,7 @@ C:\PROGRAM FILES\TELEGRAF
 <h3 id="ディレクトリ">ディレクトリ</h3>
 <ul>
 <li>ローカルに InfluxDB, Grafana のデータを保持出来るようにディレクトリを用意する。</li>
-<li>今回は C:\webeoc\yonden\docker にディレクトリを作成する。
+<li>今回は C:\docker にディレクトリを作成する。
 <ul>
 <li>上記ディレクトリに grafana，influxdb のディレクトリを用意する。</li>
 <li>influxdb に data，etc のディレクトリを用意する。</li>
@@ -230,7 +230,7 @@ C:\PROGRAM FILES\TELEGRAF
 </li>
 </ul>
 <pre><code>&gt; tree
-C:\webeoc\yonden\docker
+C:\docker
 ├─grafana
 └─influxdb
     ├─data
@@ -238,7 +238,7 @@ C:\webeoc\yonden\docker
 </code></pre><h3 id="influxdbconf">influxdb.conf</h3>
 <ul>
 <li>Graphite フォーマットでデータを受信させるため，Graphite のプラグインを有効にする。</li>
-<li>C:\webeoc\yonden\docker\influxdb\etc に influxdb.conf を作成する。
+<li>C:\docker\influxdb\etc に influxdb.conf を作成する。
 <ul>
 <li>文字コード：UTF-8</li>
 <li>改行コード：LF</li>
@@ -262,7 +262,7 @@ database = &quot;jmeter&quot;  # store graphite data in this database
 </code></pre><h3 id="docker-composeyml">docker-compose.yml</h3>
 <ul>
 <li>influxdb, grafana のコンテナを作成する。</li>
-<li>C:\webeoc\yonden\docker に docker-compose.yml を作成する。
+<li>C:\docker に docker-compose.yml を作成する。
 <ul>
 <li>文字コード：UTF-8</li>
 <li>改行コード：任意</li>
@@ -270,7 +270,7 @@ database = &quot;jmeter&quot;  # store graphite data in this database
 </li>
 </ul>
 <pre><code>&gt; tree
-C:\webeoc\yonden\docker
+C:\docker
 ├─grafana
 ├─influxdb
 │   ├─data
@@ -296,7 +296,7 @@ C:\webeoc\yonden\docker
       - <span style="color:#ae81ff">influxdb</span>
 </code></pre></div><h3 id="コンテナ作成">コンテナ作成</h3>
 <pre><code>&gt; pwd
-C:\webeoc\yonden\docker
+C:\docker
 &gt; docker-compose up -d
 &gt; docker-compose ps
          Name                       Command               State           Ports
@@ -305,11 +305,11 @@ load_test_grafana_1      /run.sh                          Up      0.0.0.0:3000-&
 load_test_influxdb_1     /entrypoint.sh influxd           Up      0.0.0.0:8086-&gt;8086/tcp
 </code></pre><h3 id="コンテナ停止">コンテナ停止</h3>
 <pre><code>&gt; pwd
-C:\webeoc\yonden\docker
+C:\docker
 &gt; docker-compose stop
 </code></pre><h3 id="コンテナ開始">コンテナ開始</h3>
 <pre><code>&gt; pwd
-C:\webeoc\yonden\docker
+C:\docker
 &gt; docker-compose start
 </code></pre><h2 id="influxdb">InfluxDB</h2>
 <h3 id="動作確認">動作確認</h3>
