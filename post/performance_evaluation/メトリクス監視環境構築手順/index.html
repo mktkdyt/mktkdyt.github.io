@@ -433,6 +433,7 @@ Transfer-Encoding: chunked
 <li>Query で InfluxDB_WinPerf を選択する。</li>
 <li>FROM の select measurement で win_cpu を選択する。</li>
 <li>FROM の WHERE に host = 見たいホスト名，instance = _Total を設定する。</li>
+<li>SELECT の field に Percent_Processor_Time を設定する。</li>
 <li>Visualization の Axes を設定する。
 <ul>
 <li>Unit : percent(0-100)</li>
@@ -464,7 +465,7 @@ Transfer-Encoding: chunked
 <tbody>
 <tr>
 <td>Name</td>
-<td>influxdb</td>
+<td>InfluxDB_JMeter</td>
 </tr>
 <tr>
 <td>URL</td>
@@ -509,7 +510,7 @@ Transfer-Encoding: chunked
 <tbody>
 <tr>
 <td>DB name</td>
-<td>influxdb</td>
+<td>InfluxDB_JMeter</td>
 </tr>
 <tr>
 <td>Measurement name</td>
@@ -543,7 +544,7 @@ Transfer-Encoding: chunked
 </tr>
 <tr>
 <td>application</td>
-<td>webeoc</td>
+<td>任意</td>
 </tr>
 <tr>
 <td>measurement</td>
