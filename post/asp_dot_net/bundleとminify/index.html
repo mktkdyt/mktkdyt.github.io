@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Bundle と Minify</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Bundle と Minify</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Bundle と Minify</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="bundle-と-minify">Bundle と Minify</h1>
+<p>ASP.NET MVCではwebpack使わなくてもスクリプトをバンドルできます．
+各画面にソースのパスを書くのは面倒なのでBundleConfigでまとめてみます．</p>
+<h3 id="microsoftaspnetweboptimizationの取得">Microsoft.AspNet.Web.Optimizationの取得</h3>
+<p>Microsoft.AspNet.Web.OptimizationをNuGetから取得します．</p>
+<h3 id="bundleconfigの作成">BundleConfigの作成</h3>
+<p>App_StartフォルダにBundleConfig.csを追加します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">using</span> System.Web.Optimization;
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BundleConfig</span>
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> RegisterBundles(BundleCollection bundles)
+    {
+        bundles.Add(<span style="color:#66d9ef">new</span> ScriptBundle(<span style="color:#e6db74">&#34;~/bundles/jquery&#34;</span>).Include(
+            <span style="color:#e6db74">&#34;~/Scripts/jquery-{version}.js&#34;</span>));    
+        bundles.Add(<span style="color:#66d9ef">new</span> ScriptBundle(<span style="color:#e6db74">&#34;~/scripts/hoge&#34;</span>).Include(
+            <span style="color:#e6db74">&#34;~/Scripts/Sample/hoge.js&#34;</span>,
+            <span style="color:#e6db74">&#34;~/Scripts/Sample/fuga.js&#34;</span>,
+            <span style="color:#e6db74">&#34;~/Scripts/Sample/piyo.js&#34;</span>));
+    }
+}
+</code></pre></div><h3 id="bundleconfigをglobalasaxへ登録する">BundleConfigをGlobal.asaxへ登録する</h3>
+<p>Global.asax.csでBundleConfigを呼び出すようにします．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">using</span> System.Web.Optimization;
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Global</span> : HttpApplication
+{
+    <span style="color:#66d9ef">void</span> Application_Start(<span style="color:#66d9ef">object</span> sender, EventArgs e)
+    {
+        BundleConfig.RegisterBundles(BundleTable.Bundles);
+    }
+}
+</code></pre></div><h3 id="画面からbundleを呼び出す">画面からBundleを呼び出す</h3>
+<p>あとは画面で呼び出すだけです．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">@using System.Web.Optimization
+
+&lt;<span style="color:#f92672">head</span>&gt;
+    @Scripts.Render(&#34;~/bundles/jquery&#34;)
+    @Scripts.Render(&#34;~/bundles/hoge&#34;)
+&lt;/<span style="color:#f92672">head</span>&gt;
+</code></pre></div><p>結果</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/map/scripts/jquery?v=WvOgJns1M1ZZkySVvxnR5qZTgNQ_UWnAsm21lcWbuMs1&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+    &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/map/scripts/hoge?v=fsiac-cyztW0v5rUgi-a9vvPTsOHXerrhW6x3w1IiHw1&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+</code></pre></div><p>ソースのパスをBundleConfigにまとめることが出来ました．
+また、BundleConfigで{version}と指定することでライブラリのバージョンを更新しても気にする必要がなくなりました．
+更に、結果のソースを見てみるとminifyされていることが分かります．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hoge</span><span style="color:#f92672">=</span><span style="color:#66d9ef">function</span>(){<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">n</span>(){}<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">JsonToDocType</span><span style="color:#f92672">=</span><span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">n</span>){ ...
+</code></pre></div><p>すてき．</p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

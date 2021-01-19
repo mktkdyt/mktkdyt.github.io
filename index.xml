@@ -54,6 +54,22 @@ Path To MSBuild.exe: msbuild.exe Executing the command cmd.exe /C &amp;#34; msbu
     </item>
     
     <item>
+      <title>Bundle と Minify</title>
+      <link>https://mktkdyt.github.io/post/asp_dot_net/bundle%E3%81%A8minify/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/asp_dot_net/bundle%E3%81%A8minify/</guid>
+      <description>Bundle と Minify ASP.NET MVCではwebpack使わなくてもスクリプトをバンドルできます． 各画面にソースのパスを書くのは面倒なのでBundleConfigでまとめてみます．
+Microsoft.AspNet.Web.Optimizationの取得 Microsoft.AspNet.Web.OptimizationをNuGetから取得します．
+BundleConfigの作成 App_StartフォルダにBundleConfig.csを追加します．
+using System.Web.Optimization; public class BundleConfig { public static void RegisterBundles(BundleCollection bundles) { bundles.Add(new ScriptBundle(&amp;#34;~/bundles/jquery&amp;#34;).Include( &amp;#34;~/Scripts/jquery-{version}.js&amp;#34;)); bundles.Add(new ScriptBundle(&amp;#34;~/scripts/hoge&amp;#34;).Include( &amp;#34;~/Scripts/Sample/hoge.js&amp;#34;, &amp;#34;~/Scripts/Sample/fuga.js&amp;#34;, &amp;#34;~/Scripts/Sample/piyo.js&amp;#34;)); } } BundleConfigをGlobal.asaxへ登録する Global.asax.csでBundleConfigを呼び出すようにします．
+using System.Web.Optimization; public class Global : HttpApplication { void Application_Start(object sender, EventArgs e) { BundleConfig.RegisterBundles(BundleTable.Bundles); } } 画面からBundleを呼び出す あとは画面で呼び出すだけです．
+@using System.Web.Optimization &amp;lt;head&amp;gt; @Scripts.Render(&amp;#34;~/bundles/jquery&amp;#34;) @Scripts.Render(&amp;#34;~/bundles/hoge&amp;#34;) &amp;lt;/head&amp;gt; 結果
+&amp;lt;head&amp;gt; &amp;lt;script src=&amp;#34;/map/scripts/jquery?v=WvOgJns1M1ZZkySVvxnR5qZTgNQ_UWnAsm21lcWbuMs1&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;script src=&amp;#34;/map/scripts/hoge?v=fsiac-cyztW0v5rUgi-a9vvPTsOHXerrhW6x3w1IiHw1&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;/head&amp;gt; ソースのパスをBundleConfigにまとめることが出来ました． また、BundleConfigで{version}と指定することでライブラリのバージョンを更新しても気にする必要がなくなりました． 更に、結果のソースを見てみるとminifyされていることが分かります．
+var hoge=function(){function n(){}return n.</description>
+    </item>
+    
+    <item>
       <title>Docker インストール手順</title>
       <link>https://mktkdyt.github.io/post/performance_evaluation/docker%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
