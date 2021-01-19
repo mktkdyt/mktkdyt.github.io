@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>面倒なオブジェクトマッピングは AutoMapper にやらせよう</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">面倒なオブジェクトマッピングは AutoMapper にやらせよう</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>面倒なオブジェクトマッピングは AutoMapper にやらせよう</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="面倒なオブジェクトマッピングは-automapper-にやらせよう">面倒なオブジェクトマッピングは AutoMapper にやらせよう</h1>
+<h2 id="automapperって">AutoMapperって？</h2>
+<p>オブジェクトの詰め替えをしてくれる.NETのライブラリです．
+マッパーを使うことでオブジェクトの詰め替えをその都度記述する必要がなくなるのでコーディング量を減らすことが出来ます．
+また、オブジェクト間のプロパティの対応関係を局所化することが出来るので、修正箇所が限定されます．</p>
+<h2 id="automapperの取得">AutoMapperの取得</h2>
+<p>NuGetからAutoMapperを取得してください．</p>
+<h2 id="automapperを使わない場合">AutoMapperを使わない場合</h2>
+<p>MVCではよくEntityをViewModelに詰め替えることがあるかと思います．
+例えばDBから取得したユーザをViewModelに詰め替えて返す場合こんな感じになるかと思います．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserController</span>
+{
+    <span style="color:#66d9ef">public</span> ActionResult Detail(<span style="color:#66d9ef">string</span> name)
+    {
+        <span style="color:#75715e">// DBからUSERを取得したとする
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> user = Service.FindUserByName(name);
+        <span style="color:#75715e">// USER -&gt; UserViewModel
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> viewModel = <span style="color:#66d9ef">new</span> UserViewModel()
+        {
+            UserId = user.USER_ID;
+            UserName = user.USER_NAME;
+            Tel = user.TEL;
+            Mail = user.MAIL;
+        }
+        <span style="color:#66d9ef">return</span> View(viewModel);
+    }
+}
+</code></pre></div><p>Entity</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">USER</span>
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> USER_ID { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> USER_NAME { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> TEL { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> MAIL { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+}
+</code></pre></div><p>ViewModel</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserViewModel</span>
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> UserId { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> UserName { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> Tel { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> Mail { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+}
+</code></pre></div><p>先ほどのControllerに一覧を返すメソッドを追加した場合はこんな感じに．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserController</span>
+{
+    <span style="color:#66d9ef">public</span> ActionResult Detail(<span style="color:#66d9ef">string</span> name)
+    {
+        <span style="color:#75715e">// DBからUSERを取得したとする
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> user = Service.FindUserByName(name);
+        <span style="color:#75715e">// USER -&gt; UserViewModel
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> viewModel = <span style="color:#66d9ef">new</span> UserViewModel()
+        {
+            UserId = user.USER_ID;
+            UserName = user.USER_NAME;
+            Tel = user.TEL;
+            Mail = user.MAIL;
+        }
+        <span style="color:#66d9ef">return</span> View(viewModel);
+    }
+
+    <span style="color:#66d9ef">public</span> ActionResult List()
+    {
+        <span style="color:#75715e">// DBからUSER一覧を取得したとする
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> users = Service.FindUsers();
+        <span style="color:#66d9ef">var</span> viewModels = <span style="color:#66d9ef">new</span> List&lt;UserViewModel&gt;();
+        <span style="color:#66d9ef">foreach</span>(<span style="color:#66d9ef">var</span> user <span style="color:#66d9ef">in</span> users)
+        {
+            <span style="color:#75715e">// USER -&gt; UserViewModel
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">var</span> viewModel = <span style="color:#66d9ef">new</span> UserViewModel()
+            {
+                UserId = user.USER_ID;
+                UserName = user.USER_NAME;
+                Tel = user.TEL;
+                Mail = user.MAIL;
+            };
+            viewModels.Add(viewModel);
+        }         
+        <span style="color:#66d9ef">return</span> View(viewModels);
+    }    
+}
+</code></pre></div><p>詰め替えまくってますね(笑)．
+例えば「USERにFAXも追加しよう」となったとき，詰め替えている箇所全て修正する必要がありますね．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserController</span>
+{
+    <span style="color:#66d9ef">public</span> ActionResult Detail(<span style="color:#66d9ef">string</span> name)
+    {
+        <span style="color:#75715e">// DBからUSERを取得したとする
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> user = Service.FindUserByName(name);
+        <span style="color:#75715e">// USER -&gt; UserViewModel
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> viewModel = <span style="color:#66d9ef">new</span> UserViewModel()
+        {
+            UserId = user.USER_ID;
+            UserName = user.USER_NAME;
+            Tel = user.TEL;
+            <span style="color:#75715e">// 追加
+</span><span style="color:#75715e"></span>            Fax = user.FAX;
+            Mail = user.MAIL;
+        }
+        <span style="color:#66d9ef">return</span> View(viewModel);
+    }
+
+    <span style="color:#66d9ef">public</span> ActionResult List()
+    {
+        <span style="color:#75715e">// DBからUSER一覧を取得したとする
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> users = Service.FindUsers();
+        <span style="color:#66d9ef">var</span> viewModels = <span style="color:#66d9ef">new</span> List&lt;UserViewModel&gt;();
+        <span style="color:#66d9ef">foreach</span>(<span style="color:#66d9ef">var</span> user <span style="color:#66d9ef">in</span> users)
+        {
+            <span style="color:#75715e">// USER -&gt; UserViewModel
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">var</span> viewModel = <span style="color:#66d9ef">new</span> UserViewModel()
+            {
+                UserId = user.USER_ID;
+                UserName = user.USER_NAME;
+                Tel = user.TEL;
+                <span style="color:#75715e">// 追加
+</span><span style="color:#75715e"></span>                Fax = user.FAX;
+                Mail = user.MAIL;
+            };
+            viewModels.Add(viewModel);
+        }         
+        <span style="color:#66d9ef">return</span> View(viewModels);
+    }    
+}
+</code></pre></div><p>いちいち該当箇所を探すのは面倒ですよね．
+そこでAutoMapperです．</p>
+<h2 id="automapperconfigの作成">AutoMapperConfigの作成</h2>
+<p>AutoMapperConfig.csにマッピング情報を追加します．
+App_Start配下に用意してくださいね．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">using</span> AutoMapper;
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AutoMapperConfig</span>
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> RegisterAutoMappings()
+    {
+        Mapper.Initialize(cfg =&gt;
+        {
+            <span style="color:#75715e">// USER -&gt; UserViewModel
+</span><span style="color:#75715e"></span>            cfg.CreateMap&lt;USER, UserViewModel&gt;()
+                .ForMember(d =&gt; d.UserId, o =&gt; o.MapFrom(s =&gt; s.USER_ID))
+                .ForMember(d =&gt; d.UserName, o =&gt; o.MapFrom(s =&gt; s.USER_NAME))
+                .ForMember(d =&gt; d.Tel, o =&gt; o.MapFrom(s =&gt; s.TEL))
+                .ForMember(d =&gt; d.Mail, o =&gt; o.MapFrom(s =&gt; s.MAIL));
+        });
+    }
+}
+</code></pre></div><h2 id="globalasaxへの登録">Global.asaxへの登録</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Global</span> : HttpApplication
+{
+    <span style="color:#66d9ef">void</span> Application_Start(<span style="color:#66d9ef">object</span> sender, EventArgs e)
+    {
+        AutoMapperConfig.RegisterAutoMappings();
+    }
+}
+</code></pre></div><h2 id="automapperの利用">AutoMapperの利用</h2>
+<p>あとはControllerを修正します．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">using</span> AutoMapper;
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserController</span>
+{
+    <span style="color:#66d9ef">public</span> ActionResult Detail(<span style="color:#66d9ef">string</span> name)
+    {
+        <span style="color:#75715e">// DBからUSERを取得したとする
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> user = Service.FindUserByName(name);
+        <span style="color:#75715e">// USER -&gt; UserViewModel
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> viewModel = Mapper.Map&lt;UserViewModel&gt;(user);
+        <span style="color:#66d9ef">return</span> View(viewModel);
+    }
+
+    <span style="color:#66d9ef">public</span> ActionResult List()
+    {
+        <span style="color:#75715e">// DBからUSER一覧を取得したとする
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> users = Service.FindUsers();
+        <span style="color:#66d9ef">var</span> viewModels = <span style="color:#66d9ef">new</span> List&lt;UserViewModel&gt;();
+        <span style="color:#66d9ef">foreach</span>(<span style="color:#66d9ef">var</span> user <span style="color:#66d9ef">in</span> users)
+        {
+            <span style="color:#75715e">// USER -&gt; UserViewModel
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">var</span> viewModel = Mapper.Map&lt;UserViewModel&gt;(user);
+            viewModels.Add(viewModel);
+        }         
+        <span style="color:#66d9ef">return</span> View(viewModels);
+    }    
+}
+</code></pre></div><p>超すっきりしましたね！
+これで「USERにFAXも追加しよう」となったときはAutoMapperConfigを修正するだけで済みます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">using</span> AutoMapper;
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AutoMapperConfig</span>
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> RegisterAutoMappings()
+    {
+        Mapper.Initialize(cfg =&gt;
+        {
+            <span style="color:#75715e">// USER -&gt; UserViewModel
+</span><span style="color:#75715e"></span>            cfg.CreateMap&lt;USER, UserViewModel&gt;()
+                .ForMember(d =&gt; d.UserId, o =&gt; o.MapFrom(s =&gt; s.USER_ID))
+                .ForMember(d =&gt; d.UserName, o =&gt; o.MapFrom(s =&gt; s.USER_NAME))
+                .ForMember(d =&gt; d.Tel, o =&gt; o.MapFrom(s =&gt; s.TEL))
+                .ForMember(d =&gt; d.Fax, o =&gt; o.MapFrom(s =&gt; s.FAX))
+                .ForMember(d =&gt; d.Mail, o =&gt; o.MapFrom(s =&gt; s.MAIL));
+        });
+    }
+}
+</code></pre></div><h2 id="最後に">最後に</h2>
+<p>AutoMapperConfigにMapping情報を書けばMapperを呼び出すだけで簡単にマッピングされるようになります．
+マッピング情報がAutoMapperConfig一箇所にまとまるのでコードの見通しも良くなりメンテも捗るはずです．</p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
