@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ASP.NET のモジュールを Jenkins で発行する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">ASP.NET のモジュールを Jenkins で発行する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>ASP.NET のモジュールを Jenkins で発行する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="aspnet-のモジュールを-jenkins-で発行する">ASP.NET のモジュールを Jenkins で発行する</h1>
+<p>デプロイモジュールを発行するために</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">msbuild target.sln /p:VisualStudioVersion=14.0 /p:DeployOnBuild=true /p:Configuration=targetStaging /p:PublishProfile=targetProfile
+</code></pre></div><p>をjenkinsのジョブに登録し、実行すると以下のエラーが発生。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">C:\Program<span style="color:#75715e"> Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0\Web\Transform\Microsoft.Web.Publishing.AspNetCompileMerge.targets(132,5): error : </span>
+Can&#39;t find the valid AspnetMergePath [C:\Jenkins\workspace\Common_Build\Apps\Pajdis.CommonAndPortal\Pajdis.CommonAndPortal\Pajdis.CommonAndPortal.csproj]
+</code></pre></div><p>なにこれ。VisualStudioで発行するときに見たこと無いぞ。
+とりあえずコマンドにAspnetMergePathを明示すれば動くだろ。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">msbuild target.sln /p:VisualStudioVersion=14.0 /p:DeployOnBuild=true /p:Configuration=targetStaging /p:PublishProfile=targetProfile 
+/p:AspnetMergePath=<span style="color:#e6db74">&#34;C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\&#34;</span>
+</code></pre></div><p>よっしゃ実行だ！</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd">MSBUILD : error MSB1008: 1 つのプロジェクトのみを指定できます。
+</code></pre></div><p>なん。。だと。。。。動かない。。。</p>
+<p>よくよく見ると</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cmd" data-lang="cmd"><span style="color:#66d9ef">Path</span> To MSBuild.exe: msbuild.exe
+Executing the command cmd.exe /C <span style="color:#e6db74">&#34; msbuild.exe /p:VisualStudioVersion=14.0 /p:DeployOnBuild=true /p:Configuration=DebugPajdis /p:PublishProfile=DebugPajdis &#34;</span>\p:AspnetMergePath=C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools<span style="color:#e6db74">&#34;&#34;</span> Apps\Pajdis.CommonAndPortal\Pajdis.CommonAndPortal.sln <span style="color:#e6db74">&#34; &amp;&amp; exit </span><span style="color:#ae81ff">%%</span><span style="color:#e6db74">ERRORLEVEL</span><span style="color:#ae81ff">%%</span><span style="color:#e6db74"> from C:\Jenkins\workspace\Common_Build</span>
+[Common_Build] $ cmd.exe /C <span style="color:#e6db74">&#34; msbuild.exe /p:VisualStudioVersion=14.0 /p:DeployOnBuild=true /p:Configuration=DebugPajdis /p:PublishProfile=DebugPajdis &#39;\p:AspnetMergePath=C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools&#34;</span>&#39; Apps\Pajdis.CommonAndPortal\Pajdis.CommonAndPortal.sln <span style="color:#e6db74">&#34; &amp;&amp; exit </span><span style="color:#ae81ff">%%</span><span style="color:#e6db74">ERRORLEVEL</span><span style="color:#ae81ff">%%</span>
+Microsoft (R) Build Engine バージョン 4.6.1086.0
+[Microsoft .NET Framework、バージョン 4.0.30319.42000]
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+MSBUILD : error MSB1008: 1 つのプロジェクトのみを指定できます。
+スイッチ:Apps\Pajdis.CommonAndPortal\Pajdis.CommonAndPortal.sln
+
+スイッチの構文については、<span style="color:#e6db74">&#34;MSBuild /help&#34;</span> と入力してください。
+Build step &#39;MSBuildの実行&#39; marked build as failure
+Finished: FAILURE
+</code></pre></div><p>jenkinsさんの解釈がおかしいのかな。うん。
+というわけでCan&rsquo;t find the valid AspnetMergePathで検索。
+<a href="http://stackoverflow.com/questions/12713714/cant-find-the-valid-aspnetmergepath-on-visual-web-developer-publish">ここ</a>にたどり着いた。</p>
+<p>結局、最初のエラーメッセージで指摘されたMicrosoft.Web.Publishing.AspNetCompileMerge.targetsを修正した。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml">  <span style="color:#f92672">&lt;Target</span>
+      <span style="color:#a6e22e">Name=</span><span style="color:#e6db74">&#34;GetAspNetMergePath&#34;</span>
+      <span style="color:#a6e22e">DependsOnTargets=</span><span style="color:#e6db74">&#34;$(GetAspNetMergePathDependsOn)&#34;</span>
+      <span style="color:#a6e22e">Condition =</span><span style="color:#e6db74">&#34;&#39;$(GetAspNetMergePath)&#39; != &#39;false&#39;&#34;</span><span style="color:#f92672">&gt;</span>
+    <span style="color:#f92672">&lt;PropertyGroup&gt;</span>
+      <span style="color:#75715e">&lt;!--追加する行--&gt;</span>
+      <span style="color:#f92672">&lt;TargetFrameworkSDKToolsDirectory&gt;</span>C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\<span style="color:#f92672">&lt;/TargetFrameworkSDKToolsDirectory&gt;</span>
+      <span style="color:#75715e">&lt;!--おわり--&gt;</span>
+      <span style="color:#f92672">&lt;AspnetMergeName&gt;</span>aspnet_merge.exe<span style="color:#f92672">&lt;/AspnetMergeName&gt;</span>
+      <span style="color:#f92672">&lt;AspnetMergePath</span> <span style="color:#a6e22e">Condition=</span><span style="color:#e6db74">&#34;Exists(&#39;$(TargetFrameworkSDKToolsDirectory)$(AspnetMergeName)&#39;)&#34;</span><span style="color:#f92672">&gt;</span>$(TargetFrameworkSDKToolsDirectory)<span style="color:#f92672">&lt;/AspnetMergePath&gt;</span>
+    <span style="color:#f92672">&lt;/PropertyGroup&gt;</span>
+    <span style="color:#f92672">&lt;Error</span> <span style="color:#a6e22e">Condition=</span><span style="color:#e6db74">&#34;&#39;$(AspnetMergePath)&#39; == &#39;&#39; Or !Exists($(AspnetMergePath))&#34;</span>
+           <span style="color:#a6e22e">Text=</span><span style="color:#e6db74">&#34;Can&#39;t find the valid AspnetMergePath&#34;</span> <span style="color:#f92672">/&gt;</span>
+  <span style="color:#f92672">&lt;/Target&gt;</span>
+</code></pre></div><p>これで最初のジョブを実行することで無事にデプロイモジュールがjenkinsから発行できるように。</p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

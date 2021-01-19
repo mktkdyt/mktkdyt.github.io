@@ -27,5 +27,20 @@ View
 $.ajax({ url: http://test/Create,  type: &amp;#34;POST&amp;#34;, dataType: &amp;#34;json&amp;#34;, data: { data: hoge }, headers: { &amp;#39;RequestVerificationToken&amp;#39;: $(&amp;#39;#requestVerificationToken&amp;#39;).</description>
     </item>
     
+    <item>
+      <title>ASP.NET のモジュールを Jenkins で発行する</title>
+      <link>https://mktkdyt.github.io/post/asp_dot_net/asp.net%E3%81%AE%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E3%82%92jenkins%E3%81%A7%E7%99%BA%E8%A1%8C%E3%81%99%E3%82%8B/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/asp_dot_net/asp.net%E3%81%AE%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E3%82%92jenkins%E3%81%A7%E7%99%BA%E8%A1%8C%E3%81%99%E3%82%8B/</guid>
+      <description>ASP.NET のモジュールを Jenkins で発行する デプロイモジュールを発行するために
+msbuild target.sln /p:VisualStudioVersion=14.0 /p:DeployOnBuild=true /p:Configuration=targetStaging /p:PublishProfile=targetProfile をjenkinsのジョブに登録し、実行すると以下のエラーが発生。
+C:\ProgramFiles (x86)\MSBuild\Microsoft\VisualStudio\v14.0\Web\Transform\Microsoft.Web.Publishing.AspNetCompileMerge.targets(132,5): error :  Can&amp;#39;t find the valid AspnetMergePath [C:\Jenkins\workspace\Common_Build\Apps\Pajdis.CommonAndPortal\Pajdis.CommonAndPortal\Pajdis.CommonAndPortal.csproj] なにこれ。VisualStudioで発行するときに見たこと無いぞ。 とりあえずコマンドにAspnetMergePathを明示すれば動くだろ。
+msbuild target.sln /p:VisualStudioVersion=14.0 /p:DeployOnBuild=true /p:Configuration=targetStaging /p:PublishProfile=targetProfile /p:AspnetMergePath=&amp;#34;C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\&amp;#34; よっしゃ実行だ！
+MSBUILD : error MSB1008: 1 つのプロジェクトのみを指定できます。 なん。。だと。。。。動かない。。。
+よくよく見ると
+Path To MSBuild.exe: msbuild.exe Executing the command cmd.exe /C &amp;#34; msbuild.exe /p:VisualStudioVersion=14.0 /p:DeployOnBuild=true /p:Configuration=DebugPajdis /p:PublishProfile=DebugPajdis &amp;#34;\p:AspnetMergePath=C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools&amp;#34;&amp;#34; Apps\Pajdis.CommonAndPortal\Pajdis.CommonAndPortal.sln &amp;#34; &amp;amp;&amp;amp; exit %%ERRORLEVEL%%from C:\Jenkins\workspace\Common_Build [Common_Build] $ cmd.</description>
+    </item>
+    
   </channel>
 </rss>
