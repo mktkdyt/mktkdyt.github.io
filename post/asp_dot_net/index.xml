@@ -42,5 +42,16 @@ MSBUILD : error MSB1008: 1 つのプロジェクトのみを指定できます�
 Path To MSBuild.exe: msbuild.exe Executing the command cmd.exe /C &amp;#34; msbuild.exe /p:VisualStudioVersion=14.0 /p:DeployOnBuild=true /p:Configuration=DebugPajdis /p:PublishProfile=DebugPajdis &amp;#34;\p:AspnetMergePath=C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools&amp;#34;&amp;#34; Apps\Pajdis.CommonAndPortal\Pajdis.CommonAndPortal.sln &amp;#34; &amp;amp;&amp;amp; exit %%ERRORLEVEL%%from C:\Jenkins\workspace\Common_Build [Common_Build] $ cmd.</description>
     </item>
     
+    <item>
+      <title>AutoMapper を導入する</title>
+      <link>https://mktkdyt.github.io/post/asp_dot_net/automapper%E3%82%92%E5%B0%8E%E5%85%A5%E3%81%99%E3%82%8B/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/asp_dot_net/automapper%E3%82%92%E5%B0%8E%E5%85%A5%E3%81%99%E3%82%8B/</guid>
+      <description>AutoMapper を導入する AutoMapperって？ オブジェクトの詰め替えをしてくれるツール。 マッパーを使うことでオブジェクトの詰め替えをその都度記述する必要がなくなるのでコーディングの作業量を減らすことが出来ます。 また、オブジェクト間のプロパティの対応関係を局所化することが出来るので、修正箇所が限定されます。
+AutoMapperの取得 NuGetからAutoMapperを取得
+AutoMapperConfigの作成 using AutoMapper; using Terdis.MasterInfoManagement.Service.DataTransferObject; using Terdis.Map.Application.Web.Dto; namespace Terdis.Map.Application.Web { public class AutoMapperConfig { public static void RegisterAutoMappings() { Mapper.Initialize(cfg =&amp;gt; { cfg.CreateMap&amp;lt;MasterInfoDto, DocumentTypeDto&amp;gt;() .ForMember(d =&amp;gt; d.Id, o =&amp;gt; o.MapFrom(s =&amp;gt; s.Name)) .ForMember(d =&amp;gt; d.Title, o =&amp;gt; o.MapFrom(s =&amp;gt; s.Code)); }); } } } Global.asaxへの登録 namespace Terdis.Map.Application.Web { public class Global : HttpApplication { void Application_Start(object sender, EventArgs e) { AutoMapperConfig.RegisterAutoMappings(); } } } ServiceでMappingを行う using System.</description>
+    </item>
+    
   </channel>
 </rss>

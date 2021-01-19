@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>AutoMapper を導入する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">AutoMapper を導入する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>AutoMapper を導入する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="automapper-を導入する">AutoMapper を導入する</h1>
+<h2 id="automapperって">AutoMapperって？</h2>
+<p>オブジェクトの詰め替えをしてくれるツール。
+マッパーを使うことでオブジェクトの詰め替えをその都度記述する必要がなくなるのでコーディングの作業量を減らすことが出来ます。
+また、オブジェクト間のプロパティの対応関係を局所化することが出来るので、修正箇所が限定されます。</p>
+<h2 id="automapperの取得">AutoMapperの取得</h2>
+<p>NuGetからAutoMapperを取得</p>
+<h2 id="automapperconfigの作成">AutoMapperConfigの作成</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">using</span> AutoMapper;
+<span style="color:#66d9ef">using</span> Terdis.MasterInfoManagement.Service.DataTransferObject;
+<span style="color:#66d9ef">using</span> Terdis.Map.Application.Web.Dto;
+
+<span style="color:#66d9ef">namespace</span> Terdis.Map.Application.Web
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AutoMapperConfig</span>
+    {
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> RegisterAutoMappings()
+        {
+            Mapper.Initialize(cfg =&gt;
+            {
+                cfg.CreateMap&lt;MasterInfoDto, DocumentTypeDto&gt;()
+                    .ForMember(d =&gt; d.Id, o =&gt; o.MapFrom(s =&gt; s.Name))
+                    .ForMember(d =&gt; d.Title, o =&gt; o.MapFrom(s =&gt; s.Code));
+            });
+        }
+    }
+}
+</code></pre></div><h2 id="globalasaxへの登録">Global.asaxへの登録</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">namespace</span> Terdis.Map.Application.Web
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Global</span> : HttpApplication
+    {
+        <span style="color:#66d9ef">void</span> Application_Start(<span style="color:#66d9ef">object</span> sender, EventArgs e)
+        {
+            AutoMapperConfig.RegisterAutoMappings();
+        }
+    }
+}
+</code></pre></div><h2 id="serviceでmappingを行う">ServiceでMappingを行う</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">using</span> System.Collections.Generic;
+<span style="color:#66d9ef">using</span> System.Configuration;
+<span style="color:#66d9ef">using</span> System.Linq;
+<span style="color:#66d9ef">using</span> System.Web;
+<span style="color:#66d9ef">using</span> Terdis.Map.Application.Web.Dto;
+<span style="color:#66d9ef">using</span> Terdis.MasterInfoManagement.Service.WebServiceClient;
+<span style="color:#66d9ef">using</span> AutoMapper;
+
+<span style="color:#66d9ef">namespace</span> Terdis.Map.Application.Web.Models.IServices
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DocumentTypeService</span>: IDocumentTypeService
+    {
+        <span style="color:#75715e">/// &lt;summary&gt;
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">/// 権限に応じた文書種別一覧を取得します。
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">/// &lt;/summary&gt;
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">/// &lt;returns&gt;権限に応じた文書種別一覧&lt;/returns&gt;
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">public</span> IList&lt;DocumentTypeDto&gt; GetDocumentTypeList()
+        {
+            <span style="color:#66d9ef">var</span> client = <span style="color:#66d9ef">new</span> MasterInfoManagementWebServiceClient();
+            client.Url = ConfigurationManager.AppSettings[<span style="color:#e6db74">&#34;MasterInfoManagementWebServiceClientUrl&#34;</span>];
+            client.AllowWriteStreamBuffering = <span style="color:#66d9ef">false</span>;
+            <span style="color:#66d9ef">var</span> list = client.GetDocumentTypeMasterInfoByUser(HttpContext.Current.User.Identity.Name);
+            <span style="color:#66d9ef">return</span> Mapper.Map&lt;List&lt;DocumentTypeDto&gt;&gt;(list);
+        }
+    }
+}
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs">
+
+</code></pre></div><p>AutoMapperConfigにMappingを書けばServiceでMapperを呼び出すだけで簡単にMappingされるようになりました。  また、Mapping情報がAutoMapperConfig一箇所にまとまるのでコードの見通しも良くなるはずです。</p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
