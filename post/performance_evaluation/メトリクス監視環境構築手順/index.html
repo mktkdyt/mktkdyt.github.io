@@ -97,8 +97,8 @@
 
     <div align="start" class="content"><h1 id="メトリクス監視環境構築手順">メトリクス監視環境構築手順</h1>
 <ul>
-<li>JMeter を CUI で実行している際の JMeter のメトリクスを Grafana で可視化する。</li>
-<li>Windows Server のメトリクスを Grafana で可視化する。</li>
+<li>JMeter を CUI で実行している際の JMeter のメトリクスを Grafana で可視化します。</li>
+<li>Windows Server のメトリクスを Grafana で可視化します。</li>
 </ul>
 <!-- raw HTML omitted -->
 <!-- raw HTML omitted -->
@@ -169,44 +169,43 @@
 <tbody>
 <tr>
 <td>InfluxDB</td>
-<td>時系列DB。メトリクスをここで収集する。</td>
+<td>時系列 DB です。メトリクスをここで収集します。</td>
 </tr>
 <tr>
 <td>Grafana</td>
-<td>様々なデータソースを可視化するGUIツール。</td>
+<td>様々なデータソースを可視化する GUI ツールです。</td>
 </tr>
 <tr>
 <td>Telegraf</td>
-<td>様々なメトリクスを influxdb に収集するコレクタ。</td>
+<td>様々なメトリクスを InfluxDB に収集するコレクタです。</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li>JMeter のメトリクスを InfluxDB に流し，Grafana で可視化する。
+<li>JMeter のメトリクスを InfluxDB に流し，Grafana で可視化します。
 <ul>
 <li>JMeter -&gt; InfluxDB -&gt; Grafana</li>
 </ul>
 </li>
-<li>対象の Windows に Telegraf をインストールし，Telegraf から Windows のメトリクスを InfluxDB に流し，Grafana で可視化する。
+<li>対象の Windows に Telegraf をインストールし，Telegraf から Windows のメトリクスを InfluxDB に流し，Grafana で可視化します。
 <ul>
 <li>Telegraf -&gt; InfluxDB -&gt; Grafana</li>
 </ul>
 </li>
 </ul>
 <h2 id="telegraf">Telegraf</h2>
-<p>パフォーマンスを見たい Windows にインストールする。</p>
+<p>パフォーマンスを見たい Windows にインストールします。</p>
 <h3 id="インストール">インストール</h3>
-<p><a href="https://portal.influxdata.com/downloads">https://portal.influxdata.com/downloads</a> から Windows 用の Telegraf をダウンロードする。
-今回は <a href="https://dl.influxdata.com/telegraf/releases/telegraf-1.14.2_windows_amd64.zip">https://dl.influxdata.com/telegraf/releases/telegraf-1.14.2_windows_amd64.zip</a> をダウンロードした。
-これを任意のディレクトリに C:\Program Files\telegraf 解凍した。</p>
-<p>中身はシンプル。
-設定ファイルと実行ファイルのみ。</p>
+<p><a href="https://portal.influxdata.com/downloads">https://portal.influxdata.com/downloads</a> から Windows 用の Telegraf をダウンロードします。<br>
+今回は <a href="https://dl.influxdata.com/telegraf/releases/telegraf-1.14.2_windows_amd64.zip">https://dl.influxdata.com/telegraf/releases/telegraf-1.14.2_windows_amd64.zip</a> をダウンロードしました。<br>
+これを任意のディレクトリに C:\Program Files\telegraf 解凍しました。</p>
+<p>中身はシンプルで設定ファイルと実行ファイルのみです。</p>
 <pre><code>&gt; tree /F .
 C:\PROGRAM FILES\TELEGRAF
     telegraf.conf
     telegraf.exe
 </code></pre><h3 id="telegrafconf">telegraf.conf</h3>
-<p>設定ファイルは InfluxDB の接続先とDB名を設定する。</p>
+<p>設定ファイルは InfluxDB の接続先とDB名を設定します。</p>
 <pre><code class="language-conf" data-lang="conf">[[outputs.influxdb]]
   urls = [&quot;http://xxx.xxx.xxx.xxx:8086&quot;]
   database = &quot;win_perf&quot;
@@ -221,11 +220,11 @@ C:\PROGRAM FILES\TELEGRAF
 </code></pre><h2 id="docker-コンテナ作成">Docker コンテナ作成</h2>
 <h3 id="ディレクトリ">ディレクトリ</h3>
 <ul>
-<li>ローカルに InfluxDB, Grafana のデータを保持出来るようにディレクトリを用意する。</li>
-<li>今回は C:\docker にディレクトリを作成する。
+<li>ローカルに InfluxDB, Grafana のデータを保持出来るようにディレクトリを用意します。</li>
+<li>今回は C:\docker にディレクトリを作成します。
 <ul>
-<li>上記ディレクトリに grafana，influxdb のディレクトリを用意する。</li>
-<li>influxdb に data，etc のディレクトリを用意する。</li>
+<li>上記ディレクトリに grafana，influxdb のディレクトリを用意します。</li>
+<li>influxdb に data，etc のディレクトリを用意します。</li>
 </ul>
 </li>
 </ul>
@@ -237,8 +236,8 @@ C:\docker
     └─etc
 </code></pre><h3 id="influxdbconf">influxdb.conf</h3>
 <ul>
-<li>Graphite フォーマットでデータを受信させるため，Graphite のプラグインを有効にする。</li>
-<li>C:\docker\influxdb\etc に influxdb.conf を作成する。
+<li>Graphite フォーマットでデータを受信させるため，Graphite のプラグインを有効にします。</li>
+<li>C:\docker\influxdb\etc に influxdb.conf を作成します。
 <ul>
 <li>文字コード：UTF-8</li>
 <li>改行コード：LF</li>
@@ -261,8 +260,8 @@ port = 2003
 database = &quot;jmeter&quot;  # store graphite data in this database
 </code></pre><h3 id="docker-composeyml">docker-compose.yml</h3>
 <ul>
-<li>influxdb, grafana のコンテナを作成する。</li>
-<li>C:\docker に docker-compose.yml を作成する。
+<li>influxdb, grafana のコンテナを作成します。</li>
+<li>C:\docker に docker-compose.yml を作成します。
 <ul>
 <li>文字コード：UTF-8</li>
 <li>改行コード：任意</li>
@@ -323,7 +322,7 @@ X-Request-Id: 47b37236-8a8b-11ea-8001-0242ac120002
 Date: Thu, <span style="color:#ae81ff">30</span> Apr <span style="color:#ae81ff">2020</span> 02:35:39 GMT
 </code></pre></div><h3 id="db-作成">DB 作成</h3>
 <ul>
-<li>JMeter のメトリクスを格納する DB を作成する。</li>
+<li>JMeter のメトリクスを格納する DB を作成します。</li>
 </ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">&gt; wsl curl -i -XPOST http://localhost:8086/query --data-urlencode <span style="color:#e6db74">&#34;q=CREATE DATABASE jmeter&#34;</span>
 HTTP/1.1 <span style="color:#ae81ff">200</span> OK
@@ -337,7 +336,7 @@ Transfer-Encoding: chunked
 
 <span style="color:#f92672">{</span><span style="color:#e6db74">&#34;results&#34;</span>:<span style="color:#f92672">[{</span><span style="color:#e6db74">&#34;statement_id&#34;</span>:0<span style="color:#f92672">}]}</span>
 </code></pre></div><ul>
-<li>Windows のメトリクスを格納する DB を作成する。</li>
+<li>Windows のメトリクスを格納する DB を作成します。</li>
 </ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">&gt; wsl curl -i -XPOST http://localhost:8086/query --data-urlencode <span style="color:#e6db74">&#34;q=CREATE DATABASE win_perf&#34;</span>
 HTTP/1.1 <span style="color:#ae81ff">200</span> OK
@@ -352,12 +351,12 @@ Transfer-Encoding: chunked
 <span style="color:#f92672">{</span><span style="color:#e6db74">&#34;results&#34;</span>:<span style="color:#f92672">[{</span><span style="color:#e6db74">&#34;statement_id&#34;</span>:0<span style="color:#f92672">}]}</span>
 </code></pre></div><h2 id="grafana">Grafana</h2>
 <ul>
-<li><a href="https://grafana.com/docs/grafana/latest/installation/migrating_to2/">https://grafana.com/docs/grafana/latest/installation/migrating_to2/</a> より cofnig.js は廃止された模様。</li>
+<li><a href="https://grafana.com/docs/grafana/latest/installation/migrating_to2/">https://grafana.com/docs/grafana/latest/installation/migrating_to2/</a> より cofnig.js は廃止されました。</li>
 </ul>
 <h3 id="管理者作成">管理者作成</h3>
 <ul>
-<li>http://localhost:3000/login にアクセする。</li>
-<li>下記のように入力し Login をクリックする。
+<li>http://localhost:3000/login にアクセスします。</li>
+<li>下記のように入力し [Login] をクリックします。
 <table>
 <thead>
 <tr>
@@ -374,12 +373,16 @@ Transfer-Encoding: chunked
 </table>
 </li>
 </ul>
+<p><img src="img/grafana_00.png" alt="img/grafana_00.png"></p>
 <h3 id="サーバメトリクス取得設定">サーバメトリクス取得設定</h3>
 <h4 id="data-source-追加">data source 追加</h4>
-<ul>
-<li>Configuration\DataSource を選択し，Add data source をクリックする。</li>
-<li>InfluxDB を選択する。</li>
-<li>下記設定し Test &amp; Save をクリックする。
+<p>[Configuration] / [DataSource] を選択します。</p>
+<p><img src="img/grafana_01.png" alt="img/grafana_01.png"></p>
+<p>[Add data source] をクリックします。</p>
+<p><img src="img/grafana_02.png" alt="img/grafana_02.png"></p>
+<p>[InfluxDB] を選択します。</p>
+<p><img src="img/grafana_03.png" alt="img/grafana_03.png"></p>
+<p>下記設定し [Save &amp; Test] をクリックします。</p>
 <table>
 <thead>
 <tr>
@@ -398,7 +401,7 @@ Transfer-Encoding: chunked
 </tr>
 <tr>
 <td>Access</td>
-<td>Server</td>
+<td>Browser</td>
 </tr>
 <tr>
 <td>Database</td>
@@ -418,43 +421,51 @@ Transfer-Encoding: chunked
 </tr>
 </tbody>
 </table>
-</li>
-</ul>
+<p><img src="img/grafana_04.png" alt="img/grafana_04.png">
+<img src="img/grafana_05.png" alt="img/grafana_05.png"></p>
 <h4 id="フォルダ作成">フォルダ作成</h4>
-<ul>
-<li>+ アイコンをクリックし，Create\Folder を選択する。</li>
-<li>Name : win_perf</li>
-<li>Create をクリックする。</li>
-</ul>
+<p>[+] / [Create] / [Folder] を選択します。</p>
+<p><img src="img/grafana_06.png" alt="img/grafana_06.png"></p>
+<p>[Name] に win_perf を入力し [Create] をクリックします。</p>
+<p><img src="img/grafana_07.png" alt="img/grafana_07.png"></p>
 <h4 id="dashboard-作成">Dashboard 作成</h4>
+<p>[+] / [Create] / [Dashboard] を選択します。</p>
+<p><img src="img/grafana_08.png" alt="img/grafana_08.png"></p>
+<p>[Add Query] をクリックします。</p>
+<p><img src="img/grafana_09.png" alt="img/grafana_09.png"></p>
+<p>[Query] で InfluxDB_WinPerf を選択します。</p>
+<p><img src="img/grafana_10.png" alt="img/grafana_10.png"></p>
+<p>[FROM] で win_cpu を選択します。<br>
+[FROM] の [WHERE] に host = 見たいホスト名，instance = _Total を設定します。<br>
+[SELECT] の field に Percent_Processor_Time を設定します。</p>
+<p><img src="img/grafana_11.png" alt="img/grafana_11.png"></p>
+<p>[Visualization] の [Axes] を設定します。</p>
 <ul>
-<li>+ アイコンをクリックし，Create\Dashboard を選択する。</li>
-<li>Add Query をクリックする。</li>
-<li>Query で InfluxDB_WinPerf を選択する。</li>
-<li>FROM の select measurement で win_cpu を選択する。</li>
-<li>FROM の WHERE に host = 見たいホスト名，instance = _Total を設定する。</li>
-<li>SELECT の field に Percent_Processor_Time を設定する。</li>
-<li>Visualization の Axes を設定する。
+<li>Left Y
 <ul>
 <li>Unit : percent(0-100)</li>
 <li>Y-Max : 100</li>
 </ul>
 </li>
-<li>General の Title を CPU Usage</li>
-<li>Save dashboard から
+</ul>
+<p><img src="img/grafana_12.png" alt="img/grafana_12.png"></p>
+<p>[General] の [Title] を CPU Usage とします。</p>
+<p><img src="img/grafana_13.png" alt="img/grafana_13.png"></p>
+<p>[Save dashboard] で下記設定し [Save] をクリックします。</p>
 <ul>
 <li>Dashboard name : Windows Performance Monitor</li>
 <li>Folder : win_perf</li>
-<li>Save をクリックする</li>
 </ul>
-</li>
-</ul>
+<p><img src="img/grafana_14.png" alt="img/grafana_14.png"></p>
+<p>CPU 使用率のグラフが完成しました。</p>
+<p><img src="img/grafana_15.png" alt="img/grafana_15.png"></p>
 <h3 id="jmeter-メトリクス取得設定">JMeter メトリクス取得設定</h3>
 <h4 id="data-source-追加-1">data source 追加</h4>
-<ul>
-<li>Configuration\DataSource を選択し，Add data source をクリックする。</li>
-<li>influxdb を選択する。</li>
-<li>下記設定し Test &amp; Save をクリックする。
+<p>[Configuration] [DataSource] を選択し，[Add data source] をクリックします。</p>
+<p><img src="img/grafana_16.png" alt="img/grafana_16.png"></p>
+<p>InfluxDB を選択します。</p>
+<p><img src="img/grafana_17.png" alt="img/grafana_17.png"></p>
+<p>下記設定し [Save &amp; Test] をクリックします。</p>
 <table>
 <thead>
 <tr>
@@ -473,7 +484,7 @@ Transfer-Encoding: chunked
 </tr>
 <tr>
 <td>Access</td>
-<td>Server</td>
+<td>Browser</td>
 </tr>
 <tr>
 <td>Database</td>
@@ -493,13 +504,14 @@ Transfer-Encoding: chunked
 </tr>
 </tbody>
 </table>
-</li>
-</ul>
+<p><img src="img/grafana_18.png" alt="img/grafana_18.png">
+<img src="img/grafana_19.png" alt="img/grafana_19.png"></p>
 <h4 id="dashboard-追加">Dashboard 追加</h4>
-<ul>
-<li>+ アイコンをクリックし，Import を選択する。</li>
-<li>Grafana.com Dashboard に 5496 を入力し，Load をクリックする。</li>
-<li>以下項目を設定し Import をクリックする。
+<p>[+] / [Import] を選択します。</p>
+<p><img src="img/grafana_20.png" alt="img/grafana_20.png"></p>
+<p>Grafana.com Dashboard に 5496 を入力し，Load をクリックします。</p>
+<p><img src="img/grafana_21.png" alt="img/grafana_21.png"></p>
+<p>以下項目を設定し Import をクリックします。</p>
 <table>
 <thead>
 <tr>
@@ -518,14 +530,13 @@ Transfer-Encoding: chunked
 </tr>
 </tbody>
 </table>
-</li>
-</ul>
+<p><img src="img/grafana_22.png" alt="img/grafana_22.png"></p>
 <h2 id="jmeter-シナリオ編集">JMeter シナリオ編集</h2>
 <h3 id="backend-listener-追加">Backend Listener 追加</h3>
-<p>JMeter シナリオに Backend Listener を追加する。</p>
+<p>JMeter シナリオに Backend Listener を追加します。</p>
 <ul>
-<li>テスト計画を右クリックし，追加\リスナー\Backend Listener を選択する。</li>
-<li>Backend Listener implemantation で org.apache.jmeter.visualizers.backend.influxdb.influxdbBackendListenerClient を選択する。
+<li>テスト計画を右クリックし，追加\リスナー\Backend Listener を選択します。</li>
+<li>Backend Listener implemantation で org.apache.jmeter.visualizers.backend.influxdb.influxdbBackendListenerClient を選択します。
 <table>
 <thead>
 <tr>

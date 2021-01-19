@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Ajax の CSRF 対策</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Ajax の CSRF 対策</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Ajax の CSRF 対策</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="ajax-の-csrf-対策">Ajax の CSRF 対策</h1>
+<p>SPAで非同期通信を多用すると思います。その際に、非同期通信の場合のCSRF対策について調査ました。</p>
+<h2 id="通常の同期処理ページ遷移の場合">通常の同期処理（ページ遷移）の場合</h2>
+<p>ASP.NET MVCではCSRF対策が超簡単です。<br>
+ViewのFormの中でRazorの@Html.AntiForgeryToken()を呼ぶだけでトークンを埋め込むことが出来ます。<br>
+トークンを検証するにはControllerでActionMethodの属性にValidationAntiForgeryTokneを指定するだけです。</p>
+<p>View</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#960050;background-color:#1e0010">@</span><span style="color:#a6e22e">using</span> (<span style="color:#a6e22e">Html</span>.<span style="color:#a6e22e">BeginForm</span>()){
+    <span style="color:#960050;background-color:#1e0010">@</span><span style="color:#a6e22e">Html</span>.<span style="color:#a6e22e">AntiForgeryToken</span>()
+    <span style="color:#75715e">// 略
+</span><span style="color:#75715e"></span>}
+</code></pre></div><p>Controller</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#a6e22e">[ValidationAntiForgeryToken]</span>
+<span style="color:#a6e22e">[HttpPost]</span>
+<span style="color:#66d9ef">public</span> ActionResult Create(ViewModel model){
+    <span style="color:#75715e">// 略
+</span><span style="color:#75715e"></span>}
+</code></pre></div><p>ところが、非同期処理（Ajax）の場合は少々工夫が必要になります。</p>
+<h2 id="非同期処理ajaxの場合">非同期処理（Ajax）の場合</h2>
+<p>Razorでクッキーのトークンとフォームのトークンを発行する関数を作成します。<br>
+作成した関数を呼び、hidden値に設定し、POST時にヘッダに付加してリクエストを送信します。</p>
+<p>View</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">script</span><span style="color:#f92672">&gt;</span>
+    <span style="color:#960050;background-color:#1e0010">@</span><span style="color:#a6e22e">functions</span>{
+        <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">string</span> <span style="color:#a6e22e">GenerateRequestVerificationToken</span>()
+        {
+            <span style="color:#a6e22e">string</span> <span style="color:#a6e22e">cookieToken</span>, <span style="color:#a6e22e">formToken</span>;
+            <span style="color:#a6e22e">AntiForgery</span>.<span style="color:#a6e22e">GetTokens</span>(<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">out</span> <span style="color:#a6e22e">cookieToken</span>, <span style="color:#a6e22e">out</span> <span style="color:#a6e22e">formToken</span>);
+            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cookieToken</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">formToken</span>;
+        }
+    }
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/script&gt;</span>
+
+<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hidden&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;requestValificationToken&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;@GenerateRequestValificationToken()&#34;</span> <span style="color:#f92672">/&gt;</span>
+</code></pre></div><p>JS</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">$</span>.<span style="color:#a6e22e">ajax</span>({
+    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">http</span><span style="color:#f92672">:</span><span style="color:#75715e">//test/Create,
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
+    <span style="color:#a6e22e">dataType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;json&#34;</span>,
+    <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> {
+        <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">hoge</span>
+    },
+    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+        <span style="color:#e6db74">&#39;RequestVerificationToken&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#requestVerificationToken&#39;</span>).<span style="color:#a6e22e">val</span>()
+    }
+});
+</code></pre></div><p>ヘッダに付与されたトークンを検証する関数を用意します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> ValidateAntiForgeryToken()
+{
+    <span style="color:#66d9ef">string</span> cookieToken = <span style="color:#e6db74">&#34;&#34;</span>;
+    <span style="color:#66d9ef">string</span> formToken = <span style="color:#e6db74">&#34;&#34;</span>;
+    <span style="color:#66d9ef">var</span> tokenHeader = Request.Headers[<span style="color:#e6db74">&#34;RequestVerificationToken&#34;</span>];
+    <span style="color:#66d9ef">if</span> (!String.IsNullOrEmpty(tokenHeader))
+    {
+        <span style="color:#66d9ef">string</span>[] tokens = tokenHeader.Split(<span style="color:#e6db74">&#39;:&#39;</span>);
+        <span style="color:#66d9ef">if</span> (tokens.Length == <span style="color:#ae81ff">2</span>)
+        {
+            cookieToken = tokens[<span style="color:#ae81ff">0</span>].Trim();
+            formToken = tokens[<span style="color:#ae81ff">1</span>].Trim();
+        }
+    }
+    AntiForgery.Validate(cookieToken, formToken);
+}
+</code></pre></div><p>ControllerのActionMethodで先ほどの関数を呼びます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">public</span> ActionResult Create(){
+    <span style="color:#75715e">// 自前でヘッダに付与されたトークンを検証する
+</span><span style="color:#75715e"></span>    ValidateAntiForgeryToken();
+    <span style="color:#75715e">// 略
+</span><span style="color:#75715e"></span>}
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

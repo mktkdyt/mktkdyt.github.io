@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ASP.NET on mktkdyt</title>
+    <link>https://mktkdyt.github.io/post/asp_dot_net/</link>
+    <description>Recent content in ASP.NET on mktkdyt</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Thu, 14 Jan 2021 17:24:23 +0900</lastBuildDate><atom:link href="https://mktkdyt.github.io/post/asp_dot_net/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ajax の CSRF 対策</title>
+      <link>https://mktkdyt.github.io/post/asp_dot_net/ajax%E3%81%AEcsrf%E5%AF%BE%E7%AD%96/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/asp_dot_net/ajax%E3%81%AEcsrf%E5%AF%BE%E7%AD%96/</guid>
+      <description>Ajax の CSRF 対策 SPAで非同期通信を多用すると思います。その際に、非同期通信の場合のCSRF対策について調査ました。
+通常の同期処理（ページ遷移）の場合 ASP.NET MVCではCSRF対策が超簡単です。
+ViewのFormの中でRazorの@Html.AntiForgeryToken()を呼ぶだけでトークンを埋め込むことが出来ます。
+トークンを検証するにはControllerでActionMethodの属性にValidationAntiForgeryTokneを指定するだけです。
+View
+@using (Html.BeginForm()){ @Html.AntiForgeryToken() // 略 } Controller
+[ValidationAntiForgeryToken] [HttpPost] public ActionResult Create(ViewModel model){ // 略 } ところが、非同期処理（Ajax）の場合は少々工夫が必要になります。
+非同期処理（Ajax）の場合 Razorでクッキーのトークンとフォームのトークンを発行する関数を作成します。
+作成した関数を呼び、hidden値に設定し、POST時にヘッダに付加してリクエストを送信します。
+View
+&amp;lt;script&amp;gt; @functions{ public string GenerateRequestVerificationToken() { string cookieToken, formToken; AntiForgery.GetTokens(null, out cookieToken, out formToken); return cookieToken + &amp;#34;:&amp;#34; + formToken; } } &amp;lt;/script&amp;gt; &amp;lt;input type=&amp;#34;hidden&amp;#34; id=&amp;#34;requestValificationToken&amp;#34; value=&amp;#34;@GenerateRequestValificationToken()&amp;#34; /&amp;gt; JS
+$.ajax({ url: http://test/Create,  type: &amp;#34;POST&amp;#34;, dataType: &amp;#34;json&amp;#34;, data: { data: hoge }, headers: { &amp;#39;RequestVerificationToken&amp;#39;: $(&amp;#39;#requestVerificationToken&amp;#39;).</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -19,6 +19,26 @@
     </item>
     
     <item>
+      <title>Ajax の CSRF 対策</title>
+      <link>https://mktkdyt.github.io/post/asp_dot_net/ajax%E3%81%AEcsrf%E5%AF%BE%E7%AD%96/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/asp_dot_net/ajax%E3%81%AEcsrf%E5%AF%BE%E7%AD%96/</guid>
+      <description>Ajax の CSRF 対策 SPAで非同期通信を多用すると思います。その際に、非同期通信の場合のCSRF対策について調査ました。
+通常の同期処理（ページ遷移）の場合 ASP.NET MVCではCSRF対策が超簡単です。
+ViewのFormの中でRazorの@Html.AntiForgeryToken()を呼ぶだけでトークンを埋め込むことが出来ます。
+トークンを検証するにはControllerでActionMethodの属性にValidationAntiForgeryTokneを指定するだけです。
+View
+@using (Html.BeginForm()){ @Html.AntiForgeryToken() // 略 } Controller
+[ValidationAntiForgeryToken] [HttpPost] public ActionResult Create(ViewModel model){ // 略 } ところが、非同期処理（Ajax）の場合は少々工夫が必要になります。
+非同期処理（Ajax）の場合 Razorでクッキーのトークンとフォームのトークンを発行する関数を作成します。
+作成した関数を呼び、hidden値に設定し、POST時にヘッダに付加してリクエストを送信します。
+View
+&amp;lt;script&amp;gt; @functions{ public string GenerateRequestVerificationToken() { string cookieToken, formToken; AntiForgery.GetTokens(null, out cookieToken, out formToken); return cookieToken + &amp;#34;:&amp;#34; + formToken; } } &amp;lt;/script&amp;gt; &amp;lt;input type=&amp;#34;hidden&amp;#34; id=&amp;#34;requestValificationToken&amp;#34; value=&amp;#34;@GenerateRequestValificationToken()&amp;#34; /&amp;gt; JS
+$.ajax({ url: http://test/Create,  type: &amp;#34;POST&amp;#34;, dataType: &amp;#34;json&amp;#34;, data: { data: hoge }, headers: { &amp;#39;RequestVerificationToken&amp;#39;: $(&amp;#39;#requestVerificationToken&amp;#39;).</description>
+    </item>
+    
+    <item>
       <title>Docker インストール手順</title>
       <link>https://mktkdyt.github.io/post/performance_evaluation/docker%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
@@ -215,7 +235,7 @@ perfMonCreater.bat  logman コマンドでカウンターを作成する。  REM
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
       
       <guid>https://mktkdyt.github.io/post/performance_evaluation/%E3%83%A1%E3%83%88%E3%83%AA%E3%82%AF%E3%82%B9%E7%9B%A3%E8%A6%96%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E6%89%8B%E9%A0%86/</guid>
-      <description>メトリクス監視環境構築手順  JMeter を CUI で実行している際の JMeter のメトリクスを Grafana で可視化する。 Windows Server のメトリクスを Grafana で可視化する。   メトリクス監視環境構築手順  概要 Telegraf  インストール telegraf.conf 起動 サービス化 サービス起動／停止   Docker コンテナ作成  ディレクトリ influxdb.conf docker-compose.yml コンテナ作成 コンテナ停止 コンテナ開始   InfluxDB  動作確認 DB 作成   Grafana  管理者作成 サーバメトリクス取得設定  data source 追加 フォルダ作成 Dashboard 作成   JMeter メトリクス取得設定  data source 追加 Dashboard 追加     JMeter シナリオ編集  Backend Listener 追加      概要    ソフト 内容     InfluxDB 時系列DB。メトリクスをここで収集する。   Grafana 様々なデータソースを可視化するGUIツール。   Telegraf 様々なメトリクスを influxdb に収集するコレクタ。     JMeter のメトリクスを InfluxDB に流し，Grafana で可視化する。  JMeter -&amp;gt; InfluxDB -&amp;gt; Grafana   対象の Windows に Telegraf をインストールし，Telegraf から Windows のメトリクスを InfluxDB に流し，Grafana で可視化する。  Telegraf -&amp;gt; InfluxDB -&amp;gt; Grafana    Telegraf パフォーマンスを見たい Windows にインストールする。</description>
+      <description>メトリクス監視環境構築手順  JMeter を CUI で実行している際の JMeter のメトリクスを Grafana で可視化します。 Windows Server のメトリクスを Grafana で可視化します。   メトリクス監視環境構築手順  概要 Telegraf  インストール telegraf.conf 起動 サービス化 サービス起動／停止   Docker コンテナ作成  ディレクトリ influxdb.conf docker-compose.yml コンテナ作成 コンテナ停止 コンテナ開始   InfluxDB  動作確認 DB 作成   Grafana  管理者作成 サーバメトリクス取得設定  data source 追加 フォルダ作成 Dashboard 作成   JMeter メトリクス取得設定  data source 追加 Dashboard 追加     JMeter シナリオ編集  Backend Listener 追加      概要    ソフト 内容     InfluxDB 時系列 DB です。メトリクスをここで収集します。   Grafana 様々なデータソースを可視化する GUI ツールです。   Telegraf 様々なメトリクスを InfluxDB に収集するコレクタです。     JMeter のメトリクスを InfluxDB に流し，Grafana で可視化します。  JMeter -&amp;gt; InfluxDB -&amp;gt; Grafana   対象の Windows に Telegraf をインストールし，Telegraf から Windows のメトリクスを InfluxDB に流し，Grafana で可視化します。  Telegraf -&amp;gt; InfluxDB -&amp;gt; Grafana    Telegraf パフォーマンスを見たい Windows にインストールします。</description>
     </item>
     
     <item>
