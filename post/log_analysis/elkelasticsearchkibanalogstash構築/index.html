@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ELK(Elasticsearch Kibana Logstash)構築</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">ELK(Elasticsearch Kibana Logstash)構築</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>ELK(Elasticsearch Kibana Logstash)構築</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="elkelasticsearch-kibana-logstash構築">ELK(Elasticsearch Kibana Logstash)構築</h1>
+<h1 id="目次">目次</h1>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li><a href="#%E5%90%84%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2%E6%A6%82%E8%A6%81">各ソフトウェア概要</a></li>
+<li><a href="#docker-%E3%81%A7-elk-%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B">Docker で ELK を構築する</a></li>
+<li><a href="#%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D">動作確認</a></li>
+</ul>
+<!-- raw HTML omitted -->
+<h2 id="各ソフトウェア概要">各ソフトウェア概要</h2>
+<ul>
+<li>処理フローは [Logstash -&gt; Elasticsearch -&gt; Kibana]</li>
+<li>Logstash はデータパイプライン。様々なソースからデータを収集，変換し目的の宛先に送信する。</li>
+<li>Elasticsearch は全文検索エンジン。</li>
+<li>Kibana はデータの可視化ツール。</li>
+</ul>
+<h2 id="docker-で-elk-を構築する">Docker で ELK を構築する</h2>
+<pre><code>&gt; docker-compose up -d
+</code></pre><pre><code>.
+├─docker-compose.yml
+├─elasticsearch
+│  └─data
+└─logstash
+    └─pipeline
+        └─logstash.conf
+</code></pre><p><strong>docker-compose.yml</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3&#34;</span>
+
+<span style="color:#f92672">services</span>:
+  <span style="color:#f92672">elasticsearch</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker.elastic.co/elasticsearch/elasticsearch:7.2.0</span>
+    <span style="color:#f92672">environment</span>:
+      - <span style="color:#ae81ff">discovery.type=single-node</span>
+      - <span style="color:#ae81ff">cluster.name=docker-cluster</span>
+      - <span style="color:#ae81ff">bootstrap.memory_lock=true</span>
+      - <span style="color:#e6db74">&#34;ES_JAVA_OPTS=-Xms512m -Xmx512m&#34;</span>
+    <span style="color:#f92672">ulimits</span>:
+      <span style="color:#f92672">memlock</span>:
+        <span style="color:#f92672">soft</span>: -<span style="color:#ae81ff">1</span>
+        <span style="color:#f92672">hard</span>: -<span style="color:#ae81ff">1</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#ae81ff">9200</span>:<span style="color:#ae81ff">9200</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#ae81ff">./elasticsearch/data:/usr/share/elasticsearch/data</span>
+  <span style="color:#f92672">kibana</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker.elastic.co/kibana/kibana:7.2.0</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#ae81ff">5601</span>:<span style="color:#ae81ff">5601</span>
+  <span style="color:#f92672">logstash</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker.elastic.co/logstash/logstash:7.2.0</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#ae81ff">5044</span>:<span style="color:#ae81ff">5044</span>
+    <span style="color:#f92672">environment</span>:
+      - <span style="color:#e6db74">&#34;LS_JAVA_OPTS=-Xms512m -Xmx512m&#34;</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#ae81ff">./logstash/pipeline:/usr/share/logstash/pipeline</span>
+</code></pre></div><p><strong>logstash.conf</strong></p>
+<pre><code class="language-conf" data-lang="conf">input {
+  heartbeat {
+    interval =&gt; 5
+    message  =&gt; 'Hello from Logstash 💓'
+  }
+}
+
+output {
+  elasticsearch {
+    hosts    =&gt; [ 'elasticsearch' ]
+    user     =&gt; 'elastic'
+    password =&gt; 'changeme'
+  }
+}
+</code></pre><h2 id="動作確認">動作確認</h2>
+<p>Elasticsearch が起動しているかを確認する。</p>
+<pre><code>&gt; wsl curl --noproxy localhost -xget http://localhost:9200
+{
+  &quot;name&quot; : &quot;792d0a1c127d&quot;,
+  &quot;cluster_name&quot; : &quot;docker-cluster&quot;,
+  &quot;cluster_uuid&quot; : &quot;rekmm9rDTEeTR2LfNLDetQ&quot;,
+  &quot;version&quot; : {
+    &quot;number&quot; : &quot;7.2.0&quot;,
+    &quot;build_flavor&quot; : &quot;default&quot;,
+    &quot;build_type&quot; : &quot;docker&quot;,
+    &quot;build_hash&quot; : &quot;508c38a&quot;,
+    &quot;build_date&quot; : &quot;2019-06-20T15:54:18.811730Z&quot;,
+    &quot;build_snapshot&quot; : false,
+    &quot;lucene_version&quot; : &quot;8.0.0&quot;,
+    &quot;minimum_wire_compatibility_version&quot; : &quot;6.8.0&quot;,
+    &quot;minimum_index_compatibility_version&quot; : &quot;6.0.0-beta1&quot;
+  },
+  &quot;tagline&quot; : &quot;You Know, for Search&quot;
+}
+</code></pre><p>http://localhost:5061 にアクセスし Kibana が起動しているかを確認する。</p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
