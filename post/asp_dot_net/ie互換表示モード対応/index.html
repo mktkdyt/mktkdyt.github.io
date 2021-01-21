@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>ASP.NET</title>
+        <title>IE 互換表示モード対応</title>
         
         <style>
 
@@ -54,9 +54,6 @@
 <script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
  <meta name="generator" content="Hugo 0.80.0" />
         
-            <link href="https://mktkdyt.github.io/post/asp_dot_net/index.xml" rel="alternate" type="application/rss&#43;xml" title="mktkdyt" />
-            <link href="https://mktkdyt.github.io/post/asp_dot_net/index.xml" rel="feed" type="application/rss&#43;xml" title="mktkdyt" />
-        
 
         
 
@@ -74,7 +71,7 @@
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand visible-xs" href="#">ASP.NET</a>
+                    <a class="navbar-brand visible-xs" href="#">IE 互換表示モード対応</a>
                     <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
@@ -91,54 +88,38 @@
 
 <main>
 
-    <h2>ASP.NET</h2>
+    <div>
+        <h2>IE 互換表示モード対応</h2>
+        <h5>January 14, 2021</h5>
+        
 
-     <div class="item">
+    </div>
 
-    
-    
-    
-
-    
-    
-
-    <h4><a href="https://mktkdyt.github.io/post/asp_dot_net/ajax%E3%81%AEcsrf%E5%AF%BE%E7%AD%96/">Ajax の CSRF 対策</a></h4>
-    <h5>January 14, 2021</h5>
-    
-
-
-</div>
-  <div class="item">
-
-    
-    
-    
-
-    
-    
-
-    <h4><a href="https://mktkdyt.github.io/post/asp_dot_net/asp.net%E3%81%AE%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E3%82%92jenkins%E3%81%A7%E7%99%BA%E8%A1%8C%E3%81%99%E3%82%8B/">ASP.NET のモジュールを Jenkins で発行する</a></h4>
-    <h5>January 14, 2021</h5>
-    
-
-
-</div>
-  <div class="item">
-
-    
-    
-    
-
-    
-    
-
-    <h4><a href="https://mktkdyt.github.io/post/asp_dot_net/bundle%E3%81%A8minify/">Bundle と Minify</a></h4>
-    <h5>January 14, 2021</h5>
-    
-
-
-</div>
-  <div class="item">
+    <div align="start" class="content"><h1 id="ie-互換表示モード対応">IE 互換表示モード対応</h1>
+<p>各Viewにmetaタグ書くのもあれなので一括でタグ入れられる方法を調べました。</p>
+<h2 id="webconfigによる対応">Web.configによる対応</h2>
+<p>Web.configでカスタムHTTPヘッダを追加します。</p>
+<pre><code>&lt;configuration&gt;
+   &lt;system.webServer&gt;
+      &lt;httpProtocol&gt;
+         &lt;customHeaders&gt;
+            &lt;add name=&quot;X-UA-Compatible&quot; value=&quot;IE=edge&quot; /&gt;
+         &lt;/customHeaders&gt;
+      &lt;/httpProtocol&gt;
+   &lt;/system.webServer&gt;
+&lt;/configuration&gt;
+</code></pre><h2 id="globalasaxによる対応">Global.asaxによる対応</h2>
+<p>レスポンスヘッダに値を追加します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> Application_PreSendRequestHeaders()
+{
+     Response.Headers.Add(<span style="color:#e6db74">&#34;X-UA-Compatible&#34;</span>, <span style="color:#e6db74">&#34;IE=edge&#34;</span>);
+}
+</code></pre></div><p>ちなみにレスポンスヘッダから値を削除する場合は下記の通りです。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs"><span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> Application_PreSendRequestHeaders()
+{
+     Response.Headers.Remove(<span style="color:#e6db74">&#34;key&#34;</span>);
+}
+</code></pre></div></div>
 
     
     
@@ -146,47 +127,8 @@
 
     
     
-
-    <h4><a href="https://mktkdyt.github.io/post/asp_dot_net/ie%E4%BA%92%E6%8F%9B%E8%A1%A8%E7%A4%BA%E3%83%A2%E3%83%BC%E3%83%89%E5%AF%BE%E5%BF%9C/">IE 互換表示モード対応</a></h4>
-    <h5>January 14, 2021</h5>
-    
-
-
-</div>
-  <div class="item">
-
-    
-    
-    
-
-    
-    
-
-    <h4><a href="https://mktkdyt.github.io/post/asp_dot_net/%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%82%B7%E3%83%BC%E3%83%88%E3%82%92%E3%83%90%E3%83%B3%E3%83%89%E3%83%AB%E3%81%99%E3%82%8B%E9%9A%9B%E3%81%AB%E7%94%BB%E5%83%8F%E3%83%91%E3%82%B9%E3%81%AB%E6%B3%A8%E6%84%8F/">スタイルシートをバンドルする際に画像パスに注意</a></h4>
-    <h5>January 14, 2021</h5>
-    
-
-
-</div>
- 
 
 </main>
-
-
-
-<div class="pages">
-
-    
-
-    
-        <a class="icon pages-icon" href="https://mktkdyt.github.io/post/asp_dot_net/page/2/" rel="next">
-            <i class="fa fa-arrow-right"></i>
-        </a>
-    
-
-</div>
-
-
 
         <footer>
             <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>

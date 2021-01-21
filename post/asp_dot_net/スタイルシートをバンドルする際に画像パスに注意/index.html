@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>スタイルシートをバンドルする際に画像パスに注意</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">スタイルシートをバンドルする際に画像パスに注意</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>スタイルシートをバンドルする際に画像パスに注意</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="スタイルシートをバンドルする際に画像パスに注意">スタイルシートをバンドルする際に画像パスに注意</h1>
+<p>またASP.NETのバンドルの話です。</p>
+<h2 id="スタイルシートを何も考えずにまとめてバンドルする">スタイルシートを何も考えずにまとめてバンドルする</h2>
+<p>とりあえずスタイルシートをまとめてみます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs">bundles.Add(<span style="color:#66d9ef">new</span> StyleBundle(<span style="color:#e6db74">&#34;~/bundles/style&#34;</span>).Include(
+    <span style="color:#e6db74">&#34;~/lib/bootstrap/css/bootstrap.min.css&#34;</span>,
+    <span style="color:#e6db74">&#34;~/lib/jquery-ui/jquery-ui.css&#34;</span>,
+    <span style="color:#e6db74">&#34;~/lib/font-awesome/css/font-awesome.css&#34;</span>
+));
+</code></pre></div><p>こうすると3つのスタイルシートは一つにバンドルされます。</p>
+<p>画面でこのスタイルを読み込んでみます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">@using System.Web.Optimization
+<span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+
+&lt;<span style="color:#f92672">html</span>&gt;
+&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;viewport&#34;</span> <span style="color:#a6e22e">content</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;width=device-width&#34;</span> /&gt;
+    &lt;<span style="color:#f92672">title</span>&gt;&lt;/<span style="color:#f92672">title</span>&gt;
+    @Scripts.Render(&#34;~/bundles/scripts&#34;)
+    @Styles.Render(&#34;~/bundles/styles&#34;)
+    &lt;<span style="color:#f92672">script</span>&gt;
+        <span style="color:#a6e22e">$</span>(<span style="color:#66d9ef">function</span> () {
+            <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#34;#hoge&#34;</span>).<span style="color:#a6e22e">dialog</span>();
+        })
+    &lt;/<span style="color:#f92672">script</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+    &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hoge&#34;</span>&gt;閉じるボタンのアイコン見えてる？&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</code></pre></div><p>画面を表示してみます。</p>
+<p><img src="img/icon_nodisp.png" alt=""></p>
+<p>ダイアログのアイコンが表示されていませんね。<br>
+コンソールを見てみるとjquery-uiのアイコンが見つからないと怒られています。</p>
+<p><img src="img/log.png" alt=""></p>
+<p>これはスタイルシートが仮想パスにバンドルされ、バンドル先にimagesが無いのが原因です。<br>
+そこで、実際にスタイルシートが置いてある場所にバンドルするようにします。</p>
+<h2 id="実在パスにあわせてスタイルシートをバンドルする">実在パスにあわせてスタイルシートをバンドルする</h2>
+<p>実際のパスはこんな感じです。  jquery-ui.cssが置かれているフォルダにimagesがあります。</p>
+<p><img src="img/lib.png" alt=""></p>
+<p>では、ソースをこのように修正しましょう。<br>
+パスに&lt;実在パス&gt;/cssのように指定します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cs" data-lang="cs">bundles.Add(<span style="color:#66d9ef">new</span> StyleBundle(<span style="color:#e6db74">&#34;~/lib/jqueryui/css&#34;</span>).Include(<span style="color:#e6db74">&#34;~/lib/jqueryui/jquery-ui.css&#34;</span>));
+bundles.Add(<span style="color:#66d9ef">new</span> StyleBundle(<span style="color:#e6db74">&#34;~/lib/bootstrap/css/css&#34;</span>).Include(<span style="color:#e6db74">&#34;~/lib/bootstrap/css/bootstrap.css&#34;</span>));
+bundles.Add(<span style="color:#66d9ef">new</span> StyleBundle(<span style="color:#e6db74">&#34;~/lib/font-awesome/css/css&#34;</span>).Include(<span style="color:#e6db74">&#34;~/lib/font-awesome/css/font-awesome.css&#34;</span>));
+</code></pre></div><p>後はそれを画面から読み込みます。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">@using System.Web.Optimization
+<span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+
+&lt;<span style="color:#f92672">html</span>&gt;
+&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;viewport&#34;</span> <span style="color:#a6e22e">content</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;width=device-width&#34;</span> /&gt;
+    &lt;<span style="color:#f92672">title</span>&gt;&lt;/<span style="color:#f92672">title</span>&gt;
+    @Scripts.Render(&#34;~/bundles/scripts&#34;)
+    @Styles.Render(&#34;~/lib/jqueryui/css&#34;)
+    @Styles.Render(&#34;~/lib/bootstrap/css/css&#34;)
+    @Styles.Render(&#34;~/lib/font-awesome/css/css&#34;)
+    &lt;<span style="color:#f92672">script</span>&gt;
+        <span style="color:#a6e22e">$</span>(<span style="color:#66d9ef">function</span> () {
+            <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#34;#hoge&#34;</span>).<span style="color:#a6e22e">dialog</span>();
+        })
+    &lt;/<span style="color:#f92672">script</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+    &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hoge&#34;</span>&gt;閉じるボタンのアイコン見えてる？&lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</code></pre></div><p>画面を表示すると、ダイアログのアイコンが表示されていることが確認出来ます。</p>
+<p><img src="img/icon_disp.png" alt=""></p>
+<p>コンソールを見てみると画像を上手く参照出来ていることが分かります。</p>
+<p><img src="img/log2.png" alt=""></p>
+<p>ASP.NETで画像を含むスタイルシートをバンドルする際は個別にバンドルしましょう。</p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

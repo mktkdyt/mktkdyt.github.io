@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>検証属性のエラーメッセージを一元管理する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">検証属性のエラーメッセージを一元管理する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>検証属性のエラーメッセージを一元管理する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="検証属性のエラーメッセージを一元管理する">検証属性のエラーメッセージを一元管理する</h1>
+<h2 id="元々ある検証属性のエラーメッセージを一元管理する場合">元々ある検証属性のエラーメッセージを一元管理する場合</h2>
+<p>検証属性に対応するAttributeAdapterを継承し、エラーメッセージのリソースを指定します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">using</span> Resources;
+<span style="color:#66d9ef">using</span> System.ComponentModel.DataAnnotations;
+<span style="color:#66d9ef">using</span> System.Web.Mvc;
+
+<span style="color:#66d9ef">namespace</span> Sample.CustomAttributeAdapter
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomStringLengthAttributeAdapter</span> : StringLengthAttributeAdapter
+    {
+        <span style="color:#66d9ef">public</span> CustomStringLengthAttributeAdapter(ModelMetadata metadata, ControllerContext context, StringLengthAttribute attribute)
+        : <span style="color:#66d9ef">base</span>(metadata, context, attribute)
+    {
+            <span style="color:#75715e">// 作成したリソースファイルを指定
+</span><span style="color:#75715e"></span>            attribute.ErrorMessageResourceType = <span style="color:#66d9ef">typeof</span>(Messages);
+            <span style="color:#75715e">// リソースファイルに記述した名前を指定
+</span><span style="color:#75715e"></span>            attribute.ErrorMessageResourceName = <span style="color:#e6db74">&#34;PropertyValueStringLength&#34;</span>;
+        }
+    }
+}
+</code></pre></div><p>Global.asaxのapplication_Startでリソースファイルを指定し、作成したアダプターを登録します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">using</span> System.ComponentModel.DataAnnotations;
+<span style="color:#66d9ef">using</span> System.Web;
+<span style="color:#66d9ef">using</span> System.Web.Mvc;
+
+<span style="color:#66d9ef">namespace</span> Sample
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MvcApplication</span> : System.Web.HttpApplication
+    {
+        <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> Application_Start()
+        {
+            <span style="color:#75715e">// 作成したリソース名を設定
+</span><span style="color:#75715e"></span>            DefaultModelBinder.ResourceClassKey = <span style="color:#e6db74">&#34;Messages&#34;</span>;
+            <span style="color:#75715e">// アダプターの設定
+</span><span style="color:#75715e"></span>            DataAnnotationsModelValidatorProvider.RegisterAdapter(
+                <span style="color:#66d9ef">typeof</span>(StringLengthAttribute), <span style="color:#66d9ef">typeof</span>(CustomStringLengthAttributeAdapter));
+        }
+    }
+}
+</code></pre></div><h2 id="自作した検証属性のエラーメッセージを一元管理する場合">自作した検証属性のエラーメッセージを一元管理する場合</h2>
+<p>例えば正しい日付形式かを検証する属性を自作したとします。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">using</span> System.ComponentModel.DataAnnotations;
+<span style="color:#66d9ef">using</span> System.Text.RegularExpressions;
+
+<span style="color:#66d9ef">namespace</span> Sample.CustomValidationAttribute
+{
+    <span style="color:#75715e">/// &lt;summary&gt;
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">/// 入力値が「yyyy/MM/dd」形式であるかを検証します。
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">/// &lt;/summary&gt;
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DateAttribute</span> : ValidationAttribute
+    {
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">bool</span> IsValid(<span style="color:#66d9ef">object</span> <span style="color:#66d9ef">value</span>)
+        {
+            <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">value</span> != <span style="color:#66d9ef">null</span>)
+            {
+                <span style="color:#66d9ef">return</span> Regex.IsMatch(<span style="color:#66d9ef">value</span>.ToString(), <span style="color:#e6db74">@&#34;^(\d{4})/(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])$&#34;</span>);
+            }
+            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+        }
+    }
+}
+</code></pre></div><p>この場合、DataAnnotationsModelValidatorを継承し、エラーメッセージのリソースを指定します。<br>
+自作の場合は、ErrorMessageをnullにしてください。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">using</span> Resources;
+<span style="color:#66d9ef">using</span> System.Web.Mvc;
+<span style="color:#66d9ef">using</span> Sample.CustomValidationAttribute;
+
+<span style="color:#66d9ef">namespace</span> Sample.CustomAttributeAdapter
+{
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomDateAttributeAdapter</span> : DataAnnotationsModelValidator&lt;DateAttribute&gt;
+    {
+        <span style="color:#66d9ef">public</span> CustomDateAttributeAdapter(ModelMetadata metadata, ControllerContext context, DateAttribute attribute)
+        : <span style="color:#66d9ef">base</span>(metadata, context, attribute)
+    {
+            attribute.ErrorMessageResourceType = <span style="color:#66d9ef">typeof</span>(Messages);
+            attribute.ErrorMessageResourceName = <span style="color:#e6db74">&#34;PropertyValueDate&#34;</span>;
+            <span style="color:#75715e">// これをしないと以下の例外
+</span><span style="color:#75715e"></span>            <span style="color:#75715e">// 「*System.InvalidOperationException*System.InvalidOperationException: ErrorMessageString と ErrorMessageResourceName は、どちらか 1 つを設定する必要があります。両方は設定できません。」
+</span><span style="color:#75715e"></span>            attribute.ErrorMessage = <span style="color:#66d9ef">null</span>;
+        }
+    }
+}
+</code></pre></div><p>Global.asaxのapplication_Startでリソースファイルを指定し、作成したアダプターを登録します。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">using</span> Sample.CustomValidationAttribute;
+<span style="color:#66d9ef">using</span> Sample.CustomAttributeAdapter;
+<span style="color:#66d9ef">using</span> System.Web;
+<span style="color:#66d9ef">using</span> System.Web.Mvc;
+
+<span style="color:#66d9ef">namespace</span> Sample
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MvcApplication</span> : System.Web.HttpApplication
+    {
+        <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> Application_Start()
+        {
+            <span style="color:#75715e">// 作成したリソース名を設定
+</span><span style="color:#75715e"></span>            DefaultModelBinder.ResourceClassKey = <span style="color:#e6db74">&#34;Messages&#34;</span>;
+            <span style="color:#75715e">// アダプターの設定
+</span><span style="color:#75715e"></span>            DataAnnotationsModelValidatorProvider.RegisterAdapter(
+                <span style="color:#66d9ef">typeof</span>(DateAttribute), <span style="color:#66d9ef">typeof</span>(CustomDateAttributeAdapter));
+        }
+    }
+}
+</code></pre></div><h2 id="あとがき">あとがき</h2>
+<p>毎度アダプターをGlobal.asaxに書くのもあれなのでConfigを作った方がいいかもしれません。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">using</span> Sample.CustomValidationAttribute;
+<span style="color:#66d9ef">using</span> Sample.CustomAttributeAdapter;
+<span style="color:#66d9ef">using</span> System.ComponentModel.DataAnnotations;
+<span style="color:#66d9ef">using</span> System.Web.Mvc;
+
+<span style="color:#66d9ef">namespace</span> Sample
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AttributeAdapterConfig</span>
+    {
+        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> RegisterAttributeAdapters()
+        {
+            <span style="color:#75715e">// 作成したリソース名を設定
+</span><span style="color:#75715e"></span>            DefaultModelBinder.ResourceClassKey = <span style="color:#e6db74">&#34;Messages&#34;</span>;
+            <span style="color:#75715e">// アダプターの設定
+</span><span style="color:#75715e"></span>            DataAnnotationsModelValidatorProvider.RegisterAdapter(
+                <span style="color:#66d9ef">typeof</span>(StringLengthAttribute), <span style="color:#66d9ef">typeof</span>(CustomStringLengthAttributeAdapter));
+            DataAnnotationsModelValidatorProvider.RegisterAdapter(
+                <span style="color:#66d9ef">typeof</span>(DateAttribute), <span style="color:#66d9ef">typeof</span>(CustomDateAttributeAdapter));
+        }
+    }
+}
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">using</span> System.Web;
+<span style="color:#66d9ef">using</span> System.Web.Mvc;
+
+<span style="color:#66d9ef">namespace</span> Sample
+{
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MvcApplication</span> : System.Web.HttpApplication
+    {
+        <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> Application_Start()
+        {
+            AttributeAdapterConfig.RegisterAttributeAdapters();
+        }
+    }
+}
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

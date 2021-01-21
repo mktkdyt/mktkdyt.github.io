@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ビルド構成毎の Config 変換</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">ビルド構成毎の Config 変換</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>ビルド構成毎の Config 変換</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="ビルド構成毎の-config-変換">ビルド構成毎の Config 変換</h1>
+<p>社内試験環境と本番環境用にWeb.configを書き換えるために調べた。@Visual Studio 2017</p>
+<h2 id="ビルド構成毎の-config-の作成">ビルド構成毎の Config の作成</h2>
+<ol>
+<li>Web.configを右クリックし、Config変換を追加を選択する。</li>
+</ol>
+<p><img src="img/Config%E5%A4%89%E6%8F%9B%E3%82%92%E8%BF%BD%E5%8A%A0.png" alt="Config変換を追加.png"></p>
+<p>ビルド構成毎にWeb.configが作成される。<br>
+<img src="img/WebConfig.png" alt="WebConfig.png"></p>
+<h2 id="ビルド構成毎に-config-を書き換える">ビルド構成毎に Config を書き換える</h2>
+<p>ビルド構成毎にWebServiceの参照先を変更したい場合があると思います。</p>
+<p>ローカルでは <a href="http://hoge.co.jp">http://hoge.co.jp</a> 、配備先では <a href="http://fuga.co.jp">http://fuga.co.jp</a> としたい場合、configを下記のように設定します。</p>
+<p>Web.config</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp">&lt;?xml version=<span style="color:#e6db74">&#34;1.0&#34;</span> encoding=<span style="color:#e6db74">&#34;utf-8&#34;</span>?&gt;
+&lt;configuration&gt;
+  &lt;appSettings&gt;
+    &lt;<span style="color:#66d9ef">add</span> key=<span style="color:#e6db74">&#34;WebServiceUrl&#34;</span> <span style="color:#66d9ef">value</span>=<span style="color:#e6db74">&#34;http://hoge.co.jp&#34;</span>/&gt;
+  &lt;/appSettings&gt;
+&lt;/configuration&gt;
+</code></pre></div><p>Web.Dev.Config</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp">&lt;?xml version=<span style="color:#e6db74">&#34;1.0&#34;</span> encoding=<span style="color:#e6db74">&#34;utf-8&#34;</span>?&gt;
+&lt;configuration xmlns:xdt=<span style="color:#e6db74">&#34;http://schemas.microsoft.com/XML-Document-Transform&#34;</span>&gt;
+  &lt;appSettings xdt:Transform=<span style="color:#e6db74">&#34;Replace&#34;</span>&gt;
+    &lt;<span style="color:#66d9ef">add</span> key=<span style="color:#e6db74">&#34;WebServiceUrl&#34;</span> <span style="color:#66d9ef">value</span>=<span style="color:#e6db74">&#34;http://fuga.co.jp&#34;</span>/&gt;
+  &lt;/appSettings&gt;
+&lt;/configuration&gt;
+</code></pre></div><p>実際に構成をDevに設定し、ビルドするとWeb.configが書き換えられます。</p>
+<p>Web.config</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp">&lt;?xml version=<span style="color:#e6db74">&#34;1.0&#34;</span> encoding=<span style="color:#e6db74">&#34;utf-8&#34;</span>?&gt;
+&lt;configuration&gt;
+  &lt;appSettings&gt;
+    &lt;<span style="color:#66d9ef">add</span> key=<span style="color:#e6db74">&#34;WebServiceUrl&#34;</span> <span style="color:#66d9ef">value</span>=<span style="color:#e6db74">&#34;http://fuga.co.jp&#34;</span>/&gt;
+  &lt;/appSettings&gt;
+&lt;/configuration&gt;
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
