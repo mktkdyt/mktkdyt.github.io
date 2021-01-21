@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Filebeat で IIS ログの更新を検知し Logstash で Elasticsearch に投入し Kibana で可視化する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Filebeat で IIS ログの更新を検知し Logstash で Elasticsearch に投入し Kibana で可視化する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Filebeat で IIS ログの更新を検知し Logstash で Elasticsearch に投入し Kibana で可視化する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="filebeat-で-iis-ログの更新を検知し-logstash-で-elasticsearch-に投入し-kibana-で可視化する">Filebeat で IIS ログの更新を検知し Logstash で Elasticsearch に投入し Kibana で可視化する</h1>
+<h1 id="目次">目次</h1>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li><a href="#%E6%A6%82%E8%A6%81">概要</a></li>
+<li><a href="#filebeat-%E3%81%A7-iis-%E3%83%AD%E3%82%B0%E3%82%92%E5%8F%8E%E9%9B%86%E3%81%97-logstash-%E3%81%AB%E6%B8%A1%E3%81%99">Filebeat で IIS ログを収集し Logstash に渡す</a>
+<ul>
+<li><a href="#filebeat-%E3%81%AE%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E4%BF%AE%E6%AD%A3">Filebeat の設定ファイル修正</a></li>
+<li><a href="#%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E8%B5%B7%E5%8B%95">サービス起動</a></li>
+</ul>
+</li>
+<li><a href="#logstash-%E3%81%A7-filebeat-%E3%81%8B%E3%82%89-iis-%E3%83%AD%E3%82%B0%E3%82%92%E5%8F%97%E3%81%91%E5%8F%96%E3%82%8A%E5%8A%A0%E5%B7%A5%E3%81%97-elasticsearch-%E3%81%AB%E6%8A%95%E5%85%A5%E3%81%99%E3%82%8B">Logstash で Filebeat から IIS ログを受け取り加工し Elasticsearch に投入する</a>
+<ul>
+<li><a href="#logstash-%E3%81%AE%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E4%BF%AE%E6%AD%A3">Logstash の設定ファイル修正</a></li>
+<li><a href="#iis-%E3%83%AD%E3%82%B0%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92%E7%BD%AE%E3%81%8F">IIS ログファイルを置く</a></li>
+</ul>
+</li>
+<li><a href="#kibana-%E3%81%A7%E5%8F%AF%E8%A6%96%E5%8C%96%E3%81%99%E3%82%8B">Kibana で可視化する</a>
+<ul>
+<li><a href="#elasticsearch-%E3%81%AE-index-%E7%A2%BA%E8%AA%8D">Elasticsearch の Index 確認</a></li>
+<li><a href="#kibana-%E3%81%AE-index-pattern-%E4%BD%9C%E6%88%90">Kibana の Index Pattern 作成</a></li>
+<li><a href="#%E3%82%B0%E3%83%A9%E3%83%95%E4%BD%9C%E6%88%90">グラフ作成</a></li>
+</ul>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<h2 id="概要">概要</h2>
+<p><img src="img/elkb.png" alt="img/elkb.png"></p>
+<ul>
+<li>Filebeat で IIS ログを監視し更新が発生したら Logstash に渡す。</li>
+<li>Logstash で IIS ログを JSON に変換し Elasticsearch に投入する。</li>
+<li>Kibana で Elasticsearch に格納された IIS　ログを可視化する。</li>
+</ul>
+<p><strong>Kibana ダッシュボード</strong></p>
+<p><img src="img/kibana_dashboard.png" alt="img/kibana_dashboard.png"></p>
+<h2 id="filebeat-で-iis-ログを収集し-logstash-に渡す">Filebeat で IIS ログを収集し Logstash に渡す</h2>
+<h3 id="filebeat-の設定ファイル修正">Filebeat の設定ファイル修正</h3>
+<p>filebeat.yml を修正する。</p>
+<p><strong>filebeat.yml</strong></p>
+<ul>
+<li>パスに IIS ログを指定する。</li>
+<li>除外対象行に 先頭が # の行，HealthChecker を指定する。</li>
+<li>送信先を Logstash にする。
+<ul>
+<li>今回は同じマシンに Filebeat と Logstash が同居している。</li>
+</ul>
+</li>
+<li>デフォルトで有効になっている Elasticsearch への出力を無効にする</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e">#=========================== Filebeat inputs =============================</span>
+<span style="color:#f92672">filebeat.inputs</span>:
+
+<span style="color:#75715e"># Each - is an input. Most options can be set at the input level, so</span>
+<span style="color:#75715e"># you can use different inputs for various configurations.</span>
+<span style="color:#75715e"># Below are the input specific configurations.</span>
+
+- <span style="color:#f92672">type</span>: <span style="color:#ae81ff">log</span>
+
+  <span style="color:#75715e"># Change to true to enable this input configuration.</span>
+  <span style="color:#f92672">enabled</span>: <span style="color:#66d9ef">true</span>
+
+  <span style="color:#75715e"># Paths that should be crawled and fetched. Glob based paths.</span>
+  <span style="color:#f92672">paths</span>:
+    <span style="color:#75715e">#- /var/log/*.log</span>
+    - <span style="color:#ae81ff">C:\inetpub\logs\LogFiles\W3SVC1\*.log</span>
+
+  <span style="color:#75715e"># Exclude lines. A list of regular expressions to match. It drops the lines that are</span>
+  <span style="color:#75715e"># matching any regular expression from the list.</span>
+  <span style="color:#75715e">#exclude_lines: [&#39;^DBG&#39;]</span>
+  <span style="color:#f92672">exclude_lines</span>: [<span style="color:#e6db74">&#39;^#&#39;</span>,<span style="color:#e6db74">&#39;HealthChecker&#39;</span>]
+
+<span style="color:#75715e"># ---------------------------- Elasticsearch Output ----------------------------</span>
+<span style="color:#75715e"># output.elasticsearch:</span>
+<span style="color:#75715e">#   # Array of hosts to connect to.</span>
+<span style="color:#75715e">#   hosts: [&#34;localhost:9200&#34;]</span>
+
+<span style="color:#75715e">#----------------------------- Logstash output --------------------------------</span>
+<span style="color:#f92672">output.logstash</span>:
+  <span style="color:#75715e"># The Logstash hosts</span>
+  <span style="color:#f92672">hosts</span>: [<span style="color:#e6db74">&#34;localhost:5044&#34;</span>]
+</code></pre></div><h3 id="サービス起動">サービス起動</h3>
+<p>設定ファイルが有効であることを確認し，サービスを開始する。</p>
+<pre><code>&gt; cd 'C:\Program Files\Filebeat\'
+&gt; .\filebeat.exe -e test config
+&gt; Start-Service filebeat
+</code></pre><h2 id="logstash-で-filebeat-から-iis-ログを受け取り加工し-elasticsearch-に投入する">Logstash で Filebeat から IIS ログを受け取り加工し Elasticsearch に投入する</h2>
+<h3 id="logstash-の設定ファイル修正">Logstash の設定ファイル修正</h3>
+<p>logstash.conf を修正する。</p>
+<p><strong>logstash.conf</strong></p>
+<pre><code class="language-conf" data-lang="conf">input {
+# input from Filebeat
+  beats {
+    port =&gt; 5044
+  }
+}
+
+filter {
+  dissect {
+  # log format is TSV
+    mapping =&gt; {
+      &quot;message&quot; =&gt; &quot;%{ts} %{+ts} %{s-sitename} %{s-computername} %{s-ip} %{cs-method} %{cs-uri-stem} %{cs-uri-query} %{s-port} %{cs-username} %{c-ip} %{cs-version} %{cs(User-Agent)} %{cs(Cookie)} %{cs(Referer)} %{cs-host} %{sc-status} %{sc-substatus} %{sc-win32-status} %{sc-bytes} %{cs-bytes} %{time-taken} %{X-Forwarded-For}&quot;
+    }
+  }
+  date {
+    match =&gt; [&quot;ts&quot;, &quot;YYYY-MM-dd HH:mm:ss&quot;]
+    timezone =&gt; &quot;UTC&quot;
+  }
+  ruby {
+    code =&gt; &quot;event.set('[@metadata][local_time]',event.get('[@timestamp]').time.localtime.strftime('%Y-%m-%d'))&quot;
+  }
+  mutate {
+    convert =&gt; { 
+      &quot;sc-bytes&quot; =&gt; &quot;integer&quot;
+      &quot;cs-bytes&quot; =&gt; &quot;integer&quot;
+      &quot;time-taken&quot; =&gt; &quot;integer&quot;
+    }
+    remove_field =&gt; &quot;message&quot;
+  }
+}
+
+output {
+  elasticsearch { 
+    hosts    =&gt; [ 'elasticsearch' ]
+    index =&gt; &quot;iislog-%{[@metadata][local_time]}&quot; 
+  }
+}
+</code></pre><h3 id="iis-ログファイルを置く">IIS ログファイルを置く</h3>
+<p>過去に実施した性能検証時の IIS ログファイルを置くと Filebeat がそれを検知し Logstash に送信する。<br>
+送信されたデータは Logstash で加工され，Elasticsearch に投入される。</p>
+<h2 id="kibana-で可視化する">Kibana で可視化する</h2>
+<h3 id="elasticsearch-の-index-確認">Elasticsearch の Index 確認</h3>
+<p>http://localhost:5601 にアクセスする。</p>
+<p><img src="img/00.png" alt="img/00.png"></p>
+<p>歯車アイコンをクリックし，Elasticsearch/Index Management をクリックする。</p>
+<p><img src="img/01.png" alt="img/01.png"></p>
+<p>IIS ログの Index が作成されていることを確認する。</p>
+<h3 id="kibana-の-index-pattern-作成">Kibana の Index Pattern 作成</h3>
+<p>Kibana/Index Patterns をクリックし，Create Index pattern をクリックする。</p>
+<p><img src="img/04.png" alt="img/04.png"></p>
+<p>Index pattern を入力し Next step をクリックする。</p>
+<p><img src="img/02.png" alt="img/02.png"></p>
+<p>Time Filter field name で @timestamp を選択し Create index pattern をクリックする。</p>
+<p><img src="img/03.png" alt="img/03.png"></p>
+<p>ここで作成した Index pattern を選択しグラフを作成していく。</p>
+<p><img src="img/04.png" alt="img/04.png"></p>
+<h3 id="グラフ作成">グラフ作成</h3>
+<p><img src="img/05.png" alt="img/05.png"></p>
+<p>先ほど作成した Index pattern を指定する。</p>
+<p><img src="img/06.png" alt="img/06.png"></p>
+<p>右上の表示期間を絞り込む。</p>
+<p><img src="img/07.png" alt="img/07.png"></p>
+<p>X 軸を指定する。<br>
+Aggregation を Date Histogram，Field を @timestamp，Minimum interval を Minute とし，▷をクリックする。</p>
+<p><img src="img/08.png" alt="img/08.png"></p>
+<p>これで分間のリクエスト数がグラフに表示された。<br>
+機能ごとの分間リクエスト数を表示するには Add filter をクリックし，Field（フィルターをかけたい項目），Operator（演算子），Value（値） を指定する。</p>
+<p><img src="img/09.png" alt="img/09.png">
+<img src="img/10.png" alt="img/10.png"></p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

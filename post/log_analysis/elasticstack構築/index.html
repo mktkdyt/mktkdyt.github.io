@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Elastic Stack 構築</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Elastic Stack 構築</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Elastic Stack 構築</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="elastic-stack-構築">Elastic Stack 構築</h1>
+<h1 id="目次">目次</h1>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li><a href="#%E5%90%84%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2%E6%A6%82%E8%A6%81">各ソフトウェア概要</a></li>
+<li><a href="#%E5%87%A6%E7%90%86%E3%83%95%E3%83%AD%E3%83%BC">処理フロー</a></li>
+<li><a href="#docker-compose-%E3%81%A7-elastic-stack-%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B">Docker Compose で Elastic Stack を構築する</a>
+<ul>
+<li><a href="#%E6%A7%8B%E6%88%90">構成</a></li>
+<li><a href="#docker-composeyml">docker-compose.yml</a></li>
+<li><a href="#env">.env</a></li>
+<li><a href="#logstashconf">logstash.conf</a></li>
+<li><a href="#filebeatyml">filebeat.yml</a></li>
+<li><a href="#iis-%E3%83%AD%E3%82%B0%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92%E7%BD%AE%E3%81%8F">IIS ログファイルを置く</a></li>
+<li><a href="#kibana-%E3%81%A7%E5%8F%AF%E8%A6%96%E5%8C%96%E3%81%99%E3%82%8B">Kibana で可視化する</a>
+<ul>
+<li><a href="#elasticsearch-%E3%81%AE-index-%E7%A2%BA%E8%AA%8D">Elasticsearch の Index 確認</a></li>
+<li><a href="#kibana-%E3%81%AE-index-pattern-%E4%BD%9C%E6%88%90">Kibana の Index Pattern 作成</a></li>
+<li><a href="#%E3%82%B0%E3%83%A9%E3%83%95%E4%BD%9C%E6%88%90">グラフ作成</a></li>
+<li><a href="#%E3%83%80%E3%83%83%E3%82%B7%E3%83%A5%E3%83%9C%E3%83%BC%E3%83%89%E4%BD%9C%E6%88%90">ダッシュボード作成</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<h2 id="各ソフトウェア概要">各ソフトウェア概要</h2>
+<p><img src="img/elkb.png" alt="img/elkb.png"></p>
+<ul>
+<li>Elastic Stack は Elasticsearch，Kibana，Beats，Logstash からなるプロダクト群のことを指す。</li>
+<li>Beats はデータシッパーと呼ばれ，データ転送ツールとして用いられる。
+<ul>
+<li>自動でファイルの更新を検知し差分を転送してくれる。</li>
+<li>今回は Filebeats を使用する。</li>
+</ul>
+</li>
+<li>Logstash はデータ処パイプラインと呼ばれ，データを取り込み，変換し Elasticsearch に格納することが出来る。</li>
+<li>Elasticsearch は言わずと知れた全文検索エンジン。データ投入時に転置インデックスを作成することで大量のドキュメントを高速に検索出来るようにしている。</li>
+<li>Kibana は Elasticsearch のデータを可視化するツールとして用いられる。</li>
+</ul>
+<h2 id="処理フロー">処理フロー</h2>
+<ul>
+<li>処理フローは [Filebeat -&gt; Logstash -&gt; Elasticsearch -&gt; Kibana]</li>
+<li>Filebeat で IIS ログを監視し，更新を検知したら Logstash に転送する。</li>
+<li>Logstash で tsv を json に変換し，Elasticsearch に投入する。</li>
+<li>Kibana で Elasticsearch のデータを可視化する。</li>
+</ul>
+<h2 id="docker-compose-で-elastic-stack-を構築する">Docker Compose で Elastic Stack を構築する</h2>
+<p>Docker Compose で構築する。　　
+docker-compose.yml があるディレクトリで docker-compose up -d でコンテナを起動する。</p>
+<pre><code>&gt; docker-compose up -d
+</code></pre><h3 id="構成">構成</h3>
+<ul>
+<li>./filebeat/log に IIS ログを格納する。
+<ul>
+<li>コンテナが起動していれば自動で Elasticsearch に投入される。</li>
+</ul>
+</li>
+<li>./filebeat/indexed に取り込んだ IIS ログを格納する。
+<ul>
+<li>コンテナを再起動すると重複して取り込まれるため。</li>
+</ul>
+</li>
+</ul>
+<pre><code>.
+├─docker-compose.yml
+├─.env
+├─elasticsearch
+│  └─data
+├─filebeat
+│  ├─conf
+│  │  └─filebeat.yml
+│  └─log
+│      └─u_exyyyymmdd.log
+│  └─indexed
+│      └─u_exyyyymmdd.log
+└─logstash
+    └─pipeline
+        └─logstash.conf
+</code></pre><h3 id="docker-composeyml">docker-compose.yml</h3>
+<ul>
+<li>Elasticsearch，Kibana，Logstash，Filebeat を構築する。</li>
+<li>Elasticsearch はシングルノードで構築する。</li>
+<li>Elasticsearch のデータを保持できるようボリュームをローカルにマウントする。
+<ul>
+<li>Kibana で作成したグラフやダッシュボードもここに格納される。</li>
+</ul>
+</li>
+<li>Logstash ではローカルの設定ファイルを読み込む。</li>
+<li>Filebeat ではローカルの設定ファイルを読みこむ。</li>
+<li>Filebeat でローカルのログを参照できるようにボリュームをマウントする。</li>
+<li>Filebeat で Docker のソケットを参照するらしいのでマウントする。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3&#34;</span>
+
+<span style="color:#f92672">services</span>:
+  <span style="color:#f92672">elasticsearch</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker.elastic.co/elasticsearch/elasticsearch:7.2.0</span>
+    <span style="color:#f92672">environment</span>:
+      - <span style="color:#ae81ff">discovery.type=single-node</span>
+      - <span style="color:#ae81ff">cluster.name=docker-cluster</span>
+      - <span style="color:#ae81ff">bootstrap.memory_lock=true</span>
+      - <span style="color:#e6db74">&#34;ES_JAVA_OPTS=-Xms4096m -Xmx4096m&#34;</span>
+    <span style="color:#f92672">ulimits</span>:
+      <span style="color:#f92672">memlock</span>:
+        <span style="color:#f92672">soft</span>: -<span style="color:#ae81ff">1</span>
+        <span style="color:#f92672">hard</span>: -<span style="color:#ae81ff">1</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#ae81ff">9200</span>:<span style="color:#ae81ff">9200</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#ae81ff">./elasticsearch/data:/usr/share/elasticsearch/data</span>
+  <span style="color:#f92672">kibana</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker.elastic.co/kibana/kibana:7.2.0</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#ae81ff">5601</span>:<span style="color:#ae81ff">5601</span>
+  <span style="color:#f92672">logstash</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker.elastic.co/logstash/logstash:7.2.0</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#ae81ff">5044</span>:<span style="color:#ae81ff">5044</span>
+    <span style="color:#f92672">environment</span>:
+      - <span style="color:#e6db74">&#34;LS_JAVA_OPTS=-Xms4096m -Xmx4096m&#34;</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#ae81ff">./logstash/pipeline:/usr/share/logstash/pipeline</span>
+  <span style="color:#f92672">filebeat</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">docker.elastic.co/beats/filebeat:7.2.0</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#ae81ff">./filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml</span>
+      - <span style="color:#ae81ff">./filebeat/log:/usr/share/filebeat/log</span>
+      - <span style="color:#ae81ff">/var/run/docker.sock:/var/run/docker.sock</span>
+    <span style="color:#f92672">user</span>: <span style="color:#ae81ff">root</span>
+</code></pre></div><h3 id="env">.env</h3>
+<p>Docker for Windows で /var/run/docker.sock をマウント出来るようにする。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-env" data-lang="env">COMPOSE_CONVERT_WINDOWS_PATHS<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</code></pre></div><h3 id="logstashconf">logstash.conf</h3>
+<ul>
+<li>Filebeat からの転送を受け付けるように input を設定する。</li>
+<li>IIS ログを加工する。</li>
+<li>Elasticsearch に投入出来るよう output を設定する。</li>
+</ul>
+<pre><code class="language-conf" data-lang="conf">input {
+# input from Filebeat
+  beats {
+    port =&gt; 5044
+  }
+}
+
+filter {
+  dissect {
+  # log format is TSV
+    mapping =&gt; {
+      &quot;message&quot; =&gt; &quot;%{ts} %{+ts} %{s-ip} %{cs-method} %{cs-uri-stem} %{cs-uri-query} %{s-port} %{cs-username} %{c-ip} %{cs(User-Agent)} %{cs(Referer)} %{sc-status} %{sc-substatus} %{sc-win32-status} %{time-taken}&quot;
+    }
+  }
+  date {
+    match =&gt; [&quot;ts&quot;, &quot;YYYY-MM-dd HH:mm:ss&quot;]
+    timezone =&gt; &quot;UTC&quot;
+  }
+  ruby {
+    code =&gt; &quot;event.set('[@metadata][local_time]',event.get('[@timestamp]').time.localtime.strftime('%Y-%m-%d'))&quot;
+  }
+  mutate {
+    convert =&gt; { 
+      &quot;sc-bytes&quot; =&gt; &quot;integer&quot;
+      &quot;cs-bytes&quot; =&gt; &quot;integer&quot;
+      &quot;time-taken&quot; =&gt; &quot;integer&quot;
+    }
+    remove_field =&gt; &quot;message&quot;
+  }
+}
+
+output {
+  elasticsearch { 
+    hosts    =&gt; [ 'elasticsearch' ]
+    index =&gt; &quot;iislog-%{[@metadata][local_time]}&quot; 
+  }
+}
+</code></pre><h3 id="filebeatyml">filebeat.yml</h3>
+<ul>
+<li>/usr/share/filebeat/log を参照するように input を設定する。
+<ul>
+<li>実際は ./filebeat/log を /usr/share/filebeat/log にマウントしているので ./filebeat/log に IIS ログを格納すれば Filebeat が自動で参照する。</li>
+</ul>
+</li>
+<li>Logstash に転送するよう output を設定する。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">filebeat.inputs</span>:
+- <span style="color:#f92672">type</span>: <span style="color:#ae81ff">log</span>
+  <span style="color:#f92672">enabled</span>: <span style="color:#66d9ef">true</span>
+  <span style="color:#f92672">paths</span>:
+    - <span style="color:#ae81ff">/usr/share/filebeat/log/*.log</span>
+  <span style="color:#f92672">exclude_lines</span>: [<span style="color:#e6db74">&#39;^#&#39;</span>,<span style="color:#e6db74">&#39;HealthChecker&#39;</span>]
+  
+<span style="color:#f92672">output.logstash</span>:
+  <span style="color:#f92672">hosts</span>: [<span style="color:#e6db74">&#34;logstash:5044&#34;</span>]
+</code></pre></div><h3 id="iis-ログファイルを置く">IIS ログファイルを置く</h3>
+<p>IIS ログファイルを ./filebeat/log に置くと Filebeat がそれを検知し Logstash に送信する。<br>
+送信されたデータは Logstash で加工され，Elasticsearch に投入される。<br>
+取り込まれたら IIS ログファイルを ./filebeat/indexed に退避する。</p>
+<h3 id="kibana-で可視化する">Kibana で可視化する</h3>
+<h4 id="elasticsearch-の-index-確認">Elasticsearch の Index 確認</h4>
+<p>http://localhost:5601 にアクセスする。</p>
+<p><img src="img/00.png" alt="img/00.png"></p>
+<p>歯車アイコンをクリックし，Elasticsearch/Index Management をクリックする。</p>
+<p><img src="img/01.png" alt="img/01.png"></p>
+<p>IIS ログの Index が作成されていることを確認する。</p>
+<h4 id="kibana-の-index-pattern-作成">Kibana の Index Pattern 作成</h4>
+<p>Kibana/Index Patterns をクリックし，Create Index pattern をクリックする。</p>
+<p><img src="img/04.png" alt="img/04.png"></p>
+<p>Index pattern を入力し Next step をクリックする。</p>
+<p><img src="img/02.png" alt="img/02.png"></p>
+<p>Time Filter field name で @timestamp を選択し Create index pattern をクリックする。</p>
+<p><img src="img/03.png" alt="img/03.png"></p>
+<p>ここで作成した Index pattern を選択しグラフを作成していく。</p>
+<p><img src="img/04.png" alt="img/04.png"></p>
+<h4 id="グラフ作成">グラフ作成</h4>
+<p><img src="img/05.png" alt="img/05.png"></p>
+<p>先ほど作成した Index pattern を指定する。</p>
+<p><img src="img/06.png" alt="img/06.png"></p>
+<p>右上の表示期間を絞り込む。</p>
+<p><img src="img/07.png" alt="img/07.png"></p>
+<p>X 軸を指定する。<br>
+Aggregation を Date Histogram，Field を @timestamp，Minimum interval を Minute とし，▷をクリックする。</p>
+<p><img src="img/08.png" alt="img/08.png"></p>
+<p>これで分間のリクエスト数がグラフに表示された。<br>
+機能ごとの分間リクエスト数を表示するには Add filter をクリックし，Field（フィルターをかけたい項目），Operator（演算子），Value（値） を指定する。</p>
+<p><img src="img/09.png" alt="img/09.png">
+<img src="img/10.png" alt="img/10.png"></p>
+<h4 id="ダッシュボード作成">ダッシュボード作成</h4>
+<p>作成したグラフをダッシュボードに並べることが出来る。</p>
+<p><img src="img/kibana_dashboard.png" alt="img/kibana_dashboard.png"></p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
