@@ -48,5 +48,15 @@ version: &amp;#34;3&amp;#34; services: elasticsearch: image: docker.elastic.co/e
 &amp;gt; .\uninstall-service-filebeat.ps1</description>
     </item>
     
+    <item>
+      <title>Kibana のダッシューボードを Excel に出力する</title>
+      <link>https://mktkdyt.github.io/post/log_analysis/kibana%E3%81%AE%E3%83%80%E3%83%83%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89%E3%82%92excel%E3%81%AB%E5%87%BA%E5%8A%9B%E3%81%99%E3%82%8B/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/log_analysis/kibana%E3%81%AE%E3%83%80%E3%83%83%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89%E3%82%92excel%E3%81%AB%E5%87%BA%E5%8A%9B%E3%81%99%E3%82%8B/</guid>
+      <description>Kibana のダッシューボードを Excel に出力する Kibana のダッシュボードを Excel に出力する機能がないのでスクリプトで出力出来るようにした。
+概要  Kibana のグラフは一系列のものであれば CSV 出力することは出来るが，複数系列のもの（Timelion）は出力出来ない。 Kibana は Elasticsearch のデータを可視化しているので，Elasticsearch から直接データを持ってきて Excel に変換すれば自動化出来る。  手順 &amp;gt; wsl $ ./export.sh &amp;#34;2021-01-12T23:45:00.000Z&amp;#34; &amp;#34;2021-01-13T08:30:00.000Z&amp;#34; &amp;#34;20210113&amp;#34; $ ./generate_graph.py &amp;#34;20210113&amp;#34; Elasticsearch からデータを CSV 出力する  curl で Elasticsearch から集計結果を JSON で取得する jq で JSON を csv に変換する 系列が複数ある場合は awk | paste で CSV をマージする  ####################################### # Elasticsearch から Grafana で表示しているデータを抽出し CSV に出力する。 # Globals: # H: Elasticsearch に送信する HTTP リクエストの Content-Type。 # U: Elasticsaerch の URL。 # TIME_HHMM_REGEX: Elasticsearch のレスポンスから時間のみを抜き出す正規表現。 # Arguments: # $1: 検索対象開始日時。日本標準時の9時間前を指定すること。（例：2020-12-13T23:45:00.</description>
+    </item>
+    
   </channel>
 </rss>

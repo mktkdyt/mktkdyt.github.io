@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Kibana のダッシューボードを Excel に出力する</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Kibana のダッシューボードを Excel に出力する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Kibana のダッシューボードを Excel に出力する</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h1 id="kibana-のダッシューボードを-excel-に出力する">Kibana のダッシューボードを Excel に出力する</h1>
+<p>Kibana のダッシュボードを Excel に出力する機能がないのでスクリプトで出力出来るようにした。</p>
+<h2 id="概要">概要</h2>
+<ul>
+<li>Kibana のグラフは一系列のものであれば CSV 出力することは出来るが，複数系列のもの（Timelion）は出力出来ない。</li>
+<li>Kibana は Elasticsearch のデータを可視化しているので，Elasticsearch から直接データを持ってきて Excel に変換すれば自動化出来る。</li>
+</ul>
+<h2 id="手順">手順</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">&gt; wsl
+$ ./export.sh <span style="color:#e6db74">&#34;2021-01-12T23:45:00.000Z&#34;</span> <span style="color:#e6db74">&#34;2021-01-13T08:30:00.000Z&#34;</span> <span style="color:#e6db74">&#34;20210113&#34;</span>
+$ ./generate_graph.py <span style="color:#e6db74">&#34;20210113&#34;</span>
+</code></pre></div><h2 id="elasticsearch-からデータを-csv-出力する">Elasticsearch からデータを CSV 出力する</h2>
+<ul>
+<li>curl で Elasticsearch から集計結果を JSON で取得する</li>
+<li>jq で JSON を csv に変換する</li>
+<li>系列が複数ある場合は awk | paste で CSV をマージする</li>
+</ul>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#######################################</span>
+<span style="color:#75715e"># Elasticsearch から Grafana で表示しているデータを抽出し CSV に出力する。</span>
+<span style="color:#75715e"># Globals:</span>
+<span style="color:#75715e">#   H: Elasticsearch に送信する HTTP リクエストの Content-Type。</span>
+<span style="color:#75715e">#   U: Elasticsaerch の URL。</span>
+<span style="color:#75715e">#   TIME_HHMM_REGEX: Elasticsearch のレスポンスから時間のみを抜き出す正規表現。</span>
+<span style="color:#75715e"># Arguments:</span>
+<span style="color:#75715e">#   $1: 検索対象開始日時。日本標準時の9時間前を指定すること。（例：2020-12-13T23:45:00.000Z）</span>
+<span style="color:#75715e">#   $2: 検索対象終了日時。日本標準時の9時間前を指定すること。（例：2020-12-14T08:30:00.000Z）</span>
+<span style="color:#75715e">#   $3: ディレクトリ名。</span>
+<span style="color:#75715e"># Returns:</span>
+<span style="color:#75715e">#   なし</span>
+<span style="color:#75715e"># Usage:</span>
+<span style="color:#75715e">#   ./export.sh &#34;2020-12-13T23:45:00.000Z&#34; &#34;2020-12-14T08:30:00.000Z&#34; &#34;20201213&#34;</span>
+<span style="color:#75715e">#######################################</span>
+
+H<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Content-Type: application/json&#39;</span>
+U<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;http://localhost:9200/_search?pretty=true&#39;</span>
+TIME_HHMM_REGEX<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;s/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T\([0-9]\{2\}:[0-9]\{2\}\):[0-9]\{2\}\.[0-9]\{3\}+09:00/\1/&#39;</span>
+
+mkdir $3
+
+<span style="color:#75715e">##############</span>
+<span style="color:#75715e"># ログイン数 #</span>
+<span style="color:#75715e">##############</span>
+
+echo <span style="color:#e6db74">&#34;ログイン数のデータを Elasticsearch から取得します。&#34;</span>
+Q<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{&#34;aggs&#34;:{&#34;2&#34;:{&#34;date_histogram&#34;:{&#34;field&#34;:&#34;@timestamp&#34;,&#34;interval&#34;:&#34;1m&#34;,&#34;time_zone&#34;:&#34;Asia/Tokyo&#34;,&#34;min_doc_count&#34;:1}}},&#34;size&#34;:0,&#34;_source&#34;:{&#34;excludes&#34;:[]},&#34;stored_fields&#34;:[&#34;*&#34;],&#34;script_fields&#34;:{},&#34;docvalue_fields&#34;:[{&#34;field&#34;:&#34;@timestamp&#34;,&#34;format&#34;:&#34;date_time&#34;}],&#34;query&#34;:{&#34;bool&#34;:{&#34;must&#34;:[{&#34;match_phrase&#34;:{&#34;cs-uri-stem&#34;:{&#34;query&#34;:&#34;/hoge/login&#34;}}},{&#34;range&#34;:{&#34;@timestamp&#34;:{&#34;format&#34;:&#34;strict_date_optional_time&#34;,&#34;gte&#34;:&#34;&#39;</span>
+Q<span style="color:#f92672">+=</span><span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+Q<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;&#34;,&#34;lte&#34;:&#34;&#39;</span>
+Q<span style="color:#f92672">+=</span><span style="color:#e6db74">&#34;</span>$2<span style="color:#e6db74">&#34;</span>
+Q<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;&#34;}}}],&#34;filter&#34;:[{&#34;match_all&#34;:{}}],&#34;should&#34;:[],&#34;must_not&#34;:[]}},&#34;timeout&#34;:&#34;30000ms&#34;}&#39;</span>
+C<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;login_count.csv&#39;</span>
+touch <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C<span style="color:#e6db74">&#34;</span>
+echo <span style="color:#e6db74">&#34;@timestamp,count&#34;</span> &gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C<span style="color:#e6db74">&#34;</span>
+curl -s -H <span style="color:#e6db74">&#34;</span>$H<span style="color:#e6db74">&#34;</span> -XGET $U -d $Q | jq -r <span style="color:#e6db74">&#39;.aggregations.&#34;2&#34;.buckets[] | [.key_as_string, .doc_count] | @csv&#39;</span> | sed -e $TIME_HHMM_REGEX &gt;&gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C<span style="color:#e6db74">&#34;</span>
+echo <span style="color:#e6db74">&#34;ログイン数のデータを Elasticsearch から取得しました。&#34;</span>
+
+<span style="color:#75715e">########################</span>
+<span style="color:#75715e"># ログイン平均応答時間 #</span>
+<span style="color:#75715e">########################</span>
+
+echo <span style="color:#e6db74">&#34;ログイン平均応答時間のデータを Elasticsearch から取得します。&#34;</span>
+Q<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{&#34;aggs&#34;:{&#34;1&#34;:{&#34;date_histogram&#34;:{&#34;field&#34;:&#34;@timestamp&#34;,&#34;interval&#34;:&#34;1m&#34;,&#34;time_zone&#34;:&#34;Asia/Tokyo&#34;,&#34;min_doc_count&#34;:1},&#34;aggs&#34;:{&#34;1&#34;:{&#34;avg&#34;:{&#34;field&#34;:&#34;time-taken&#34;}}}}},&#34;size&#34;:0,&#34;_source&#34;:{&#34;excludes&#34;:[]},&#34;stored_fields&#34;:[&#34;*&#34;],&#34;script_fields&#34;:{},&#34;docvalue_fields&#34;:[{&#34;field&#34;:&#34;@timestamp&#34;,&#34;format&#34;:&#34;date_time&#34;}],&#34;query&#34;:{&#34;bool&#34;:{&#34;must&#34;:[{&#34;match_phrase&#34;:{&#34;cs-uri-stem&#34;:{&#34;query&#34;:&#34;/hoge/login&#34;}}},{&#34;range&#34;:{&#34;@timestamp&#34;:{&#34;format&#34;:&#34;strict_date_optional_time&#34;,&#34;gte&#34;:&#34;&#39;</span>
+Q<span style="color:#f92672">+=</span><span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+Q<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;&#34;,&#34;lte&#34;:&#34;&#39;</span>
+Q<span style="color:#f92672">+=</span><span style="color:#e6db74">&#34;</span>$2<span style="color:#e6db74">&#34;</span>
+Q<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;&#34;}}}],&#34;filter&#34;:[{&#34;match_all&#34;:{}}],&#34;should&#34;:[],&#34;must_not&#34;:[]}},&#34;timeout&#34;:&#34;30000ms&#34;}&#39;</span>
+C<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;login_avg.csv&#39;</span>
+touch <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C<span style="color:#e6db74">&#34;</span>
+echo <span style="color:#e6db74">&#34;@timestamp,avg-time-taken&#34;</span> &gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C<span style="color:#e6db74">&#34;</span>
+curl -s -H <span style="color:#e6db74">&#34;</span>$H<span style="color:#e6db74">&#34;</span> -XGET $U -d $Q | jq -r <span style="color:#e6db74">&#39;.aggregations.&#34;1&#34;.buckets[] | [.key_as_string, .&#34;1&#34;.value] | @csv&#39;</span> | sed -e $TIME_HHMM_REGEX &gt;&gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C<span style="color:#e6db74">&#34;</span>
+echo <span style="color:#e6db74">&#34;ログイン平均応答時間のデータを Elasticsearch から取得しました。&#34;</span>
+
+<span style="color:#75715e">##########</span>
+<span style="color:#75715e"># 参照数 #</span>
+<span style="color:#75715e">##########</span>
+
+echo <span style="color:#e6db74">&#34;参照数のデータを Elasticsearch から取得します。&#34;</span>
+
+Q1<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{&#34;aggs&#34;:{&#34;2&#34;:{&#34;date_histogram&#34;:{&#34;field&#34;:&#34;@timestamp&#34;,&#34;interval&#34;:&#34;1m&#34;,&#34;time_zone&#34;:&#34;Asia/Tokyo&#34;,&#34;min_doc_count&#34;:1}}},&#34;size&#34;:0,&#34;_source&#34;:{&#34;excludes&#34;:[]},&#34;stored_fields&#34;:[&#34;*&#34;],&#34;script_fields&#34;:{},&#34;docvalue_fields&#34;:[{&#34;field&#34;:&#34;@timestamp&#34;,&#34;format&#34;:&#34;date_time&#34;}],&#34;query&#34;:{&#34;bool&#34;:{&#34;must&#34;:[{&#34;match_phrase&#34;:{&#34;cs-uri-query&#34;:{&#34;query&#34;:&#34;*id=&#39;</span>
+Q2<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;*&#34;}}},{&#34;match_phrase&#34;:{&#34;cs-uri-stem&#34;:{&#34;query&#34;:&#34;/hoge/read&#34;}}},{&#34;range&#34;:{&#34;@timestamp&#34;:{&#34;format&#34;:&#34;strict_date_optional_time&#34;,&#34;gte&#34;:&#34;&#39;</span>
+Q2<span style="color:#f92672">+=</span><span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+Q2<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;&#34;,&#34;lte&#34;:&#34;&#39;</span>
+Q2<span style="color:#f92672">+=</span><span style="color:#e6db74">&#34;</span>$2<span style="color:#e6db74">&#34;</span>
+Q2<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;&#34;}}}],&#34;filter&#34;:[{&#34;match_all&#34;:{}}],&#34;should&#34;:[],&#34;must_not&#34;:[]}},&#34;timeout&#34;:&#34;30000ms&#34;}&#39;</span>
+
+ID<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+C1<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;id1_read_count.csv&#39;</span>
+touch <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">&#34;</span>
+curl -s -H <span style="color:#e6db74">&#34;</span>$H<span style="color:#e6db74">&#34;</span> -XGET $U -d $Q1$ID$Q2 | jq -r <span style="color:#e6db74">&#39;.aggregations.&#34;2&#34;.buckets[] | [.key_as_string, .doc_count] | @csv&#39;</span> | sed -e $TIME_HHMM_REGEX &gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">&#34;</span>
+
+ID<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>
+C2<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;id2_read_count.csv&#39;</span>
+touch <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span>
+curl -s -H <span style="color:#e6db74">&#34;</span>$H<span style="color:#e6db74">&#34;</span> -XGET $U -d $Q1$ID$Q2 | jq -r <span style="color:#e6db74">&#39;.aggregations.&#34;2&#34;.buckets[] | [.key_as_string, .doc_count] | @csv&#39;</span> | sed -e $TIME_HHMM_REGEX &gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span>
+
+ID<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>
+C3<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;id3_read_count.csv&#39;</span>
+touch <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span>
+curl -s -H <span style="color:#e6db74">&#34;</span>$H<span style="color:#e6db74">&#34;</span> -XGET $U -d $Q1$ID$Q2 | jq -r <span style="color:#e6db74">&#39;.aggregations.&#34;2&#34;.buckets[] | [.key_as_string, .doc_count] | @csv&#39;</span> | sed -e $TIME_HHMM_REGEX &gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C3<span style="color:#e6db74">&#34;</span>
+
+echo <span style="color:#e6db74">&#34;参照数のデータを Elasticsearch から取得しました。&#34;</span>
+
+<span style="color:#75715e"># CSVマージ</span>
+<span style="color:#75715e"># paste で行単位で結合する</span>
+echo <span style="color:#e6db74">&#34;参照数の CSV をマージします。&#34;</span>
+C<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;read_count.csv&#34;</span>
+echo <span style="color:#e6db74">&#34;@timestamp,</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">,</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">,</span>$3<span style="color:#e6db74">/</span>$C3<span style="color:#e6db74">&#34;</span> &gt; $3/$C
+join -o 1.1 1.2 2.2 -t, -a <span style="color:#ae81ff">1</span> <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span> &gt; tmp1_read_count.csv
+join -o 1.1 1.2 1.3 2.2 -t, -a <span style="color:#ae81ff">1</span> tmp1_read_count.csv <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C3<span style="color:#e6db74">&#34;</span> &gt;&gt; $3/$C
+rm tmp*.csv
+rm <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">&#34;</span>
+rm <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span>
+rm <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C3<span style="color:#e6db74">&#34;</span>
+echo <span style="color:#e6db74">&#34;参照数の CSV をマージしました。&#34;</span>
+
+<span style="color:#75715e">####################</span>
+<span style="color:#75715e"># 参照平均応答時間 #</span>
+<span style="color:#75715e">####################</span>
+
+echo <span style="color:#e6db74">&#34;参照平均応答時間のデータを Elasticsearch から取得します。&#34;</span>
+
+Q1<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{&#34;aggs&#34;:{&#34;1&#34;:{&#34;date_histogram&#34;:{&#34;field&#34;:&#34;@timestamp&#34;,&#34;interval&#34;:&#34;1m&#34;,&#34;time_zone&#34;:&#34;Asia/Tokyo&#34;,&#34;min_doc_count&#34;:1},&#34;aggs&#34;:{&#34;1&#34;:{&#34;avg&#34;:{&#34;field&#34;:&#34;time-taken&#34;}}}}},&#34;size&#34;:0,&#34;_source&#34;:{&#34;excludes&#34;:[]},&#34;stored_fields&#34;:[&#34;*&#34;],&#34;script_fields&#34;:{},&#34;docvalue_fields&#34;:[{&#34;field&#34;:&#34;@timestamp&#34;,&#34;format&#34;:&#34;date_time&#34;}],&#34;query&#34;:{&#34;bool&#34;:{&#34;must&#34;:[{&#34;match_phrase&#34;:{&#34;cs-uri-query&#34;:{&#34;query&#34;:&#34;*id=&#39;</span>
+Q2<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;*&#34;}}},{&#34;match_phrase&#34;:{&#34;cs-uri-stem&#34;:{&#34;query&#34;:&#34;/hoge/read&#34;}}},{&#34;range&#34;:{&#34;@timestamp&#34;:{&#34;format&#34;:&#34;strict_date_optional_time&#34;,&#34;gte&#34;:&#34;&#39;</span>
+Q2<span style="color:#f92672">+=</span><span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+Q2<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;&#34;,&#34;lte&#34;:&#34;&#39;</span>
+Q2<span style="color:#f92672">+=</span><span style="color:#e6db74">&#34;</span>$2<span style="color:#e6db74">&#34;</span>
+Q2<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;&#34;}}}],&#34;filter&#34;:[{&#34;match_all&#34;:{}}],&#34;should&#34;:[],&#34;must_not&#34;:[]}},&#34;timeout&#34;:&#34;30000ms&#34;}&#39;</span>
+
+ID<span style="color:#f92672">=</span><span style="color:#ae81ff">37</span>
+C1<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;id1_read_avg.csv&#39;</span>
+touch <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">&#34;</span>
+curl -s -H <span style="color:#e6db74">&#34;</span>$H<span style="color:#e6db74">&#34;</span> -XGET $U -d $Q1$ID$Q2 | jq -r <span style="color:#e6db74">&#39;.aggregations.&#34;1&#34;.buckets[] | [.key_as_string, .&#34;1&#34;.value] | @csv&#39;</span> | sed -e $TIME_HHMM_REGEX &gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">&#34;</span>
+
+ID<span style="color:#f92672">=</span><span style="color:#ae81ff">38</span>
+C2<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;id2_read_avg.csv&#39;</span>
+touch <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span>
+curl -s -H <span style="color:#e6db74">&#34;</span>$H<span style="color:#e6db74">&#34;</span> -XGET $U -d $Q1$ID$Q2 | jq -r <span style="color:#e6db74">&#39;.aggregations.&#34;1&#34;.buckets[] | [.key_as_string, .&#34;1&#34;.value] | @csv&#39;</span> | sed -e $TIME_HHMM_REGEX &gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span>
+
+ID<span style="color:#f92672">=</span><span style="color:#ae81ff">39</span>
+C3<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;id3_read_avg.csv&#39;</span>
+touch <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span>
+curl -s -H <span style="color:#e6db74">&#34;</span>$H<span style="color:#e6db74">&#34;</span> -XGET $U -d $Q1$ID$Q2 | jq -r <span style="color:#e6db74">&#39;.aggregations.&#34;1&#34;.buckets[] | [.key_as_string, .&#34;1&#34;.value] | @csv&#39;</span> | sed -e $TIME_HHMM_REGEX &gt; <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C3<span style="color:#e6db74">&#34;</span>
+
+<span style="color:#75715e"># CSVマージ</span>
+<span style="color:#75715e"># paste で行単位で結合する</span>
+echo <span style="color:#e6db74">&#34;参照平均応答時間の CSV をマージします。&#34;</span>
+C<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;read_avg.csv&#34;</span>
+echo <span style="color:#e6db74">&#34;@timestamp,</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">,</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">,</span>$3<span style="color:#e6db74">/</span>$C3<span style="color:#e6db74">&#34;</span> &gt; $3/$C
+join -o 1.1 1.2 2.2 -t, -a <span style="color:#ae81ff">1</span> <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span> &gt; tmp1_read_avg.csv
+join -o 1.1 1.2 1.3 2.2 -t, -a <span style="color:#ae81ff">1</span> tmp1_read_avg.csv <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C3<span style="color:#e6db74">&#34;</span> &gt;&gt; $3/$C
+
+rm tmp*.csv
+rm <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C1<span style="color:#e6db74">&#34;</span>
+rm <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C2<span style="color:#e6db74">&#34;</span>
+rm <span style="color:#e6db74">&#34;</span>$3<span style="color:#e6db74">/</span>$C3<span style="color:#e6db74">&#34;</span>
+
+echo <span style="color:#e6db74">&#34;参照平均応答時間の CSV をマージしました。&#34;</span>
+</code></pre></div><!-- raw HTML omitted -->
+<h2 id="csv-から-excel-でグラフ出力する">CSV から Excel でグラフ出力する</h2>
+<ul>
+<li>openpyxl でワークブックを作成する</li>
+<li>pandas で csv を読み込みシートに貼る</li>
+<li>openpyxl でグラフを描画する</li>
+</ul>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e">#!/usr/bin/env python3</span>
+<span style="color:#75715e"># coding: UTF-8</span>
+
+<span style="color:#e6db74">&#34;&#34;&#34;
+</span><span style="color:#e6db74">Elasticsearch から出力した CSV を Excel のグラフに変換する。
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">Parameters
+</span><span style="color:#e6db74">----------
+</span><span style="color:#e6db74">args[1] : str
+</span><span style="color:#e6db74">    Elasticsearch から出力した CSV のディレクトリ。
+</span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+
+<span style="color:#f92672">import</span> pandas <span style="color:#f92672">as</span> pd
+<span style="color:#f92672">import</span> openpyxl <span style="color:#f92672">as</span> px
+<span style="color:#f92672">from</span> openpyxl.chart <span style="color:#f92672">import</span> BarChart,LineChart, Reference, Series
+<span style="color:#f92672">import</span> sys
+
+<span style="color:#75715e"># 第一引数にディレクトリ名が入る</span>
+args <span style="color:#f92672">=</span> sys<span style="color:#f92672">.</span>argv
+
+OUTPUT_FILE_PATH <span style="color:#f92672">=</span> f<span style="color:#e6db74">&#39;{args[1]}/kibana.xlsx&#39;</span>
+INDEX_SHEET_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;index&#39;</span>
+LEGENDS <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;id1&#39;</span>, <span style="color:#e6db74">&#39;id2&#39;</span>, <span style="color:#e6db74">&#39;id3&#39;</span>]
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">init</span>():
+    wb <span style="color:#f92672">=</span> px<span style="color:#f92672">.</span>Workbook()
+    ws <span style="color:#f92672">=</span> wb<span style="color:#f92672">.</span>active
+    ws<span style="color:#f92672">.</span>title <span style="color:#f92672">=</span> INDEX_SHEET_NAME
+    wb<span style="color:#f92672">.</span>save(OUTPUT_FILE_PATH)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generate_graph</span>(csv, sheet_name, graph_title, x_axis_title, x_axis_format, y_axis_title, legends, graph_position, height, width, is_bar, is_stack):
+    <span style="color:#e6db74">&#34;&#34;&#34;
+</span><span style="color:#e6db74">    凡例数分折れ線グラフを生成します。
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#39;グラフ {graph_title} を生成します。&#39;</span>)
+    <span style="color:#75715e"># pandas で csv を読み込む</span>
+    inputDf <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(csv, engine<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;python&#39;</span>, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;utf-8&#39;</span>)
+    
+    <span style="color:#75715e"># pandas で csv を Excel に書き込む</span>
+    <span style="color:#66d9ef">with</span> pd<span style="color:#f92672">.</span>ExcelWriter(OUTPUT_FILE_PATH) <span style="color:#66d9ef">as</span> writer:
+        writer<span style="color:#f92672">.</span>book <span style="color:#f92672">=</span> px<span style="color:#f92672">.</span>load_workbook(OUTPUT_FILE_PATH)
+        inputDf<span style="color:#f92672">.</span>to_excel(writer, sheet_name<span style="color:#f92672">=</span>sheet_name, index<span style="color:#f92672">=</span>False)
+        writer<span style="color:#f92672">.</span>save()
+    
+    <span style="color:#75715e"># openpyxl で Excel を操作する</span>
+    wb <span style="color:#f92672">=</span> px<span style="color:#f92672">.</span>load_workbook(OUTPUT_FILE_PATH)
+    ws <span style="color:#f92672">=</span> wb[sheet_name]
+    
+    <span style="color:#75715e"># openpyxl でグラフを作成する</span>
+    <span style="color:#66d9ef">if</span> is_bar:
+      chart <span style="color:#f92672">=</span> BarChart()
+      <span style="color:#66d9ef">if</span> is_stack:
+        chart<span style="color:#f92672">.</span>grouping <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stacked&#34;</span>
+    <span style="color:#66d9ef">else</span>:
+      chart <span style="color:#f92672">=</span> LineChart()
+    chart<span style="color:#f92672">.</span>title <span style="color:#f92672">=</span> graph_title
+    chart<span style="color:#f92672">.</span>height <span style="color:#f92672">=</span> height
+    chart<span style="color:#f92672">.</span>width <span style="color:#f92672">=</span> width
+
+    <span style="color:#75715e"># y軸設定</span>
+    <span style="color:#66d9ef">for</span> i, legend <span style="color:#f92672">in</span> enumerate(legends):
+        y_values <span style="color:#f92672">=</span> Reference(ws, min_col<span style="color:#f92672">=</span>i<span style="color:#f92672">+</span><span style="color:#ae81ff">2</span>, min_row<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, max_row<span style="color:#f92672">=</span>len(inputDf))
+        s <span style="color:#f92672">=</span> Series(y_values, title<span style="color:#f92672">=</span>legend)
+        chart<span style="color:#f92672">.</span>append(s)
+    chart<span style="color:#f92672">.</span>y_axis<span style="color:#f92672">.</span>title <span style="color:#f92672">=</span> y_axis_title
+
+    <span style="color:#75715e"># x軸設定</span>
+    x_values <span style="color:#f92672">=</span> Reference(ws, min_col<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, min_row<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, max_row<span style="color:#f92672">=</span>len(inputDf))
+    chart<span style="color:#f92672">.</span>set_categories(x_values)
+    chart<span style="color:#f92672">.</span>x_axis<span style="color:#f92672">.</span>title <span style="color:#f92672">=</span> x_axis_title
+    chart<span style="color:#f92672">.</span>x_axis<span style="color:#f92672">.</span>number_format <span style="color:#f92672">=</span> x_axis_format
+    <span style="color:#75715e"># グラフ作成</span>
+    wb[INDEX_SHEET_NAME]<span style="color:#f92672">.</span>add_chart(chart, graph_position)
+    wb<span style="color:#f92672">.</span>save(OUTPUT_FILE_PATH)
+
+    <span style="color:#66d9ef">print</span>(f<span style="color:#e6db74">&#39;グラフ {graph_title} を生成しました。&#39;</span>)
+
+
+init()
+generate_graph(csv<span style="color:#f92672">=</span>f<span style="color:#e6db74">&#39;{args[1]}/login_count.csv&#39;</span>, sheet_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ログイン数&#39;</span>, graph_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ログイン数&#39;</span>, x_axis_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;計測時刻&#39;</span>, x_axis_format<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;hh:mm&#39;</span>, y_axis_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;リクエスト数&#39;</span>, legends<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;リクエスト数&#39;</span>], graph_position<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;A1&#39;</span>, height<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>, width<span style="color:#f92672">=</span><span style="color:#ae81ff">15</span>, is_bar<span style="color:#f92672">=</span>True, is_stack<span style="color:#f92672">=</span>False)
+generate_graph(csv<span style="color:#f92672">=</span>f<span style="color:#e6db74">&#39;{args[1]}/login_avg.csv&#39;</span>, sheet_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ログイン平均応答時間&#39;</span>, graph_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ログイン平均応答時間&#39;</span>, x_axis_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;計測時刻&#39;</span>, x_axis_format<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;hh:mm&#39;</span>, y_axis_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;平均応答時間 / ms&#39;</span>, legends<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;平均応答時間&#39;</span>], graph_position<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;K1&#39;</span>, height<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>, width<span style="color:#f92672">=</span><span style="color:#ae81ff">15</span>, is_bar<span style="color:#f92672">=</span>False, is_stack<span style="color:#f92672">=</span>False)
+
+generate_graph(csv<span style="color:#f92672">=</span>f<span style="color:#e6db74">&#39;{args[1]}/read_count.csv&#39;</span>, sheet_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;参照数&#39;</span>, graph_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;参照数&#39;</span>, x_axis_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;計測時刻&#39;</span>, x_axis_format<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;hh:mm&#39;</span>, y_axis_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;リクエスト数&#39;</span>, legends<span style="color:#f92672">=</span>LEGENDS, graph_position<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;A22&#39;</span>, height<span style="color:#f92672">=</span><span style="color:#ae81ff">20</span>, width<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>, is_bar<span style="color:#f92672">=</span>True, is_stack<span style="color:#f92672">=</span>True)
+generate_graph(csv<span style="color:#f92672">=</span>f<span style="color:#e6db74">&#39;{args[1]}/read_avg.csv&#39;</span>, sheet_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;参照平均応答時間&#39;</span>, graph_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;参照平均応答時間&#39;</span>, x_axis_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;計測時刻&#39;</span>, x_axis_format<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;hh:mm&#39;</span>, y_axis_title<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;平均応答時間 / ms&#39;</span>, legends<span style="color:#f92672">=</span>LEGENDS, graph_position<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;K22&#39;</span>, height<span style="color:#f92672">=</span><span style="color:#ae81ff">20</span>, width<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>, is_bar<span style="color:#f92672">=</span>False, is_stack<span style="color:#f92672">=</span>False)
+
+</code></pre></div><!-- raw HTML omitted -->
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
