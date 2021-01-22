@@ -168,14 +168,14 @@ WinRM セキュリティの構成。
 &gt; $cred = New-Object System.Management.Automation.PSCredential($id, $securePassword)
 &gt; Enter-PSSession -ComputerName $targetHost -Credential $cred
 </code></pre></div><p>上記をスクリプトとして保存すればコマンドですぐ呼び出せる。</p>
-<p>EnablePSSessionToShimakaze.ps1</p>
+<p>EnablePSSession.ps1</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">$targetHost = <span style="color:#e6db74">&#34;host&#34;</span>
 $id = <span style="color:#e6db74">&#34;user&#34;</span>
 $password = <span style="color:#e6db74">&#34;password&#34;</span>
 $securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential($id, $securePassword)
 Enter-PSSession -ComputerName $targetHost -Credential $cred
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">&gt; .\EnablePSSessionToShimakaze.ps1
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">&gt; .\EnablePSSession.ps1
 </code></pre></div><h2 id="ホストから切断">ホストから切断</h2>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ps1" data-lang="ps1">&gt; Exit-PSSession
 </code></pre></div></div>

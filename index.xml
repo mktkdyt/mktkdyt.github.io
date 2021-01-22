@@ -134,15 +134,6 @@ version: &amp;#34;3&amp;#34; services: elasticsearch: image: docker.elastic.co/e
     </item>
     
     <item>
-      <title>GIS</title>
-      <link>https://mktkdyt.github.io/post/gis/</link>
-      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
-      
-      <guid>https://mktkdyt.github.io/post/gis/</guid>
-      <description> OpenLayers  </description>
-    </item>
-    
-    <item>
       <title>IE 互換表示モード対応</title>
       <link>https://mktkdyt.github.io/post/asp_dot_net/ie%E4%BA%92%E6%8F%9B%E8%A1%A8%E7%A4%BA%E3%83%A2%E3%83%BC%E3%83%89%E5%AF%BE%E5%BF%9C/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
