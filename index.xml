@@ -134,6 +134,15 @@ version: &amp;#34;3&amp;#34; services: elasticsearch: image: docker.elastic.co/e
     </item>
     
     <item>
+      <title>GIS</title>
+      <link>https://mktkdyt.github.io/post/gis/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/gis/</guid>
+      <description> OpenLayers  </description>
+    </item>
+    
+    <item>
       <title>IE 互換表示モード対応</title>
       <link>https://mktkdyt.github.io/post/asp_dot_net/ie%E4%BA%92%E6%8F%9B%E8%A1%A8%E7%A4%BA%E3%83%A2%E3%83%BC%E3%83%89%E5%AF%BE%E5%BF%9C/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
@@ -187,6 +196,42 @@ language=jalocales.add=jajmeter.save.saveservice.timestamp_format=yyyy/MM/dd H
       
       <guid>https://mktkdyt.github.io/post/performance_evaluation/logman%E3%81%A7%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%BC%E3%81%AE%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E9%96%8B%E5%A7%8B%E5%81%9C%E6%AD%A2/</guid>
       <description>logmanでパフォーマンスモニターのカウンター開始／停止  logmanでパフォーマンスモニターのカウンター開始／停止  概要 WinRM でクライアントからホストに接続 カウンター一覧 カウンター状態確認 カウンター開始 カウンター停止    概要  WinRM でクライアントからホストに接続する。 logman コマンドでカウンターを開始する。 logman コマンドでカウンターを停止する。  WinRM でクライアントからホストに接続 &amp;gt; $targetHost = &amp;#34;web&amp;#34; &amp;gt; $id = &amp;#34;user&amp;#34; &amp;gt; $password = &amp;#34;password&amp;#34; &amp;gt; $securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force &amp;gt; $cred = New-Object System.Management.Automation.PSCredential($id, $securePassword) &amp;gt; Enter-PSSession -ComputerName $targetHost -Credential $cred カウンター一覧 &amp;gt; logman query データ コレクター セット 種類 状態 ------------------------------------------------------------------------------- GAEvents トレース 実行中 PerfMonWeb カウンター 停止済み RTEvents トレース 実行中 Server Manager Performance Monitor カウンター 停止済み カウンター状態確認 &amp;gt; logman query PerfMonWeb 名前: PerfMonWeb 状態: 実行中 ルート パス: %systemdrive%\PerfLogs\Admin セグメント: オフ スケジュール: オフ 別のユーザーとして実行: SYSTEM 名前: PerfMonWeb\PerfMonWeb 種類: カウンター 出力場所: C:\PerfLogs\Admin\PerfMonWeb_05131446.</description>
+    </item>
+    
+    <item>
+      <title>OpenLayers でアイコン（ポイント）を地図上に表示する</title>
+      <link>https://mktkdyt.github.io/post/openlayers/openlayers%E3%81%A7%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88%E3%82%92%E5%9C%B0%E5%9B%B3%E4%B8%8A%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%99%E3%82%8B/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/openlayers/openlayers%E3%81%A7%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88%E3%82%92%E5%9C%B0%E5%9B%B3%E4%B8%8A%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%99%E3%82%8B/</guid>
+      <description>OpenLayersでアイコン（ポイント）を地図上に表示する ライブラリ参照  OpenLayers の js ライブラリとスタイルシートを参照します。  &amp;lt;link rel=&amp;#34;stylesheet&amp;#34; href=&amp;#34;https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css&amp;#34; type=&amp;#34;text/css&amp;#34;&amp;gt; &amp;lt;script src=&amp;#34;https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; 画面  地図を描画する要素を用意します。  &amp;lt;div id=&amp;#34;map&amp;#34;&amp;gt;&amp;lt;/div&amp;gt; スクリプト  ポイントフィーチャを作成します。 アイコン用のスタイルを定義し，フィーチャのスタイルとして割り当てます。  var center = [130.93, 31.9]; function addIconFeature() { var iconStyle = new ol.style.Style({ image: new ol.style.Icon({ src: &amp;#39;icon.png&amp;#39; }) }); var vectorLayer = new ol.layer.Vector({ source: new ol.source.Vector(), style: iconStyle }); var f = new ol.Feature(new ol.geom.Point(ol.proj.transform(center, &amp;#39;EPSG:4326&amp;#39;, &amp;#39;EPSG:3857&amp;#39;))); f.setStyle(iconStyle); vectorLayer.getSource().addFeature(f); map.addLayer(vectorLayer); } 成果物 下記ソースコードを html ファイルとして保存し，Webブラウザで表示します。</description>
+    </item>
+    
+    <item>
+      <title>OpenLayers で地図を表示する</title>
+      <link>https://mktkdyt.github.io/post/openlayers/openlayers%E3%81%A7%E5%9C%B0%E5%9B%B3%E3%82%92%E8%A1%A8%E7%A4%BA%E3%81%99%E3%82%8B/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/openlayers/openlayers%E3%81%A7%E5%9C%B0%E5%9B%B3%E3%82%92%E8%A1%A8%E7%A4%BA%E3%81%99%E3%82%8B/</guid>
+      <description>OpenLayers で地図を表示する ライブラリ参照  OpenLayers の js ライブラリとスタイルシートを参照します。  &amp;lt;link rel=&amp;#34;stylesheet&amp;#34; href=&amp;#34;https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css&amp;#34; type=&amp;#34;text/css&amp;#34;&amp;gt; &amp;lt;script src=&amp;#34;https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; 画面  地図を描画する要素を用意します。  &amp;lt;div id=&amp;#34;map&amp;#34;&amp;gt;&amp;lt;/div&amp;gt; スクリプト  ベースマップとして OpenStreetMap を用意します。 ol.Map インスタンスを作成します。  target に画面で用意した要素の id を指定します。 layers に地図に表示したいレイヤを追加します。  今回はベースマップを追加します。   view で中心座標やズームレベルを設定します。   DOM構築完了後に地図初期化処理を実行します。  今回は jQuery にしました。    $(function(){ initializeMap(); }); function initializeMap() { const baseMap = new ol.layer.Tile({ source: new ol.source.OSM() }); var map = new ol.</description>
+    </item>
+    
+    <item>
+      <title>OpenLayers で現在の中心座標やズームレベルを表示する</title>
+      <link>https://mktkdyt.github.io/post/openlayers/openlayers%E3%81%A7%E7%8F%BE%E5%9C%A8%E3%81%AE%E4%B8%AD%E5%BF%83%E5%BA%A7%E6%A8%99%E3%82%84%E3%82%BA%E3%83%BC%E3%83%A0%E3%83%AC%E3%83%99%E3%83%AB%E3%82%92%E8%A1%A8%E7%A4%BA%E3%81%99%E3%82%8B/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/openlayers/openlayers%E3%81%A7%E7%8F%BE%E5%9C%A8%E3%81%AE%E4%B8%AD%E5%BF%83%E5%BA%A7%E6%A8%99%E3%82%84%E3%82%BA%E3%83%BC%E3%83%A0%E3%83%AC%E3%83%99%E3%83%AB%E3%82%92%E8%A1%A8%E7%A4%BA%E3%81%99%E3%82%8B/</guid>
+      <description>OpenLayers で現在の中心座標やズームレベルを表示する ライブラリ参照  OpenLayers の js ライブラリとスタイルシートを参照します。 jQuery，Knockout の js ライブラリも参照します。  &amp;lt;link rel=&amp;#34;stylesheet&amp;#34; href=&amp;#34;https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css&amp;#34; type=&amp;#34;text/css&amp;#34;&amp;gt; &amp;lt;script src=&amp;#34;https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;script src=&amp;#34;https://code.jquery.com/jquery-3.5.1.min.js&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;script src=&amp;#34;https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.min.js&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; 画面  地図を描画する要素を用意します。 Knockout でズームレベルや中心座標を表示します。  &amp;lt;div id=&amp;#34;map&amp;#34; class=&amp;#34;map&amp;#34;&amp;gt;&amp;lt;/div&amp;gt; &amp;lt;div class=&amp;#34;map-footer&amp;#34;&amp;gt; &amp;lt;div&amp;gt;Zoom Level: &amp;lt;span data-bind=&amp;#34;text: zoomLevel&amp;#34;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt; &amp;lt;div&amp;gt;Center: &amp;lt;span data-bind=&amp;#34;text: center&amp;#34;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt; &amp;lt;/div&amp;gt; スクリプト  map をグローバル変数とします。 画面に表示するズームレベルや中心座標を ViewModel のプロパティに設定します。 ViewModel を View にバインドします。 map にイベントリスナーを追加します。  地図の移動が完了したら現在の中心座標とズームレベルを取得し，ViewModel のプロパティを更新します。    var map; $(function () { var vm = { zoomLevel: ko.</description>
+    </item>
+    
+    <item>
+      <title>OpenLayers で選択されたフィーチャのスタイルを変える</title>
+      <link>https://mktkdyt.github.io/post/openlayers/openlayers%E3%81%A7%E9%81%B8%E6%8A%9E%E3%81%95%E3%82%8C%E3%81%9F%E3%83%95%E3%82%A3%E3%83%BC%E3%83%81%E3%83%A3%E3%81%AE%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%82%92%E5%A4%89%E3%81%88%E3%82%8B/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/openlayers/openlayers%E3%81%A7%E9%81%B8%E6%8A%9E%E3%81%95%E3%82%8C%E3%81%9F%E3%83%95%E3%82%A3%E3%83%BC%E3%83%81%E3%83%A3%E3%81%AE%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%82%92%E5%A4%89%E3%81%88%E3%82%8B/</guid>
+      <description>OpenLayers で選択されたフィーチャのスタイルを変える ライブラリ参照  OpenLayers の js ライブラリとスタイルシートを参照します。  &amp;lt;link rel=&amp;#34;stylesheet&amp;#34; href=&amp;#34;https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css&amp;#34; type=&amp;#34;text/css&amp;#34;&amp;gt; &amp;lt;script src=&amp;#34;https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; 画面  地図を描画する要素を用意します。  &amp;lt;div id=&amp;#34;map&amp;#34;&amp;gt;&amp;lt;/div&amp;gt; スクリプト  ol.interaction.Select() でフィーチャを選択出来るようになります。 interaction はマップに addInteraction() で追加する必要があります。 getFeatures() で選択されたフィーチャを取得出来るので，スタイルを変える場合はフィーチャが選択された時のイベントハンドラにスタイルを変える処理を実装します。  function initializeSelect() { var select = new ol.interaction.Select(); map.addInteraction(select); var selectedFeatures = select.getFeatures(); selectedFeatures.on([&amp;#39;add&amp;#39;, &amp;#39;remove&amp;#39;], function () { var selectedStyle = new ol.style.Style({ image: new ol.style.Circle({ radius: 8, fill: new ol.style.Fill({ color: &amp;#39;#FF0000&amp;#39; }), stroke: new ol.style.Stroke({ color: &amp;#39;#FFFFFF&amp;#39;, width: 3 }) }) }); var features = selectedFeatures.</description>
     </item>
     
     <item>
