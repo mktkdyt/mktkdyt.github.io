@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Linux 仮想マシン追加</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Linux 仮想マシン追加</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Linux 仮想マシン追加</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h2 id="目次">目次</h2>
+<ul>
+<li><a href="#vm-%E8%BF%BD%E5%8A%A0">VM 追加</a></li>
+<li><a href="#vm-%E6%8E%A5%E7%B6%9A">VM 接続</a></li>
+<li><a href="#%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%B9%E3%83%88%E3%83%AC%E3%83%BC%E3%82%B8%E5%88%A9%E7%94%A8">ファイルストレージ利用</a></li>
+<li><a href="#%E5%8F%82%E8%80%83">参考</a>
+<ul>
+<li><a href="#linux-%E3%81%A7-azure-files-%E3%81%AE%E8%A8%AD%E5%AE%9A">Linux で Azure Files の設定</a></li>
+<li><a href="#linux-%E3%81%A7%E3%83%87%E3%82%A3%E3%82%B9%E3%82%AF%E3%82%B5%E3%82%A4%E3%82%BA%E3%81%AE%E6%8B%A1%E5%BC%B5">Linux でディスクサイズの拡張</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="vm-追加">VM 追加</h2>
+<p>Azure のポータル画面で [Virtual Machines] をクリックし [＋追加] / [＋仮想マシン] をクリックします。</p>
+<p><img src="img/create_linux_vm_00.png" alt="img/create_linux_vm_00.png"></p>
+<p>[基本] で下記内容を入力します。
+${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを，${VirtualMachineName} には仮想マシン名を指定します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>サブスクリプション</td>
+<td>${SubscriptionName}</td>
+</tr>
+<tr>
+<td>リソースグループ</td>
+<td>${ResourceGroupName}</td>
+</tr>
+<tr>
+<td>仮想マシン名</td>
+<td>${VirtualMachineName}</td>
+</tr>
+<tr>
+<td>地域</td>
+<td>東日本</td>
+</tr>
+<tr>
+<td>可用性オプション</td>
+<td>インフラストラクチャ冗長は必要ありません</td>
+</tr>
+<tr>
+<td>イメージ</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>サイズ</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>ユーザー名</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>パスワード</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>パスワードの確認</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>パブリック受信ポート</td>
+<td>なし</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_linux_vm_01.png" alt="img/create_linux_vm_01.png">
+<img src="img/create_linux_vm_02.png" alt="img/create_linux_vm_02.png"></p>
+<p>[ディスク] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OS ディスクの種類</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>暗号化の種類</td>
+<td>規定</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_linux_vm_03.png" alt="img/create_linux_vm_03.png"></p>
+<p>[ネットワーク] で下記内容を入力します。
+${VirtualNetworkName} には仮想ネットワークを，${VirtualMachineName} には仮想マシン名を指定します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>仮想ネットワーク</td>
+<td>${VirtualNetworkName}</td>
+</tr>
+<tr>
+<td>サブネット</td>
+<td>default(10.0.0.0./24)</td>
+</tr>
+<tr>
+<td>パブリック IP</td>
+<td>(新規) ${VirtualMachineName}-ip</td>
+</tr>
+<tr>
+<td>NIC ネットワークセキュリティグループ</td>
+<td>Basic</td>
+</tr>
+<tr>
+<td>パブリック受信ポート</td>
+<td>なし</td>
+</tr>
+<tr>
+<td>高速ネットワーク</td>
+<td>有効</td>
+</tr>
+<tr>
+<td>負荷分散</td>
+<td>無効</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_linux_vm_04.png" alt="img/create_linux_vm_04.png">
+<img src="img/create_linux_vm_05.png" alt="img/create_linux_vm_05.png"></p>
+<p>[管理] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ブート診断</td>
+<td>マネージドストレージアカウントで有効にする (推奨)</td>
+</tr>
+<tr>
+<td>OS のゲスト診断を有効にする</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>システム割当マネージド ID</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>自動シャットダウン</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>バックアップ</td>
+<td>無効</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_linux_vm_06.png" alt="img/create_linux_vm_06.png"></p>
+<p>[詳細] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ホストグループ</td>
+<td></td>
+</tr>
+<tr>
+<td>近接配置グループ</td>
+<td></td>
+</tr>
+<tr>
+<td>VM の生成</td>
+<td>Gen 1</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_linux_vm_07.png" alt="img/create_linux_vm_07.png">
+<img src="img/create_linux_vm_08.png" alt="img/create_linux_vm_08.png"></p>
+<p>[タグ] は何も指定せず，[確認と作成] をクリックします。</p>
+<p><img src="img/create_linux_vm_09.png" alt="img/create_linux_vm_09.png"></p>
+<p>[作成] をクリックします。</p>
+<p><img src="img/create_linux_vm_10.png" alt="img/create_linux_vm_10.png">
+<img src="img/create_linux_vm_11.png" alt="img/create_linux_vm_11.png">
+<img src="img/create_linux_vm_12.png" alt="img/create_linux_vm_12.png">
+<img src="img/create_linux_vm_13.png" alt="img/create_linux_vm_13.png"></p>
+<h2 id="vm-接続">VM 接続</h2>
+<p>[Azure サービス] の [Virtual Machines] をクリックします。<br>
+VM 一覧画面で接続したい VM をクリックします（今回は ）。</p>
+<p><img src="img/vm_login_00.png" alt="img/vm_login_00.png"></p>
+<p>[接続] の [Bastion] をクリックします。</p>
+<p><img src="img/vm_login_01.png" alt="img/vm_login_01.png"></p>
+<p>[Bastion を使用する] をクリックします。</p>
+<p><img src="img/vm_login_02.png" alt="img/vm_login_02.png"></p>
+<p>ユーザー名，パスワードを入力し [接続] をクリックします。</p>
+<p><img src="img/vm_login_03.png" alt="img/vm_login_03.png"></p>
+<p>以上で Bastion 経由で VM に接続できました。</p>
+<p><img src="img/vm_login_04.png" alt="img/vm_login_04.png"></p>
+<h2 id="ファイルストレージ利用">ファイルストレージ利用</h2>
+<p>[Azure サービス] の [ストレージアカウント] をクリックします。</p>
+<p><img src="img/storage_00.png" alt="img/storage_00.png"></p>
+<p>使用するストレージアカウントをクリックします。</p>
+<p><img src="img/storage_01.png" alt="img/storage_01.png"></p>
+<p>[File サービス] の [ファイル共有] をクリックします。</p>
+<p><img src="img/storage_02.png" alt="img/storage_02.png"></p>
+<p>[share] をクリックします。</p>
+<p><img src="img/storage_03.png" alt="img/storage_03.png"></p>
+<p>VM に配置したいファイルを [アップロード] でストレージにアップロードします。</p>
+<p><img src="img/storage_04.png" alt="img/storage_04.png"></p>
+<p>VM の /mnt/share にストレージをマウントしているので /mnt/share からファイルを適宜取得し利用します。</p>
+<p><img src="img/storage_05.png" alt="img/storage_05.png"></p>
+<h2 id="参考">参考</h2>
+<h3 id="linux-で-azure-files-の設定">Linux で Azure Files の設定</h3>
+<p>Windows では PowerShell コマンドを実行するだけで Azure Files の設定が完了します。<br>
+Linux では Shell コマンドを実行する前に cifs-utils をインストールする必要があります。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e"># cifs-utils を先にインストールする</span>
+yum install cifs-utils
+<span style="color:#75715e"># Azure Files 設定</span>
+sudo mkdir /mnt/share
+<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -d <span style="color:#e6db74">&#34;/etc/smbcredentials&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+sudo mkdir /etc/smbcredentials
+<span style="color:#66d9ef">fi</span>
+<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -f <span style="color:#e6db74">&#34;/etc/smbcredentials/sampleazurestorage.cred&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+    sudo bash -c <span style="color:#e6db74">&#39;echo &#34;username=sampleazurestorage&#34; &gt;&gt; /etc/smbcredentials/sampleazurestorage.cred&#39;</span>
+    sudo bash -c <span style="color:#e6db74">&#39;echo &#34;password=+S@mp1e@Zur3st0r@G3+S@mp1e@Zur3st0r@G3+S@mp1e@Zur3st0r@G3==&#34; &gt;&gt; /etc/smbcredentials/sampleazurestorage.cred&#39;</span>
+<span style="color:#66d9ef">fi</span>
+sudo chmod <span style="color:#ae81ff">600</span> /etc/smbcredentials/sampleazurestorage.cred
+
+sudo bash -c <span style="color:#e6db74">&#39;echo &#34;//sampleazurestorage.file.core.windows.net/share /mnt/share cifs nofail,vers=3.0,credentials=/etc/smbcredentials/sampleazurestorage.cred,dir_mode=0777,file_mode=0777,serverino&#34; &gt;&gt; /etc/fstab&#39;</span>
+sudo mount -t cifs //sampleazurestorage.file.core.windows.net/share /mnt/share -o vers<span style="color:#f92672">=</span>3.0,credentials<span style="color:#f92672">=</span>/etc/smbcredentials/sampleazurestorage.cred,dir_mode<span style="color:#f92672">=</span>0777,file_mode<span style="color:#f92672">=</span>0777,serverino
+</code></pre></div><h3 id="linux-でディスクサイズの拡張">Linux でディスクサイズの拡張</h3>
+<p><strong>Azure 上で VM のディスクサイズを拡張する</strong></p>
+<p>ポータル画面で [Virtual Machines] をクリックします。<br>
+VM をクリックします。<br>
+[ディスク] をクリックし拡張するディスクをクリックします。<br>
+[設定] の [サイズおよびパフォーマンス] をクリックします。<br>
+サイズを選択し [サイズ変更] をクリックします。</p>
+<p><strong>VM でファイルシステムを拡張する</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e"># 拡張するパーティションを確認します</span>
+&gt; lsblk -p -o NAME,FSTYPE,SIZE,MOUNTPOINT
+NAME                          FSTYPE       SIZE MOUNTPOINT
+/dev/sda                                   128G 
+├─/dev/sda1                   xfs          500M /boot
+├─/dev/sda2                   LVM2_member   63G 
+│ ├─/dev/mapper/rootvg-tmplv  xfs            2G /tmp
+│ ├─/dev/mapper/rootvg-usrlv  xfs           10G /usr
+│ ├─/dev/mapper/rootvg-homelv xfs            1G /home
+│ ├─/dev/mapper/rootvg-varlv  xfs            8G /var
+│ └─/dev/mapper/rootvg-rootlv xfs            2G /
+├─/dev/sda14                                 4M 
+└─/dev/sda15                  vfat         495M /boot/efi
+/dev/sdb                                    32G 
+└─/dev/sdb1                   ext4          32G /mnt
+<span style="color:#75715e"># cloud-utils-growpart をインストールします</span>
+&gt; sudo yum install -y cloud-utils-growpart
+Red Hat Enterprise Linux <span style="color:#ae81ff">8</span> <span style="color:#66d9ef">for</span> x86_64 - BaseOS - Extended Update Support from RHUI <span style="color:#f92672">(</span>RPMs<span style="color:#f92672">)</span>                                                                     3.8 kB/s | 2.4 kB     00:00    
+Red Hat Enterprise Linux <span style="color:#ae81ff">8</span> <span style="color:#66d9ef">for</span> x86_64 - AppStream - Extended Update Support from RHUI <span style="color:#f92672">(</span>RPMs<span style="color:#f92672">)</span>                                                                  3.9 kB/s | 2.8 kB     00:00    
+Microsoft Azure RPMs <span style="color:#66d9ef">for</span> RHEL8 Extended Update Support                                                                                                        7.2 kB/s | 2.1 kB     00:00    
+Package cloud-utils-growpart-0.31-1.el8.noarch is already installed.
+Dependencies resolved.
+Nothing to <span style="color:#66d9ef">do</span>.
+Complete!
+<span style="color:#75715e"># パーティションを拡張します</span>
+&gt; sudo growpart /dev/sda <span style="color:#ae81ff">2</span>
+CHANGED: partition<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> start<span style="color:#f92672">=</span><span style="color:#ae81ff">2050048</span> old: size<span style="color:#f92672">=</span><span style="color:#ae81ff">132165632</span> end<span style="color:#f92672">=</span><span style="color:#ae81ff">134215680</span> new: size<span style="color:#f92672">=</span><span style="color:#ae81ff">266385375</span> end<span style="color:#f92672">=</span><span style="color:#ae81ff">268435423</span>
+<span style="color:#75715e"># 物理ボリュームをリサイズします</span>
+&gt; sudo pvresize /dev/sda2
+  Physical volume <span style="color:#e6db74">&#34;/dev/sda2&#34;</span> changed
+  <span style="color:#ae81ff">1</span> physical volume<span style="color:#f92672">(</span>s<span style="color:#f92672">)</span> resized or updated / <span style="color:#ae81ff">0</span> physical volume<span style="color:#f92672">(</span>s<span style="color:#f92672">)</span> not resized
+<span style="color:#75715e"># 領域を確認する</span>
+sudo vgs
+  VG     <span style="color:#75715e">#PV #LV #SN Attr   VSize    VFree   </span>
+  rootvg   <span style="color:#ae81ff">1</span>   <span style="color:#ae81ff">5</span>   <span style="color:#ae81ff">0</span> wz--n- &lt;127.02g &lt;104.02g
+<span style="color:#75715e"># 論理ボリュームを拡張します</span>
+&gt; sudo lvextend -l +100%FREE /dev/rootvg/rootlv
+  Size of logical volume rootvg/rootlv changed from 2.00 GiB <span style="color:#f92672">(</span><span style="color:#ae81ff">512</span> extents<span style="color:#f92672">)</span> to &lt;106.02 GiB <span style="color:#f92672">(</span><span style="color:#ae81ff">27141</span> extents<span style="color:#f92672">)</span>.
+  Logical volume rootvg/rootlv successfully resized.
+<span style="color:#75715e"># ファイルシステムを拡張します</span>
+&gt; sudo xfs_growfs /
+meta-data<span style="color:#f92672">=</span>/dev/mapper/rootvg-rootlv isize<span style="color:#f92672">=</span><span style="color:#ae81ff">512</span>    agcount<span style="color:#f92672">=</span>4, agsize<span style="color:#f92672">=</span><span style="color:#ae81ff">131072</span> blks
+         <span style="color:#f92672">=</span>                       sectsz<span style="color:#f92672">=</span><span style="color:#ae81ff">4096</span>  attr<span style="color:#f92672">=</span>2, projid32bit<span style="color:#f92672">=</span>1
+         <span style="color:#f92672">=</span>                       crc<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>        finobt<span style="color:#f92672">=</span>1, sparse<span style="color:#f92672">=</span>1, rmapbt<span style="color:#f92672">=</span>0
+         <span style="color:#f92672">=</span>                       reflink<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+data     <span style="color:#f92672">=</span>                       bsize<span style="color:#f92672">=</span><span style="color:#ae81ff">4096</span>   blocks<span style="color:#f92672">=</span>524288, imaxpct<span style="color:#f92672">=</span>25
+         <span style="color:#f92672">=</span>                       sunit<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>      swidth<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> blks
+naming   <span style="color:#f92672">=</span>version <span style="color:#ae81ff">2</span>              bsize<span style="color:#f92672">=</span><span style="color:#ae81ff">4096</span>   ascii-ci<span style="color:#f92672">=</span>0, ftype<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+log      <span style="color:#f92672">=</span>internal log           bsize<span style="color:#f92672">=</span><span style="color:#ae81ff">4096</span>   blocks<span style="color:#f92672">=</span>2560, version<span style="color:#f92672">=</span>2
+         <span style="color:#f92672">=</span>                       sectsz<span style="color:#f92672">=</span><span style="color:#ae81ff">4096</span>  sunit<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> blks, lazy-count<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+realtime <span style="color:#f92672">=</span>none                   extsz<span style="color:#f92672">=</span><span style="color:#ae81ff">4096</span>   blocks<span style="color:#f92672">=</span>0, rtextents<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+data blocks changed from <span style="color:#ae81ff">524288</span> to <span style="color:#ae81ff">27792384</span>
+<span style="color:#75715e"># ルートディレクトリのサイズを確認します</span>
+df -hT /
+Filesystem                Type  Size  Used Avail Use% Mounted on
+/dev/mapper/rootvg-rootlv xfs   107G  829M  106G   1% /
+</code></pre></div></div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

@@ -54,6 +54,46 @@ Path To MSBuild.exe: msbuild.exe Executing the command cmd.exe /C &amp;#34; msbu
     </item>
     
     <item>
+      <title>Authenticator 追加</title>
+      <link>https://mktkdyt.github.io/post/azure/authenticator%E8%BF%BD%E5%8A%A0/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/authenticator%E8%BF%BD%E5%8A%A0/</guid>
+      <description>Azure ポータルにログインします。
+右上のアカウントをクリックし，[アカウントを表示] をクリックします。
+[セキュリティ情報] をクリックします。
+[方法の追加] をクリックします。
+[認証アプリ] を選択し [追加] をクリックします。
+自分のスマートフォンに Microsoft Authenticator をインストールします。
+[次へ] をクリックします。
+Microsoft Authenticator を起動し右上の [+] から [職場または学校アカウント] をタップします。 [次へ] をクリックします。
+Microsoft Authenticator で [QR コードをスキャン] をタップし画面の QR コードを読み取ります。 [次へ] をクリックします。
+Microsoft Authenticator で承認します。
+[次へ] をクリックします。
+サインイン方法が追加されます。</description>
+    </item>
+    
+    <item>
+      <title>Azure Files 設定手順</title>
+      <link>https://mktkdyt.github.io/post/azure/azure-files%E8%A8%AD%E5%AE%9A/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/azure-files%E8%A8%AD%E5%AE%9A/</guid>
+      <description>概要 Azure Files は Azure でファイル共有を可能にするサービスです。
+仮想マシンにストレージアカウントをマウントさせることが出来ます。
+手順 Azure のポータル画面で [ストレージアカウント] をクリックします。
+ファイル共有したい [ストレージアカウント] をクリックします。
+[File サービス]/[ファイル共有] をクリックします。
+[＋ファイル共有] をクリックします。
+下記内容を入力し [作成] をクリックします。
+   項目 設定     名前 share   クォータ 20   層 トランザクションが最適化されました    作成したファイル共有をクリックします。
+[接続] をクリックします。
+PowerShell コマンドをコピーします。
+仮想マシンに接続し PowerShell コマンドを実行します。
+再起動しても自動的にマウントされるようになります。</description>
+    </item>
+    
+    <item>
       <title>Azure のストレージアカウント情報を調べる</title>
       <link>https://mktkdyt.github.io/post/azure/%E3%82%B9%E3%83%88%E3%83%AC%E3%83%BC%E3%82%B8%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E6%83%85%E5%A0%B1%E5%8F%96%E5%BE%97/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
@@ -63,6 +103,32 @@ Path To MSBuild.exe: msbuild.exe Executing the command cmd.exe /C &amp;#34; msbu
 ストレージアカウントを表示します。
 ストレージアカウントを選択します。
 アクセスキーを表示します。</description>
+    </item>
+    
+    <item>
+      <title>Azure 環境構築 index</title>
+      <link>https://mktkdyt.github.io/post/azure/azure%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89index/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/azure%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89index/</guid>
+      <description> リソースグループを追加する  サブスクリプションにリソースグループを追加し仮想マシンやストレージなどのリソースを追加出来るようにします。   仮想ネットワークを追加する  Azure 上でネットワークを構築します。   ストレージアカウントを追加する  ローカルと Azure 上の仮想マシンでファイルをやり取りするためのストレージを用意します。   仮想マシンを追加する  Azure 上に仮想マシンを構築します。   SQL 仮想マシンを追加する  Azure 上に SQL Server を載せた仮想マシンを構築します。   Bastion を追加する  Web ブラウザで Azure のポータルから Azure の仮想マシンに接続出来るようにします。   Azure Files を追加する  Azure の仮想マシンでストレージをマウントしローカルとファイルをやり取り出来るようにします。   SSMS を日本語化する  Azure で SQL Server を含む仮想マシンを構築すると英語版の SSMS がプリインストールされてしまうため日本語化したい場合は追加で設定が必要です。   クォータ上限を引き上げる  Azure ではコア数の上限をクォータといい性能評価でマシンサイズを上げるときにクォータ上限の引き上げをサポート経由で依頼する必要があります。   Authenticator 追加  Azure のアカウントに Microsoft Authenticator で二要素認証出来るようにします。    </description>
+    </item>
+    
+    <item>
+      <title>Bastion 追加手順</title>
+      <link>https://mktkdyt.github.io/post/azure/bastion%E8%BF%BD%E5%8A%A0/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/bastion%E8%BF%BD%E5%8A%A0/</guid>
+      <description>概要 Web ブラウザで Azure のポータルから Azure の仮想マシンに接続出来るサービスです。
+手順 サブネット構築 Azure のポータル画面で [仮想ネットワーク] をクリックします。
+サブネットを追加したい仮想ネットワークをクリックします。
+[＋サブネット] をクリックします。
+下記内容を入力し [保存] をクリックします。
+名前は必ず AzureBastionSubnet とします。
+   項目 設定     名前 AzureBastionSubnet   サブネット アドレス範囲 10.0.1.0/24   IPv6 アドレス空間の追加 無効   サービス 未選択   サブネットをサービスに委任 なし    Bastion 構築 Azure のポータル画面で [Bastion] をクリックし [＋追加] をクリックします。
+下記内容を入力し [確認と作成] をクリックします。 ${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを指定します。
+   項目 設定     サブスクリプション ${SubscriptionName}   リソースグループ ${ResourceGroupName}   名前 ${ResourceGroupName}-vnet-bastion   場所 東日本   仮想ネットワーク ${ResourceGroupName}-vnet   サブネット AzureBastionSubnet(10.</description>
     </item>
     
     <item>
@@ -79,6 +145,31 @@ using System.Web.Optimization; public class Global : HttpApplication { void Appl
 @using System.Web.Optimization &amp;lt;head&amp;gt; @Scripts.Render(&amp;#34;~/bundles/jquery&amp;#34;) @Scripts.Render(&amp;#34;~/bundles/hoge&amp;#34;) &amp;lt;/head&amp;gt; 結果
 &amp;lt;head&amp;gt; &amp;lt;script src=&amp;#34;/map/scripts/jquery?v=WvOgJns1M1ZZkySVvxnR5qZTgNQ_UWnAsm21lcWbuMs1&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;script src=&amp;#34;/map/scripts/hoge?v=fsiac-cyztW0v5rUgi-a9vvPTsOHXerrhW6x3w1IiHw1&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;/head&amp;gt; ソースのパスをBundleConfigにまとめることが出来ました． また、BundleConfigで{version}と指定することでライブラリのバージョンを更新しても気にする必要がなくなりました． 更に、結果のソースを見てみるとminifyされていることが分かります．
 var hoge=function(){function n(){}return n.</description>
+    </item>
+    
+    <item>
+      <title>CloudBerry Explorer インストール手順</title>
+      <link>https://mktkdyt.github.io/post/azure/cloudberryexplorer%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/cloudberryexplorer%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86/</guid>
+      <description>インストーラー実行 インストーラーを起動します。 [Next] をクリックします。
+[I Agree] をクリックします。
+[Install] をクリックします。
+[Finish] をクリックします。
+Freeware edition を選択し [Next] をクリックします。
+ダイアログが出たら [OK] をクリックします。
+もう一度 [Next] をクリックします。
+[Proxy Setting] をクリックします。
+プロキシを設定する必要がある場合は [Manual proxy configuration] をチェックし Address，Port を指定します。
+プロキシ認証が必要な場合は [Use authenticvation] をチェックしプロキシ認証で使用しているユーザ，パスワードを入力し [OK] をクリックします。
+[Start Freeware] をクリックします。
+CloudBerry Explorer を Azure ストレージアカウントに接続する [Azure File] をダブルクリックします。
+Azure のストレージアカウントの情報を入力します。
+入力内容はプロジェクトごとに異なるので管理者に聞きましょう。
+入力したら [Test Connection] で接続出来るか確認し問題なければ [OK] をクリックします。
+以上で Azure のストレージアカウントに接続しローカルのファイルを Azure に移動することが出来るようになります。
+左にローカルのディレクトリを，右に Azure のストレージアカウントを表示します。</description>
     </item>
     
     <item>
@@ -190,6 +281,17 @@ language=jalocales.add=jajmeter.save.saveservice.timestamp_format=yyyy/MM/dd H
       <guid>https://mktkdyt.github.io/post/log_analysis/kibana%E3%81%AE%E3%83%80%E3%83%83%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89%E3%82%92excel%E3%81%AB%E5%87%BA%E5%8A%9B%E3%81%99%E3%82%8B/</guid>
       <description>Kibana のダッシューボードを Excel に出力する Kibana のダッシュボードを Excel に出力する機能がないのでスクリプトで出力出来るようにした。
 概要  Kibana のグラフは一系列のものであれば CSV 出力することは出来るが，複数系列のもの（Timelion）は出力出来ない。 Kibana は Elasticsearch のデータを可視化しているので，Elasticsearch から直接データを持ってきて Excel に変換すれば自動化出来る。  手順 &amp;gt; wsl $ ./export.sh &amp;#34;2021-01-12T23:45:00.000Z&amp;#34; &amp;#34;2021-01-13T08:30:00.000Z&amp;#34; &amp;#34;20210113&amp;#34; $ ./generate_graph.py &amp;#34;20210113&amp;#34; Elasticsearch からデータを CSV 出力する  curl で Elasticsearch から集計結果を JSON で取得する jq で JSON を csv に変換する 系列が複数ある場合は awk | paste で CSV をマージする  ####################################### # Elasticsearch から Grafana で表示しているデータを抽出し CSV に出力する。 # Globals: # H: Elasticsearch に送信する HTTP リクエストの Content-Type。 # U: Elasticsaerch の URL。 # TIME_HHMM_REGEX: Elasticsearch のレスポンスから時間のみを抜き出す正規表現。 # Arguments: # $1: 検索対象開始日時。日本標準時の9時間前を指定すること。（例：2020-12-13T23:45:00.</description>
+    </item>
+    
+    <item>
+      <title>Linux 仮想マシン追加</title>
+      <link>https://mktkdyt.github.io/post/azure/linux%E4%BB%AE%E6%83%B3%E3%83%9E%E3%82%B7%E3%83%B3%E6%A7%8B%E7%AF%89/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/linux%E4%BB%AE%E6%83%B3%E3%83%9E%E3%82%B7%E3%83%B3%E6%A7%8B%E7%AF%89/</guid>
+      <description>目次  VM 追加 VM 接続 ファイルストレージ利用 参考  Linux で Azure Files の設定 Linux でディスクサイズの拡張    VM 追加 Azure のポータル画面で [Virtual Machines] をクリックし [＋追加] / [＋仮想マシン] をクリックします。
+[基本] で下記内容を入力します。 ${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを，${VirtualMachineName} には仮想マシン名を指定します。
+   項目 設定     サブスクリプション ${SubscriptionName}   リソースグループ ${ResourceGroupName}   仮想マシン名 ${VirtualMachineName}   地域 東日本   可用性オプション インフラストラクチャ冗長は必要ありません   イメージ 任意   サイズ 任意   ユーザー名 任意   パスワード 任意   パスワードの確認 任意   パブリック受信ポート なし    [ディスク] で下記内容を入力します。</description>
     </item>
     
     <item>
@@ -375,6 +477,30 @@ Solr Cloud では collection を 複数の shard に分けることでインデ�
 ZooKeeper は分散アプリケーションの管理をおこない，Solr Cloud において shard の replica が格納された Solr の各 node の状態を管理します．
 構成 ZooKeeper の構築はシェルでやることにしました．
 D:\vagrant\zk ┣Vagrantfile ┗create_zk.sh Vagrantfile  OS は CentOS 7 を使用します． プロビジョナでシェルを実行します．  Vagrant.configure(&amp;#34;2&amp;#34;) do |config| config.vm.box = &amp;#34;centos/7&amp;#34; config.vm.network &amp;#34;private_network&amp;#34;, ip: &amp;#34;192.168.33.10&amp;#34; config.vm.provision :shell, path: &amp;#34;.</description>
+    </item>
+    
+    <item>
+      <title>クォータ上限引き上げ手順</title>
+      <link>https://mktkdyt.github.io/post/azure/%E3%82%AF%E3%82%A9%E3%83%BC%E3%82%BF%E4%B8%8A%E9%99%90%E5%BC%95%E3%81%8D%E4%B8%8A%E3%81%92%E6%89%8B%E9%A0%86/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/%E3%82%AF%E3%82%A9%E3%83%BC%E3%82%BF%E4%B8%8A%E9%99%90%E5%BC%95%E3%81%8D%E4%B8%8A%E3%81%92%E6%89%8B%E9%A0%86/</guid>
+      <description>サブスクリプションごとに利用出来るコア数に上限があります。
+Azure ではコア数の上限をクォータといい性能評価でマシンサイズを上げるときにクォータ上限の引き上げをサポート経由で依頼する必要があります。
+[ヘルプとサポート] をクリックします。
+[新しいサポートリクエスト] をクリックします。
+[問題の種類] で [サービスとサブスクリプションの制限(クォータ)] を選択します。
+[サブスクリプション] で対象のサブスクリプションを選択します。
+[クォータの種類] で [コンピューティング-VM(コア-vCPU)のサブスクリプション上限の増加] を選択します。
+[次へ: ソリューション &amp;raquo;] をクリックします。
+[詳細を入力] をクリックします。
+[場所] で [(Asia Pacific)東日本] を選択します。
+[Standard] で [FSv2 Series] を選択します。
+[新しい vCPU の制限] で必要なコア数を入力します。 [保存してから続ける] をクリックします。
+[ご希望の連絡応報] で [メール] を選択します。
+[サポート言語] で [日本語] を選択します。
+[次へ: 確認および作成 &amp;raquo;] をクリックします。
+[作成] をクリックします。</description>
     </item>
     
     <item>
