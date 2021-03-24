@@ -54,6 +54,18 @@ Path To MSBuild.exe: msbuild.exe Executing the command cmd.exe /C &amp;#34; msbu
     </item>
     
     <item>
+      <title>Azure のストレージアカウント情報を調べる</title>
+      <link>https://mktkdyt.github.io/post/azure/%E3%82%B9%E3%83%88%E3%83%AC%E3%83%BC%E3%82%B8%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E6%83%85%E5%A0%B1%E5%8F%96%E5%BE%97/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/%E3%82%B9%E3%83%88%E3%83%AC%E3%83%BC%E3%82%B8%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E6%83%85%E5%A0%B1%E5%8F%96%E5%BE%97/</guid>
+      <description>Azure のポータル画面を表示します。
+ストレージアカウントを表示します。
+ストレージアカウントを選択します。
+アクセスキーを表示します。</description>
+    </item>
+    
+    <item>
       <title>Bundle と Minify</title>
       <link>https://mktkdyt.github.io/post/asp_dot_net/bundle%E3%81%A8minify/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
@@ -283,6 +295,38 @@ D:\vagrant\solr-standalone ┣Vagrantfile ┗create_solr.sh Vagrantfile  OS は 
     </item>
     
     <item>
+      <title>SQL 仮想マシン追加手順</title>
+      <link>https://mktkdyt.github.io/post/azure/sql%E4%BB%AE%E6%83%B3%E3%83%9E%E3%82%B7%E3%83%B3%E8%BF%BD%E5%8A%A0/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/sql%E4%BB%AE%E6%83%B3%E3%83%9E%E3%82%B7%E3%83%B3%E8%BF%BD%E5%8A%A0/</guid>
+      <description>概要 Azure で SQL Server を載せる仮想マシンを追加する場合，SQL 仮想マシンを作成します。
+手順 Azure のポータル画面で [SQL 仮想マシン] をクリックし [＋追加] をクリックします。
+[SQL 仮想マシン] でイメージを選択し [作成] をクリックします。
+[基本] で下記内容を入力します。 ${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを，${VirtualMachineName} には仮想マシン名を指定します。
+   項目 設定     サブスクリプション ${SubscriptionName}   リソースグループ ${ResourceGroupName}   仮想マシン名 ${VirtualMachineName}   地域 東日本   可用性オプション インフラストラクチャ冗長は必要ありません   イメージ 任意   サイズ 任意   ユーザー名 任意   パスワード 任意   パスワードの確認 任意   パブリック受信ポート なし    [ディスク] で下記内容を入力します。</description>
+    </item>
+    
+    <item>
+      <title>SSMS 日本語化手順</title>
+      <link>https://mktkdyt.github.io/post/azure/ssms%E6%97%A5%E6%9C%AC%E8%AA%9E%E5%8C%96/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/ssms%E6%97%A5%E6%9C%AC%E8%AA%9E%E5%8C%96/</guid>
+      <description>英語版 SSMS アンインストール Azure で SQL Server を含むイメージをデプロイすると英語版の SSMS がプリインストールされてしまうためこれをアンインストールする必要があります。
+[コントロールパネル] / [プログラムと機能] で SQL Server Management Studio をアンインストールします。
+日本語版 SSMS インストール https://docs.microsoft.com/ja-jp/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver15 にアクセスし [使用出来る言語] で日本語をクリックし日本語版のインストーラをダウンロードします。
+日本語版のインストーラを実行します。
+日本語版インストール前に SSMS を実行していない場合
+日本語で表示されます。
+日本語版インストール前に SSMS を実行した場合
+英語で表示されてしまうため，日本語で表示されるように設定する必要があります。
+[Tools] / [Options] をクリックします。
+[Environment] / [International Settings] で Language を日本語にします。
+日本語で表示されるようになります。</description>
+    </item>
+    
+    <item>
       <title>WinRM(Windows Remote Management)設定手順</title>
       <link>https://mktkdyt.github.io/post/performance_evaluation/winrmwindowsremotemanagement%E8%A8%AD%E5%AE%9A%E6%89%8B%E9%A0%86/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
@@ -371,6 +415,20 @@ bundles.Add(new StyleBundle(&amp;#34;~/lib/jqueryui/css&amp;#34;).Include(&amp;#
     </item>
     
     <item>
+      <title>ストレージアカウント追加手順</title>
+      <link>https://mktkdyt.github.io/post/azure/%E3%82%B9%E3%83%88%E3%83%AC%E3%83%BC%E3%82%B8%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E8%BF%BD%E5%8A%A0/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/%E3%82%B9%E3%83%88%E3%83%AC%E3%83%BC%E3%82%B8%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E8%BF%BD%E5%8A%A0/</guid>
+      <description>概要 ストレージアカウントを追加することでストレージアカウント経由で Azure の仮想マシンとデータの受け渡しが可能になります。
+手順 Azure のポータル画面で [ストレージアカウント] をクリックし [＋追加] をクリックします。
+下記内容を入力し [確認と作成] をクリックします。 ${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを指定します。 ${resourcegroupname} には ${ResourceGroupName} をすべて小文字にした文字列を指定します。
+[基本] で下記内容を入力します。
+   項目 設定     サブスクリプション ${SubscriptionName}   リソースグループ ${ResourceGroupName}   ストレージアカウント名 ${resourcegroupname}   場所 東日本   パフォーマンス Standard   アカウントの種類 StorageV2 (汎用 v2)   レプリケーション 読み取りアクセス地理冗長ストレージ (RA-GRS)    [ネットワーク] で下記内容を入力します。
+   項目 設定     接続方法 パブリックエンドポイント (すべてのネットワーク)   ルーティングの優先順位 Microsoft ネットワークルーティング    [データ保護] で下記内容を入力します。</description>
+    </item>
+    
+    <item>
       <title>パフォーマンスモニター設定手順</title>
       <link>https://mktkdyt.github.io/post/performance_evaluation/%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%BC%E8%A8%AD%E5%AE%9A%E6%89%8B%E9%A0%86/</link>
       <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
@@ -419,6 +477,43 @@ Web.config
       
       <guid>https://mktkdyt.github.io/post/performance_evaluation/%E3%83%A1%E3%83%88%E3%83%AA%E3%82%AF%E3%82%B9%E7%9B%A3%E8%A6%96%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E6%89%8B%E9%A0%86/</guid>
       <description>メトリクス監視環境構築手順  JMeter を CUI で実行している際の JMeter のメトリクスを Grafana で可視化します。 Windows Server のメトリクスを Grafana で可視化します。   メトリクス監視環境構築手順  概要 Telegraf  インストール telegraf.conf 起動 サービス化 サービス起動／停止   Docker コンテナ作成  ディレクトリ influxdb.conf docker-compose.yml コンテナ作成 コンテナ停止 コンテナ開始   InfluxDB  動作確認 DB 作成   Grafana  管理者作成 サーバメトリクス取得設定  data source 追加 フォルダ作成 Dashboard 作成   JMeter メトリクス取得設定  data source 追加 Dashboard 追加     JMeter シナリオ編集  Backend Listener 追加      概要    ソフト 内容     InfluxDB 時系列 DB です。メトリクスをここで収集します。   Grafana 様々なデータソースを可視化する GUI ツールです。   Telegraf 様々なメトリクスを InfluxDB に収集するコレクタです。     JMeter のメトリクスを InfluxDB に流し，Grafana で可視化します。  JMeter -&amp;gt; InfluxDB -&amp;gt; Grafana   対象の Windows に Telegraf をインストールし，Telegraf から Windows のメトリクスを InfluxDB に流し，Grafana で可視化します。  Telegraf -&amp;gt; InfluxDB -&amp;gt; Grafana    Telegraf パフォーマンスを見たい Windows にインストールします。</description>
+    </item>
+    
+    <item>
+      <title>リソースグループ追加手順</title>
+      <link>https://mktkdyt.github.io/post/azure/%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%B0%E3%83%AB%E3%83%BC%E3%83%97%E8%BF%BD%E5%8A%A0/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%B0%E3%83%AB%E3%83%BC%E3%83%97%E8%BF%BD%E5%8A%A0/</guid>
+      <description>概要 Azure ではサブスクリプションにリソースグループを追加しリソースグループに仮想マシンやストレージアカウント等のリソースを追加します。
+手順 Azure のポータル画面で [リソースグループ] をクリックし　[＋追加] をクリックします。
+下記内容を入力し [タグ] をクリックします。 ${SubscriptionName} にはサブスクリプションを，${ResourceGroupName} にはリソースグループを指定します。
+   項目 設定     サブスクリプション ${SubscriptionName}   リソースグループ ${ResourceGroupName}   リージョン 東日本    タグは空欄のまま [確認および作成] をクリックします。
+[作成] をクリックします。</description>
+    </item>
+    
+    <item>
+      <title>仮想ネットワーク追加手順</title>
+      <link>https://mktkdyt.github.io/post/azure/%E4%BB%AE%E6%83%B3%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%BF%BD%E5%8A%A0/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/%E4%BB%AE%E6%83%B3%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%BF%BD%E5%8A%A0/</guid>
+      <description>概要 Azure のデータセンター内にプライベートネットワークを構築することが出来ます。
+手順 Azure のポータル画面で [仮想ネットワーク] をクリックし [＋追加] をクリックします。
+下記内容を入力し [確認と作成] をクリックします。 ${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを指定します。
+   項目 設定     サブスクリプション ${SubscriptionName}   リソースグループ ${ResourceGroupName}   名前 ${ResourceGroupName}-vnet   地域 東日本   アドレス空間 10.0.0.0/16   アドレス空間 CIDR ブロック 10.0.0.0/16   サブネット名 default   サブネット CIDR ブロック 10.0.0.0/24   BastionHost 無効化   DDoS Protection Standard 無効化   ファイアウォール 無効化    [作成] をクリックします。</description>
+    </item>
+    
+    <item>
+      <title>仮想マシン追加手順</title>
+      <link>https://mktkdyt.github.io/post/azure/%E4%BB%AE%E6%83%B3%E3%83%9E%E3%82%B7%E3%83%B3%E8%BF%BD%E5%8A%A0/</link>
+      <pubDate>Thu, 14 Jan 2021 17:24:23 +0900</pubDate>
+      
+      <guid>https://mktkdyt.github.io/post/azure/%E4%BB%AE%E6%83%B3%E3%83%9E%E3%82%B7%E3%83%B3%E8%BF%BD%E5%8A%A0/</guid>
+      <description>概要 Azure で仮想マシンを作成します。
+手順 Azure のポータル画面で [Virtual Machines] をクリックし [＋追加] / [＋仮想マシン] をクリックします。
+[基本] で下記内容を入力します。 ${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを，${VirtualMachineName} には仮想マシン名を指定します。
+   項目 設定     サブスクリプション ${SubscriptionName}   リソースグループ ${ResourceGroupName}   仮想マシン名 ${VirtualMachineName}   地域 東日本   可用性オプション インフラストラクチャ冗長は必要ありません   イメージ 任意   サイズ 任意   ユーザー名 任意   パスワード 任意   パスワードの確認 任意   パブリック受信ポート なし    [ディスク] で下記内容を入力します。</description>
     </item>
     
     <item>

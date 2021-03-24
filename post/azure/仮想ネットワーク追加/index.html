@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title></title>
+        <title>仮想ネットワーク追加手順</title>
         
         <style>
 
@@ -54,9 +54,6 @@
 <script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
  <meta name="generator" content="Hugo 0.80.0" />
         
-            <link href="https://mktkdyt.github.io/index.xml" rel="alternate" type="application/rss&#43;xml" title="mktkdyt" />
-            <link href="https://mktkdyt.github.io/index.xml" rel="feed" type="application/rss&#43;xml" title="mktkdyt" />
-        
 
         
 
@@ -74,7 +71,7 @@
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand visible-xs" href="#"></a>
+                    <a class="navbar-brand visible-xs" href="#">仮想ネットワーク追加手順</a>
                     <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
@@ -90,23 +87,91 @@
 
 
 <main>
-    <div class="intro">
+
+    <div>
+        <h2>仮想ネットワーク追加手順</h2>
+        <h5>January 14, 2021</h5>
         
-        <h1>mktkdyt</h1>
-        <h2></h2>
-         <div class="homepage-content text-justify"><h2 id="post">Post</h2>
-<ul>
-<li><a href="https://mktkdyt.github.io/post/bigdata">ビッグデータ分析</a></li>
-<li><a href="https://mktkdyt.github.io/post/full_text_search">全文検索</a></li>
-<li><a href="https://mktkdyt.github.io/post/machine_learning">機械学習</a></li>
-<li><a href="https://mktkdyt.github.io/post/performance_evaluation">性能評価</a></li>
-<li><a href="https://mktkdyt.github.io/post/asp_dot_net">ASP.NET</a></li>
-<li><a href="https://mktkdyt.github.io/post/log_analysis">ログ分析</a></li>
-<li><a href="https://mktkdyt.github.io/post/openlayers">OpenLayers</a></li>
-<li><a href="https://mktkdyt.github.io/post/azure">Azure</a></li>
-</ul>
-</div> 
+
     </div>
+
+    <div align="start" class="content"><h2 id="概要">概要</h2>
+<p>Azure のデータセンター内にプライベートネットワークを構築することが出来ます。</p>
+<h2 id="手順">手順</h2>
+<p>Azure のポータル画面で [仮想ネットワーク] をクリックし [＋追加] をクリックします。</p>
+<p><img src="img/virtual_network_00.png" alt="img/virtual_network_00.png"></p>
+<p>下記内容を入力し [確認と作成] をクリックします。
+${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを指定します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>サブスクリプション</td>
+<td>${SubscriptionName}</td>
+</tr>
+<tr>
+<td>リソースグループ</td>
+<td>${ResourceGroupName}</td>
+</tr>
+<tr>
+<td>名前</td>
+<td>${ResourceGroupName}-vnet</td>
+</tr>
+<tr>
+<td>地域</td>
+<td>東日本</td>
+</tr>
+<tr>
+<td>アドレス空間</td>
+<td>10.0.0.0/16</td>
+</tr>
+<tr>
+<td>アドレス空間 CIDR ブロック</td>
+<td>10.0.0.0/16</td>
+</tr>
+<tr>
+<td>サブネット名</td>
+<td>default</td>
+</tr>
+<tr>
+<td>サブネット CIDR ブロック</td>
+<td>10.0.0.0/24</td>
+</tr>
+<tr>
+<td>BastionHost</td>
+<td>無効化</td>
+</tr>
+<tr>
+<td>DDoS Protection Standard</td>
+<td>無効化</td>
+</tr>
+<tr>
+<td>ファイアウォール</td>
+<td>無効化</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/virtual_network_01.png" alt="img/virtual_network_01.png">
+<img src="img/virtual_network_02.png" alt="img/virtual_network_02.png">
+<img src="img/virtual_network_03.png" alt="img/virtual_network_03.png">
+<img src="img/virtual_network_04.png" alt="img/virtual_network_04.png"></p>
+<p>[作成] をクリックします。</p>
+<p><img src="img/virtual_network_05.png" alt="img/virtual_network_05.png">
+<img src="img/virtual_network_06.png" alt="img/virtual_network_06.png"></p>
+</div>
+
+    
+    
+    
+
+    
+    
+
 </main>
 
         <footer>

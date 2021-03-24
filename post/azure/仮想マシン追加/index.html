@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>仮想マシン追加手順</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">仮想マシン追加手順</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>仮想マシン追加手順</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h2 id="概要">概要</h2>
+<p>Azure で仮想マシンを作成します。</p>
+<h2 id="手順">手順</h2>
+<p>Azure のポータル画面で [Virtual Machines] をクリックし [＋追加] / [＋仮想マシン] をクリックします。</p>
+<p><img src="img/create_vm_00.png" alt="img/create_vm_00.png"></p>
+<p>[基本] で下記内容を入力します。
+${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを，${VirtualMachineName} には仮想マシン名を指定します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>サブスクリプション</td>
+<td>${SubscriptionName}</td>
+</tr>
+<tr>
+<td>リソースグループ</td>
+<td>${ResourceGroupName}</td>
+</tr>
+<tr>
+<td>仮想マシン名</td>
+<td>${VirtualMachineName}</td>
+</tr>
+<tr>
+<td>地域</td>
+<td>東日本</td>
+</tr>
+<tr>
+<td>可用性オプション</td>
+<td>インフラストラクチャ冗長は必要ありません</td>
+</tr>
+<tr>
+<td>イメージ</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>サイズ</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>ユーザー名</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>パスワード</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>パスワードの確認</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>パブリック受信ポート</td>
+<td>なし</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_vm_01.png" alt="img/create_vm_01.png">
+<img src="img/create_vm_02.png" alt="img/create_vm_02.png"></p>
+<p>[ディスク] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OS ディスクの種類</td>
+<td>任意</td>
+</tr>
+<tr>
+<td>暗号化の種類</td>
+<td>規定</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_vm_03.png" alt="img/create_vm_03.png"></p>
+<p>[ネットワーク] で下記内容を入力します。
+${VirtualNetworkName} には仮想ネットワークを，${VirtualMachineName} には仮想マシン名を指定します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>仮想ネットワーク</td>
+<td>${VirtualNetworkName}</td>
+</tr>
+<tr>
+<td>サブネット</td>
+<td>default(10.0.0.0./24)</td>
+</tr>
+<tr>
+<td>パブリック IP</td>
+<td>(新規) ${VirtualMachineName}-ip</td>
+</tr>
+<tr>
+<td>NIC ネットワークセキュリティグループ</td>
+<td>Basic</td>
+</tr>
+<tr>
+<td>パブリック受信ポート</td>
+<td>なし</td>
+</tr>
+<tr>
+<td>高速ネットワーク</td>
+<td>有効</td>
+</tr>
+<tr>
+<td>負荷分散</td>
+<td>無効</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_vm_04.png" alt="img/create_vm_04.png">
+<img src="img/create_vm_05.png" alt="img/create_vm_05.png"></p>
+<p>[管理] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ブート診断</td>
+<td>マネージドストレージアカウントで有効にする (推奨)</td>
+</tr>
+<tr>
+<td>OS のゲスト診断を有効にする</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>システム割当マネージド ID</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>自動シャットダウン</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>バックアップ</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>パッチのインストール</td>
+<td>OS によって調整されるパッチ</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_vm_06.png" alt="img/create_vm_06.png"></p>
+<p>[詳細] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ホストグループ</td>
+<td></td>
+</tr>
+<tr>
+<td>近接配置グループ</td>
+<td></td>
+</tr>
+<tr>
+<td>VM の生成</td>
+<td>Gen 2</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/create_vm_07.png" alt="img/create_vm_07.png">
+<img src="img/create_vm_08.png" alt="img/create_vm_08.png"></p>
+<p>[タグ] は何も指定せず，[確認と作成] をクリックします。</p>
+<p><img src="img/create_vm_09.png" alt="img/create_vm_09.png"></p>
+<p>[作成] をクリックします。</p>
+<p><img src="img/create_vm_10.png" alt="img/create_vm_10.png">
+<img src="img/create_vm_11.png" alt="img/create_vm_11.png">
+<img src="img/create_vm_12.png" alt="img/create_vm_12.png">
+<img src="img/create_vm_13.png" alt="img/create_vm_13.png"></p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

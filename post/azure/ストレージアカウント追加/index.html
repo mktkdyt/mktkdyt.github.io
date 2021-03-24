@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ストレージアカウント追加手順</title>
+        
+        <style>
+
+    html body {
+        font-family: '', sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: #2196F3;
+        --border-width:  0 ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://mktkdyt.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.80.0" />
+        
+
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">ストレージアカウント追加手順</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>ストレージアカウント追加手順</h2>
+        <h5>January 14, 2021</h5>
+        
+
+    </div>
+
+    <div align="start" class="content"><h2 id="概要">概要</h2>
+<p>ストレージアカウントを追加することでストレージアカウント経由で Azure の仮想マシンとデータの受け渡しが可能になります。</p>
+<h2 id="手順">手順</h2>
+<p>Azure のポータル画面で [ストレージアカウント] をクリックし [＋追加] をクリックします。</p>
+<p><img src="img/storage_account_00.png" alt="img/storage_account_00.png"></p>
+<p>下記内容を入力し [確認と作成] をクリックします。
+${ResourceGroupName} にはリソースグループを，${SubscriptionName} にはサブスクリプションを指定します。
+${resourcegroupname} には ${ResourceGroupName} をすべて小文字にした文字列を指定します。</p>
+<p>[基本] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>サブスクリプション</td>
+<td>${SubscriptionName}</td>
+</tr>
+<tr>
+<td>リソースグループ</td>
+<td>${ResourceGroupName}</td>
+</tr>
+<tr>
+<td>ストレージアカウント名</td>
+<td>${resourcegroupname}</td>
+</tr>
+<tr>
+<td>場所</td>
+<td>東日本</td>
+</tr>
+<tr>
+<td>パフォーマンス</td>
+<td>Standard</td>
+</tr>
+<tr>
+<td>アカウントの種類</td>
+<td>StorageV2 (汎用 v2)</td>
+</tr>
+<tr>
+<td>レプリケーション</td>
+<td>読み取りアクセス地理冗長ストレージ (RA-GRS)</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/storage_account_01.png" alt="img/storage_account_01.png"></p>
+<p>[ネットワーク] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>接続方法</td>
+<td>パブリックエンドポイント (すべてのネットワーク)</td>
+</tr>
+<tr>
+<td>ルーティングの優先順位</td>
+<td>Microsoft ネットワークルーティング</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/storage_account_02.png" alt="img/storage_account_02.png"></p>
+<p>[データ保護] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>コンテナーのポイントインタイムリストアを有効にする</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>BLOB の論理的な削除を有効にする</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>コンテナーの論理的な削除を有効にする</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>ファイル共有の論理的な削除を有効にする</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>BLOB のバージョン管理を有効にする</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>BLOB の変更フィールドを有効にする</td>
+<td>無効</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/storage_account_03.png" alt="img/storage_account_03.png"></p>
+<p>[詳細] で下記内容を入力します。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>安全な転送が必須</td>
+<td>有効</td>
+</tr>
+<tr>
+<td>TLS の最小バージョン</td>
+<td>バージョン 1.2</td>
+</tr>
+<tr>
+<td>BLOB パブリックアクセスを許可する</td>
+<td>有効</td>
+</tr>
+<tr>
+<td>BLOB のアクセスレベル</td>
+<td>ホット</td>
+</tr>
+<tr>
+<td>階層構造の名前空間</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>大きいファイルの共有</td>
+<td>無効</td>
+</tr>
+<tr>
+<td>カスタマーマネージドキーのサポート</td>
+<td>無効</td>
+</tr>
+</tbody>
+</table>
+<p><img src="img/storage_account_04.png" alt="img/storage_account_04.png"></p>
+<p>[タグ] は何も指定せず，[確認と作成] をクリックします。</p>
+<p><img src="img/storage_account_05.png" alt="img/storage_account_05.png"></p>
+<p>[作成] をクリックします。</p>
+<p><img src="img/storage_account_06.png" alt="img/storage_account_06.png">
+<img src="img/storage_account_07.png" alt="img/storage_account_07.png">
+<img src="img/storage_account_08.png" alt="img/storage_account_08.png">
+<img src="img/storage_account_09.png" alt="img/storage_account_09.png"></p>
+</div>
+
+    
+    
+    
+
+    
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title></title>
+        <title>SSMS 日本語化手順</title>
         
         <style>
 
@@ -54,9 +54,6 @@
 <script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
  <meta name="generator" content="Hugo 0.80.0" />
         
-            <link href="https://mktkdyt.github.io/index.xml" rel="alternate" type="application/rss&#43;xml" title="mktkdyt" />
-            <link href="https://mktkdyt.github.io/index.xml" rel="feed" type="application/rss&#43;xml" title="mktkdyt" />
-        
 
         
 
@@ -74,7 +71,7 @@
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand visible-xs" href="#"></a>
+                    <a class="navbar-brand visible-xs" href="#">SSMS 日本語化手順</a>
                     <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
@@ -90,23 +87,45 @@
 
 
 <main>
-    <div class="intro">
+
+    <div>
+        <h2>SSMS 日本語化手順</h2>
+        <h5>January 14, 2021</h5>
         
-        <h1>mktkdyt</h1>
-        <h2></h2>
-         <div class="homepage-content text-justify"><h2 id="post">Post</h2>
-<ul>
-<li><a href="https://mktkdyt.github.io/post/bigdata">ビッグデータ分析</a></li>
-<li><a href="https://mktkdyt.github.io/post/full_text_search">全文検索</a></li>
-<li><a href="https://mktkdyt.github.io/post/machine_learning">機械学習</a></li>
-<li><a href="https://mktkdyt.github.io/post/performance_evaluation">性能評価</a></li>
-<li><a href="https://mktkdyt.github.io/post/asp_dot_net">ASP.NET</a></li>
-<li><a href="https://mktkdyt.github.io/post/log_analysis">ログ分析</a></li>
-<li><a href="https://mktkdyt.github.io/post/openlayers">OpenLayers</a></li>
-<li><a href="https://mktkdyt.github.io/post/azure">Azure</a></li>
-</ul>
-</div> 
+
     </div>
+
+    <div align="start" class="content"><h2 id="英語版-ssms-アンインストール">英語版 SSMS アンインストール</h2>
+<p>Azure で SQL Server を含むイメージをデプロイすると英語版の SSMS がプリインストールされてしまうためこれをアンインストールする必要があります。</p>
+<p>[コントロールパネル] / [プログラムと機能] で SQL Server Management Studio をアンインストールします。</p>
+<p><img src="img/ssms_jpn_00.png" alt="img/ssms_jpn_00.png">
+<img src="img/ssms_jpn_01.png" alt="img/ssms_jpn_01.png">
+<img src="img/ssms_jpn_02.png" alt="img/ssms_jpn_02.png"></p>
+<h2 id="日本語版-ssms-インストール">日本語版 SSMS インストール</h2>
+<p><a href="https://docs.microsoft.com/ja-jp/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver15">https://docs.microsoft.com/ja-jp/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver15</a> にアクセスし [使用出来る言語] で日本語をクリックし日本語版のインストーラをダウンロードします。</p>
+<p>日本語版のインストーラを実行します。</p>
+<p><img src="img/ssms_jpn_03.png" alt="img/ssms_jpn_03.png">
+<img src="img/ssms_jpn_04.png" alt="img/ssms_jpn_04.png"></p>
+<p><strong>日本語版インストール前に SSMS を実行していない場合</strong></p>
+<p>日本語で表示されます。</p>
+<p><img src="img/ssms_jpn_05.png" alt="img/ssms_jpn_05.png"></p>
+<p><strong>日本語版インストール前に SSMS を実行した場合</strong></p>
+<p>英語で表示されてしまうため，日本語で表示されるように設定する必要があります。</p>
+<p>[Tools] / [Options] をクリックします。</p>
+<p><img src="img/ssms_jpn_06.png" alt="img/ssms_jpn_06.png"></p>
+<p>[Environment] / [International Settings] で Language を日本語にします。</p>
+<p><img src="img/ssms_jpn_07.png" alt="img/ssms_jpn_07.png"></p>
+<p>日本語で表示されるようになります。</p>
+<p><img src="img/ssms_jpn_08.png" alt="img/ssms_jpn_08.png"></p>
+</div>
+
+    
+    
+    
+
+    
+    
+
 </main>
 
         <footer>
